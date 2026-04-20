@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import mimetypes
 import uuid
 from pathlib import Path
 from typing import Protocol
@@ -39,12 +40,19 @@ class SupabaseStorageAdapter:
         suffix = Path(upload.filename or "").suffix or ".jpg"
         file_key = f"spots/{uuid.uuid4().hex}{suffix}"
         binary = await upload.read()
+        normalized_content_type = (upload.content_type or "").strip().lower()
+        if (
+            not normalized_content_type
+            or normalized_content_type == "application/octet-stream"
+        ):
+            guessed, _ = mimetypes.guess_type(upload.filename or file_key)
+            normalized_content_type = guessed or "image/jpeg"
 
         upload_url = f"{self._base_url}/storage/v1/object/{self._bucket}/{file_key}"
         headers = {
             "apikey": self._service_key,
             "Authorization": f"Bearer {self._service_key}",
-            "Content-Type": upload.content_type or "application/octet-stream",
+            "Content-Type": normalized_content_type,
             "x-upsert": "false",
         }
         async with httpx.AsyncClient(timeout=20.0) as client:
