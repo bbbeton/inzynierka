@@ -49,10 +49,18 @@ class SupabaseStorageAdapter:
         }
         async with httpx.AsyncClient(timeout=20.0) as client:
             response = await client.post(upload_url, headers=headers, content=binary)
+            # Some storage gateways expect PUT on this endpoint.
+            if response.status_code in {404, 405}:
+                response = await client.put(upload_url, headers=headers, content=binary)
         if response.status_code >= 300:
+            upstream_body = response.text.strip()
+            trimmed_body = upstream_body[:500] if upstream_body else "<empty>"
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
-                detail="Photo upload to storage failed",
+                detail=(
+                    "Photo upload to storage failed "
+                    f"(status={response.status_code}, bucket={self._bucket}): {trimmed_body}"
+                ),
             )
         public_url = f"{self._base_url}/storage/v1/object/public/{self._bucket}/{file_key}"
         return upload.filename or file_key, public_url

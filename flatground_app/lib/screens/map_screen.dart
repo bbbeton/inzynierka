@@ -1197,13 +1197,27 @@ class _MapScreenState extends State<MapScreen> {
                               _currentLocation!.latitude!,
                               _currentLocation!.longitude!,
                             ),
-                            width: 30,
-                            height: 30,
+                            width: 36,
+                            height: 36,
                             rotate: true,
-                            child: const Icon(
-                              Icons.my_location,
-                              color: Color(0xFF00A86B),
-                              size: 30,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF00A86B),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Color(0x33000000),
+                                    blurRadius: 4,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.my_location,
+                                color: Colors.white,
+                                size: 20,
+                              ),
                             ),
                           ),
                         // Temporary pin marker (when user taps to add)
