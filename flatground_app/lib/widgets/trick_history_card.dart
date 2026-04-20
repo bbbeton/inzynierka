@@ -11,15 +11,7 @@ class TrickHistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayHistory = trickHistory.isEmpty
-        ? [
-            {'name': 'Ollie', 'percentage': '67%', 'time': 'Just now'},
-            {'name': 'Treflip', 'percentage': '100%', 'time': '1 hour ago'},
-            {'name': 'Kickflip', 'percentage': '82%', 'time': 'This morning'},
-            {'name': 'Shove-it', 'percentage': '31%', 'time': 'Yesterday'},
-            {'name': 'Backside 180', 'percentage': '96%', 'time': 'Last week'},
-          ]
-        : trickHistory;
+    final displayHistory = trickHistory;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 26),
@@ -55,9 +47,19 @@ class TrickHistoryCard extends StatelessWidget {
             
             // Trick List
             Expanded(
-              child: ListView.builder(
-                itemCount: displayHistory.length,
-                itemBuilder: (context, index) {
+              child: displayHistory.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No trick history yet.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: const Color(0xFF180081).withOpacity(0.44),
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: displayHistory.length,
+                      itemBuilder: (context, index) {
                   final trick = displayHistory[index];
                   return Container(
                     margin: const EdgeInsets.only(bottom: 29),
@@ -123,8 +125,8 @@ class TrickHistoryCard extends StatelessWidget {
                       ),
                     ),
                   );
-                },
-              ),
+                      },
+                    ),
             ),
           ],
         ),

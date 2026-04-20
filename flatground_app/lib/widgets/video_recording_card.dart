@@ -71,8 +71,13 @@ class DashedBorderPainter extends CustomPainter {
 
 class VideoRecordingCard extends StatefulWidget {
   final Function(String)? onVideoSelected;
+  final Function(String)? onAnalyzeVideo;
 
-  const VideoRecordingCard({super.key, this.onVideoSelected});
+  const VideoRecordingCard({
+    super.key,
+    this.onVideoSelected,
+    this.onAnalyzeVideo,
+  });
 
   @override
   State<VideoRecordingCard> createState() => _VideoRecordingCardState();
@@ -82,6 +87,10 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
   File? _videoFile;
   VideoPlayerController? _videoController;
   final ImagePicker _picker = ImagePicker();
+  bool _isVideoPlaying = false;
+  bool _isRecordPressed = false;
+  bool _isUploadPressed = false;
+  bool _isAnalyzePressed = false;
 
   @override
   void initState() {
@@ -102,6 +111,7 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
             if (widget.onVideoSelected != null) {
               widget.onVideoSelected!(videoPath);
             }
+            // Don't auto-analyze - user will click analyze button
           },
         ),
       ),
@@ -121,6 +131,7 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
         if (widget.onVideoSelected != null) {
           widget.onVideoSelected!(_videoFile!.path);
         }
+        // Don't auto-analyze - user will click analyze button
       }
     } catch (e) {
       print('Error picking video: $e');
@@ -133,12 +144,32 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
       _videoController = VideoPlayerController.file(_videoFile!);
       _videoController!.initialize().then((_) {
         if (mounted) {
-          setState(() {});
-          _videoController!.setLooping(true);
-          _videoController!.play();
+          setState(() {
+            _isVideoPlaying = false;
+          });
+          _videoController!.addListener(() {
+            if (mounted) {
+              setState(() {
+                _isVideoPlaying = _videoController!.value.isPlaying;
+              });
+            }
+          });
         }
       }).catchError((error) {
         print('Error loading video: $error');
+      });
+    }
+  }
+
+  void _toggleVideoPlayback() {
+    if (_videoController != null && _videoController!.value.isInitialized) {
+      if (_videoController!.value.isPlaying) {
+        _videoController!.pause();
+      } else {
+        _videoController!.play();
+      }
+      setState(() {
+        _isVideoPlaying = _videoController!.value.isPlaying;
       });
     }
   }
@@ -180,16 +211,39 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
                 // Video preview
                 if (_videoController != null &&
                     _videoController!.value.isInitialized)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(27),
-                    child: SizedBox.expand(
-                      child: FittedBox(
-                        fit: BoxFit.cover,
-                        child: SizedBox(
-                          width: _videoController!.value.size.width,
-                          height: _videoController!.value.size.height,
-                          child: VideoPlayer(_videoController!),
-                        ),
+                  GestureDetector(
+                    onTap: _toggleVideoPlayback,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(27),
+                      child: Stack(
+                        children: [
+                          SizedBox.expand(
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: SizedBox(
+                                width: _videoController!.value.size.width,
+                                height: _videoController!.value.size.height,
+                                child: VideoPlayer(_videoController!),
+                              ),
+                            ),
+                          ),
+                          // Play/Pause overlay button
+                          Center(
+                            child: Container(
+                              width: 56,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _isVideoPlaying ? Icons.pause : Icons.play_arrow,
+                                color: Colors.white,
+                                size: 32,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   )
@@ -219,95 +273,205 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
           // Action Buttons
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Column(
               children: [
-              // RECORD Button
-              Flexible(
-                child: GestureDetector(
-                  onTap: _recordVideo,
-                  child: Container(
-                    constraints: const BoxConstraints(maxWidth: 120),
-                    width: double.infinity,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2F00FF),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: const Color(0xFF2F00FF),
-                        width: 1,
-                      ),
-                    ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.videocam,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              'RECORD',
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // RECORD Button
+                    Flexible(
+                      child: GestureDetector(
+                        onTapDown: (_) => setState(() => _isRecordPressed = true),
+                        onTapUp: (_) {
+                          setState(() => _isRecordPressed = false);
+                          _recordVideo();
+                        },
+                        onTapCancel: () => setState(() => _isRecordPressed = false),
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 120),
+                          width: double.infinity,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: _isRecordPressed
+                                ? const Color(0xFF1A00CC)
+                                : const Color(0xFF2F00FF),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF2F00FF),
+                              width: 1,
                             ),
+                            boxShadow: _isRecordPressed
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF2F00FF).withOpacity(0.5),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ]
+                                : [
+                                    BoxShadow(
+                                      color: const Color(0xFF2F00FF).withOpacity(0.3),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                           ),
-                        ],
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.videocam,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'RECORD',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 20),
+                    const SizedBox(width: 20),
 
-                // UPLOAD Button
-                Flexible(
-                  child: GestureDetector(
-                    onTap: _uploadVideo,
+                    // UPLOAD Button
+                    Flexible(
+                      child: GestureDetector(
+                        onTapDown: (_) => setState(() => _isUploadPressed = true),
+                        onTapUp: (_) {
+                          setState(() => _isUploadPressed = false);
+                          _uploadVideo();
+                        },
+                        onTapCancel: () => setState(() => _isUploadPressed = false),
+                        child: Container(
+                          constraints: const BoxConstraints(maxWidth: 120),
+                          width: double.infinity,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: _isUploadPressed
+                                ? const Color(0xFFE8E5F5)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF2F00FF),
+                              width: 1,
+                            ),
+                            boxShadow: _isUploadPressed
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF2F00FF).withOpacity(0.4),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ]
+                                : [
+                                    BoxShadow(
+                                      color: const Color(0xFF2F00FF).withOpacity(0.2),
+                                      blurRadius: 4,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.upload,
+                                color: Color(0xFF2F00FF),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'UPLOAD',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF2F00FF),
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Analyze Button (shown when video is loaded)
+                if (_videoFile != null) ...[
+                  const SizedBox(height: 12),
+                  GestureDetector(
+                    onTapDown: (_) => setState(() => _isAnalyzePressed = true),
+                    onTapUp: (_) {
+                      setState(() => _isAnalyzePressed = false);
+                      if (_videoFile != null && widget.onAnalyzeVideo != null) {
+                        widget.onAnalyzeVideo!(_videoFile!.path);
+                      }
+                    },
+                    onTapCancel: () => setState(() => _isAnalyzePressed = false),
                     child: Container(
-                      constraints: const BoxConstraints(maxWidth: 120),
                       width: double.infinity,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: _isAnalyzePressed
+                            ? const Color(0xFFB5A9D9)
+                            : const Color(0xFFC7C1E4),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: const Color(0xFF2F00FF),
                           width: 1,
                         ),
+                        boxShadow: _isAnalyzePressed
+                            ? [
+                                BoxShadow(
+                                  color: const Color(0xFF2F00FF).withOpacity(0.4),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ]
+                            : [
+                                BoxShadow(
+                                  color: const Color(0xFF2F00FF).withOpacity(0.2),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(
-                            Icons.upload,
+                            Icons.analytics,
                             color: Color(0xFF2F00FF),
                             size: 16,
                           ),
                           const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              'UPLOAD',
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF2F00FF),
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                          Text(
+                            'ANALYZE TRICK',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF2F00FF),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

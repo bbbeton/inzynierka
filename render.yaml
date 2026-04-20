@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: flatground-map-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python scripts/migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: STORAGE_PROVIDER
+        value: supabase
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://flatground-map-backend.onrender.com
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_BUCKET
+        value: spot-photos

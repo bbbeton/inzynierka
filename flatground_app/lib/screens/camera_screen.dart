@@ -32,14 +32,20 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future<void> _onVideoSelected(String videoPath) async {
+    if (_isProcessing) return;
+
     setState(() {
       _isProcessing = true;
       _detectionResult = null;
     });
 
     try {
+      print('Starting analysis for video: $videoPath');
+      await Future<void>.delayed(const Duration(milliseconds: 16));
       // Process video with trick detector
       final result = await _trickDetector.detectTrickFromVideo(videoPath);
+      
+      print('Analysis completed: ${result['trick']}');
       
       setState(() {
         _detectionResult = result;
@@ -52,10 +58,29 @@ class _CameraScreenState extends State<CameraScreen> {
           'time': 'Just now',
         });
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Error processing video: $e');
+      print('Stack trace: $stackTrace');
+      
+      // Show error to user
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error analyzing video: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      
       setState(() {
         _isProcessing = false;
+        _detectionResult = {
+          'trick': 'Unknown',
+          'confidence': 0,
+          'statistics': {
+            'confidence': 0,
+          },
+        };
       });
     }
   }
@@ -95,7 +120,13 @@ class _CameraScreenState extends State<CameraScreen> {
                   const SizedBox(height: 16),
                   // Video Recording Card
                   VideoRecordingCard(
-                    onVideoSelected: _onVideoSelected,
+                    onVideoSelected: (videoPath) {
+                      // Just load the video, don't analyze yet
+                      setState(() {
+                        _detectionResult = null;
+                      });
+                    },
+                    onAnalyzeVideo: _onVideoSelected,
                   ),
                   const SizedBox(height: 27),
                   

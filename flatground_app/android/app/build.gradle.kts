@@ -28,6 +28,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -39,6 +40,22 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Force TensorFlow Lite Select TF Ops version to ensure compatibility
+        force("org.tensorflow:tensorflow-lite-select-tf-ops:+")
+    }
+}
+
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // TensorFlow Lite Select TF Ops for models using Select TensorFlow ops
+    // This enables support for models that use Select TensorFlow operations (Flex ops)
+    // The Select TF Ops library must be included for models with Flex operations
+    // Version 2.13.0 is forced via resolutionStrategy above
+    implementation("org.tensorflow:tensorflow-lite-select-tf-ops:+")
+    implementation("androidx.multidex:multidex:2.0.1")
 }
