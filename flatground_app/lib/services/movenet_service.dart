@@ -121,6 +121,8 @@ class MoveNetService {
       String videoPath, {
         int maxFrames = _defaultFrameBudget,
         int? durationMs,
+        int? trimStartMs,
+        int? trimEndMs,
       }) async {
     if (!_isInitialized) await initialize();
 
@@ -132,6 +134,8 @@ class MoveNetService {
         videoPath,
         maxFrames: processedFrames,
         durationMs: durationMs,
+        trimStartMs: trimStartMs,
+        trimEndMs: trimEndMs,
       );
 
       print("Extracted ${frameBytes.length} frames for analysis");
@@ -160,17 +164,27 @@ class MoveNetService {
     String videoPath, {
     required int maxFrames,
     int? durationMs,
+    int? trimStartMs,
+    int? trimEndMs,
   }) async {
     final List<Uint8List> frameBytes = [];
 
     // Dla krótkich klipów bierzemy pełny zakres (trick może być na początku/końcu).
     // Dla dłuższych klipów skupiamy się na środku, żeby ograniczyć "szum" z dojazdu/odjazdu.
     final int safeDurationMs = (durationMs ?? 3000).clamp(1000, 30000);
+    final int segmentStartMs = (trimStartMs ?? 0).clamp(0, safeDurationMs - 1);
+    final int requestedEndMs = trimEndMs ?? safeDurationMs;
+    final int segmentEndMs = requestedEndMs.clamp(segmentStartMs + 1, safeDurationMs);
+    final int segmentDurationMs = (segmentEndMs - segmentStartMs).clamp(300, safeDurationMs);
     final int frameCount = maxFrames.clamp(30, 30);
-    final bool shortClip = safeDurationMs <= 2400;
-    final int windowStartMs = shortClip ? 0 : (safeDurationMs * 0.20).round();
-    final int windowEndMs = shortClip ? safeDurationMs : (safeDurationMs * 0.80).round();
-    final int windowDurationMs = (windowEndMs - windowStartMs).clamp(300, safeDurationMs);
+    final bool shortClip = segmentDurationMs <= 2400;
+    final int windowStartMs = shortClip
+        ? segmentStartMs
+        : (segmentStartMs + (segmentDurationMs * 0.20).round());
+    final int windowEndMs = shortClip
+        ? segmentEndMs
+        : (segmentStartMs + (segmentDurationMs * 0.80).round());
+    final int windowDurationMs = (windowEndMs - windowStartMs).clamp(300, segmentDurationMs);
     final int intervalMs = (windowDurationMs / frameCount).floor().clamp(1, windowDurationMs);
     final List<int> selectedTimestamps = List.generate(
       frameCount,
@@ -178,8 +192,8 @@ class MoveNetService {
     );
 
     print(
-      "Starting extraction: Target $frameCount frames across full clip "
-      "(window ${windowStartMs}-${windowEndMs}ms of 0-${safeDurationMs}ms), interval ${intervalMs}ms",
+      "Starting extraction: Target $frameCount frames in selected segment "
+      "(segment ${segmentStartMs}-${segmentEndMs}ms, window ${windowStartMs}-${windowEndMs}ms of full 0-${safeDurationMs}ms), interval ${intervalMs}ms",
     );
 
     for (int i = 0; i < selectedTimestamps.length; i++) {

@@ -1,0 +1,28 @@
+\newpage
+\section{Wstęp}
+        
+        W sporcie nie brakuje rozwiązań wspierających uprawianie go - aplikacje, akcesoria, społeczności, fora - biegacze, rowerzyści czy pływacy mogą korzystać z wielu narzędzi do śledzenia i wspierania swojego rozwoju. Nie jest to jednak prawdziwe dla sportów ekstremalnych i \enquote{freestyle'owych}. Na rynku brakuje narzędzi wspierających tych sportowców, pomimo ich rosnącej popularności. Na Igrzyskach Olimpijskich w Tokio w 2020 roku zadebiutowała deskorolka, zyskując tym samym status pełnoprawnego sportu olimpijskiego. Wiąże się to z profesjonalizacją treningów i rosnącym zapotrzebowaniem na narzędzia wspomagające analizę techniczną trików. Dodatkowo, postęp w dziedzinie widzenia komputerowego (ang. \textit{Computer Vision}) daje dziś nowe możliwości tworzenia osobistych, \enquote{kieszonkowych} trenerów, które jeszcze kilka lat temu, wymagałyby zaawansowanego sprzętu z laboratorium biomechaniki.
+
+        Głównym celem pracy inżynierskiej jest stworzenie platformy mobilnej dla społeczności deskorolkowej, która analizuje nagrania trików deskorolkowych, automatycznie je klasyfikuje oraz ocenia poprawność ich wykonania. Ponadto w aplikacji zaimplementowano interaktywną mapę, którą użytkownicy mogą współtworzyć poprzez dodawanie zdjęć oraz informacji o przeszkodach i stanie obiektów. Zaprojektowane rozwiązanie ma na celu wspieranie rozwoju społeczności, umożliwiając jej członkom śledzenie postępów oraz łatwe lokalizowanie nowych miejsc do jazdy.
+
+        W ramach pracy inżynierskiej zrealizowano aplikację mobilną z wykorzystaniem frameworka Flutter (język Dart). W celu realizacji projektu podjęto następujące kroki:
+        \begin{enumerate}
+            \item Przegląd literatury i rozwiązań istniejących na rynku;
+            \item Zdefiniowanie założeń oraz architektury systemu, a także dobór technologii;
+            \item Zaprojektowanie interfejsu użytkownika (ang. \textit{User Interface} / \textit{User Experience} [UI/UX]);
+            \item Zebranie i przygotowanie zbioru danych wideo;
+            \item Wytrenowanie modelu klasyfikacyjnego;
+            \item Zaimplementowanie modułu mapy;
+            \item Przeprowadzenie testów funkcjonalnych.
+        \end{enumerate}
+        
+        Aplikacja powstała w technologii cross-platformowej, a moduł sztucznej inteligencji działa bezpośrednio na urządzeniu mobilnym (ang. \textit{Edge AI}). Taka decyzja projektowa wynika z fizycznego położenia deskorolkowych \enquote{spotów} -- często znajdują się one w miejscach zurbanizowanych lub ustronnych, do których nie zawsze dociera stabilny zasięg sieci komórkowej. Dzięki uruchamianiu klasyfikatora lokalnie na telefonie, sportowcy mogą korzystać z pełnej analityki wideo w trakcie jazdy, bez konieczności połączenia z Internetem.
+        
+        W projekcie świadomie zrezygnowano z implementacji mechanizmów uwierzytelniania, ponieważ specyfika rozwiązania nie wymaga tworzenia profili opartych na architekturze chmurowej. Zamiast tego dane przechowywane są lokalnie na urządzeniu, a udostępniana mapa działa w trybie globalnym. Takie podejście pozwoliło uniknąć nadmiarowej złożoności systemu oraz obniżyło próg wejścia, zapobiegając zniechęceniu potencjalnych użytkowników koniecznością zakładania konta przed pierwszym użyciem aplikacji. 
+
+        Z analogicznych względów odstąpiono od integracji zewnętrznych czujników sprzętowych (IoT) montowanych bezpośrednio do deskorolki. Jak wykazała przeprowadzona analiza literatury, rozwiązania oparte wyłącznie na wizji komputerowej są znacznie przystępniejsze, a użytkownicy preferują metody bezinwazyjne. Głównym priorytetem stała się maksymalna ergonomia i prostota obsługi, dzięki czemu smartfon pełni rolę jedynego, w pełni samowystarczalnego narzędzia analitycznego.
+
+        Osobistą motywacją do podjęcia tematu jest zaangażowanie autora pracy w jazdę na deskorolce oraz chęć wsparcia społeczności związanej z tą dyscypliną. Wśród dostępnych narzędzi brakuje rozwiązań wspierających osoby początkujące, dla których obszerne i skomplikowane nazewnictwo trików często stanowi barierę. Ponadto sport ten powszechnie uprawiany jest na ulicznych przeszkodach (tzw. \enquote{spotach}), które nie są oficjalnie skatalogowane jako obiekty sportowe. Brak dostępu do informacji o takich miejscach znacząco utrudnia rozwój umiejętności nowym adeptom tego sportu, ograniczając ich wyłącznie do oficjalnych skateparków. Projekt aplikacji wynika bezpośrednio z osobistych doświadczeń autora i trudności napotkanych na początkowym etapie nauki jazdy na deskorolce.
+
+        Praca inżynierska została podzielona na siedem głównych rozdziałów. Rozdział pierwszy zawiera wstęp, w którym zdefiniowano problem badawczy, motywację autora, cel oraz zakres pracy. Rozdział drugi zawiera przegląd istniejących na rynku aplikacji sportowych dla społeczności deskorolkowej oraz uzasadnia wybór analizy wizyjnej zamiast czujników sprzętowych. W rozdziale trzecim omówiono założenia projektowe, wybór technologii oraz architekturę systemu. Rozdział czwarty jest poświęcony procesowi projektowania interfejsu użytkownika (UI/UX) aplikacji mobilnej. W rozdziale piątym autor skupił się na szczegółowym opisie opracowania modułu sztucznej inteligencji, w tym przygotowanie zbioru danych oraz wybór i trenowanie sieci neuronowej. Rozdział szósty skupia się na technicznych aspektach implementacji aplikacji w środowisku Flutter, tworzeniu modułu mapy oraz integracji z modelem SI. Pracę zamyka rozdział siódmy, zawierający opis przeprowadzonych testów, ewaluację skuteczności modelu rozpoznającego triki oraz końcowe wnioski.
+        

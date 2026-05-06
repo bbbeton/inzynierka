@@ -62,7 +62,11 @@ class TrickDetector {
     }
   }
 
-  Future<Map<String, dynamic>> detectTrickFromVideo(String videoPath) async {
+  Future<Map<String, dynamic>> detectTrickFromVideo(
+    String videoPath, {
+    int? trimStartMs,
+    int? trimEndMs,
+  }) async {
     if (!_isInitialized) await initialize();
 
     try {
@@ -81,6 +85,8 @@ class TrickDetector {
         videoPath,
         maxFrames: targetFrames,
         durationMs: durationMs,
+        trimStartMs: trimStartMs,
+        trimEndMs: trimEndMs,
       );
       print('Got ${keypoints.length} processed frames from MoveNet (training parity)');
 

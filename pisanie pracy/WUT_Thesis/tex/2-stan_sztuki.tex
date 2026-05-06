@@ -1,0 +1,124 @@
+\newpage
+\section{Przegląd istniejących rozwiązań}
+
+    Poniższy rozdział poświęcono analizie literaturowej oraz przeglądowi rozwiązań dostępnych na rynku. Jego głównym celem jest uzasadnienie kluczowych decyzji projektowych podjętych w pracy, a także zdefiniowanie luki badawczej i rynkowej. W pierwszej kolejności omówiono istniejące aplikacje mobilne dedykowane społeczności deskorolkowej. Następnie przeprowadzono zestawienie metod analizy ruchu w sporcie, porównując zastosowanie czujników sprzętowych z rozwiązaniami opartymi na analizie wideo. W dalszej części przybliżono wybrane modele wizyjnej analizy ruchu. Rozdział zamyka podsumowanie zidentyfikowanych braków w dotychczasowych rozwiązaniach, co stanowi bezpośredni punkt wyjścia dla zaprojektowanego systemu.
+
+    \subsection{Aplikacje dedykowane dla społeczności deskorolkowej}
+        Na rynku istnieje kilka rozwiązań dedykowanych społeczności deskorolkowej, które oferują różnorodne funkcje wspierające zarówno początkujących, jak i zaawansowanych użytkowników.
+
+        \medskip
+        \noindent\textbf{SkateSpots}
+        \medskip
+        
+            \textit{SkateSpots} to aplikacja umożliwiająca użytkownikom wyszukiwanie i udostępnianie miejsc do jazdy na deskorolce \cite{wikipedia_skatespots}. Użytkownicy mogą dodawać zdjęcia, opisy oraz informacje o przeszkodach i stanie nawierzchni. Narzędzie to posiada również funkcje społecznościowe, takie jak komentowanie i ocenianie poszczególnych lokalizacji. Oprogramowanie nie dysponuje jednak funkcją rozpoznawania trików deskorolkowych i nie zyskało dużej popularności w Polsce.
+
+        \medskip
+        \noindent\textbf{FindSkateSpots.com}
+        \medskip
+        
+            Znajdująca się pod adresem \textit{findskatespots.com} platforma internetowa stanowi funkcjonalny odpowiednik aplikacji SkateSpots, przeniesiony do środowiska przeglądarkowego \cite{findskatespots}. Serwis charakteryzuje się stosunkowo niewielką bazą aktywnych użytkowników, skoncentrowaną przede wszystkim w Stanach Zjednoczonych. Z punktu widzenia użyteczności, dedykowana aplikacja mobilna stanowi znacznie wygodniejsze i bardziej przystępne źródło informacji dla przeciętnego deskorolkarza.
+
+        \medskip
+        \noindent\textbf{Skatespot.com}
+        \medskip
+        
+            Kolejna platforma internetowa - \textit{skatespot.com} - przeznaczona do lokalizowania skateparków oraz śledzenia aktywności fizycznej \cite{skatespot_home}. Podobnie jak wyżej wymienione rozwiązanie, serwis ten nie został szeroko spopularyzowany wśród docelowej społeczności deskorolkowej.
+
+        \medskip
+        \noindent\textbf{Skategrounds}\nopagebreak
+        \medskip
+
+            Przykładem rozwiązania komercyjnego o zbliżonych założeniach - czyli dążeniu do automatyzacji procesu dokumentowania postępów treningowych przy jednoczesnym mapowaniu infrastruktury sportowej -  jest platforma \textit{Skategrounds} \cite{skategrounds_tech}. System ten opiera się na architekturze hybrydowej, wykorzystującej dedykowany moduł sprzętowy typu IMU (z ang. \textit{Inertial Measurement Unit}) montowany bezpośrednio do podstawy deskorolki. Czujnik ten komunikuje się bezprzewodowo z aplikacją mobilną, przesyłając dane o przyspieszeniu i orientacji przestrzennej deski w czasie rzeczywistym. Urządzenie, oraz miejsce jego umiejscowienia widoczne jest na rysunku \ref{fig:skategrounds-sensor}.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=0.5\linewidth]{skategrounds-sensor.jpg}
+                \caption{Czujnik \textit{Skategrounds} montowany do podstawy \textit{trucka} deskorolki, Źródło: \cite{skategrounds_tech}.}
+                \label{fig:skategrounds-sensor}
+            \end{figure}
+
+            Mimo innowacyjnego podejścia, system ten wykazuje istotne ograniczenia natury technicznej. Największą wadą tego podejścia jest brak analizy kinematyki ciała użytkownika. Czujnik rejestryje wyłącznie wektory ruchu samej deskorolki, co powoduje, że algorytmy klasyfikujące nie są w stanie odróżnić rotacji samej deskorolki od rotacji deskorolki wraz z tułowiem skatera. Prowadzi to do niskiej precyzji w rozróżnianiu ewolucji o podobnej charakterystyce ruchu sprzętu, ale różnym ułożeniu ciała (np. Frontside 180$^\circ$, który polega na rotacji zarówno deskorolki, jak i sportowca o 180$^\circ$ przodem do kierunku jazdy, zostanie sklasyfikowany identycznie jak Frontside Shuvit, który polega na rotacji samej deskorolki w tę samą stronę). Ponadto, funkcja mapowania przeszkód sportowych w tej aplikacji ograniczona jest terytorialnie do obszaru Stanów Zjednoczonych, co czyni ją nieużyteczną dla społeczności w innych regionach.
+
+            Eksploatacja zewnętrznego modułu wiąże się również z istotnymi niedogodnościami użytkowymi, takimi jak konieczność regularnego ładowania ogniwa zasilającego. Ponadto, użytkownik jest zmuszony do stałego dbania o stan techniczny sensora. Ze względu na inwazyjne miejsce montażu — bezpośrednio na konstrukcji deskorolki — urządzenie jest narażone na trudne warunki zewnętrzne. Brak pełnej odporności na wilgoć sprawia, że przypadkowy kontakt z wodą (np. przejazd przez kałużę) może doprowadzić do permanentnego uszkodzenia elektroniki, co w konsekwencji uniemożliwia dalsze korzystanie z systemu. Powyższe czynniki stanowią dodatkową barierę, która często zniechęca sportowców do wyboru rozwiązań opartych na czujnikach sprzętowych.
+
+        \medskip
+        \noindent\textbf{Spinnax}
+        \medskip
+
+            Kolejnym rozwiązaniem komercyjnym o charakterystyce zbliżonej do platformy \textit{Skategrounds} jest system \textit{Spinnax FREAK}, opracowany przez niemiecki start-up \cite{spinnax_com}. Urządzenie wykorzystuje moduł sprzętowy montowany pod podstawą \textit{trucka} deskorolki, który w odróżnieniu od swojego poprzednika charakteryzuje się pełną wodoodpornością, co minimalizuje ryzyko awarii wynikających z kontaktu z wilgocią. Zasada działania opiera się na integracji dedykowanego sensora o gabarytach przekraczających wymiary modułu \textit{Skategrounds} z aplikacją mobilną za pośrednictwem protokołu bezprzewodowego. System umożliwia rejestrację historii przejazdów w czasie rzeczywistym oraz udostępnia moduł automatycznego nazewnictwa i analizy wykonanych ewolucji. Dodatkową funkcjonalnością jest tryb odtwarzania sekwencji ruchu \enquote{krok po kroku}, pozwalający użytkownikowi na manualną weryfikację techniki wykonania triku. Zdjęcie urządzenia wraz ze zrzutem ekranu z aplikacji mobilnej widoczne jest na rysunku \ref{fig:spinnax}.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=0.5\linewidth]{spinnax.png}
+                \caption{Urządzenie \textit{Spinnax FREAK} oraz dedykowana aplikacja mobilna, Źródło: \cite{spinnax_com}.}
+                \label{fig:spinnax}
+            \end{figure}           
+            
+            Mimo usprawnień w zakresie ochrony fizycznej urządzenia, platforma wykazuje istotne ograniczenia natury technicznej i rynkowej. Podobnie jak w przypadku innych systemów opartych wyłącznie na czujnikach kinematycznych, rozwiązanie to wykazuje niską precyzję w klasyfikacji ewolucji opartych na rotacji ciała użytkownika, co wynika z braku wizyjnej analizy sylwetki skatera. Użyteczność systemu jest dodatkowo ograniczona barierą językową - interfejs aplikacji dostępny jest wyłącznie w języku niemieckim, co znacząco zawęża potencjalne grono odbiorców. Ponadto platforma nie oferuje funkcji mapowania infrastruktury sportowej, co ogranicza jej rolę w budowaniu społeczności. Krytycznym aspektem z punktu widzenia użytkownika końcowego jest model biznesowy oparty na cyklicznej subskrypcji lub wysokiej opłacie początkowej. Wysoki koszt eksploatacji w stosunku do oferowanych możliwości analitycznych stanowi istotną barierę adopcji tego rozwiązania na rynku masowym.
+
+    \subsection{Analiza ruchu w sporcie: Wideo a czujniki sprzętowe}
+        Rozpoznawanie ludzkich akcji (z ang. \textit{Human Action Recognition - HAR}) w sporcie polega na wykrywaniu atlety, śledzeniu jego ruchów oraz identyfikacji rodzaju wykonywanej czynności \cite{host2022overview}. Jak wskazują Host i Ivašić-Kos \cite{host2022overview} w swoim przeglądzie, głównym celem systemów HAR jest nie tylko prosta klasyfikacja ruchu, ale również automatyzacja analizy statystycznej oraz monitorowanie wydajności sportowców w celu poprawy ich techniki\cite{host2022overview}.
+
+        Wybór analizy wizyjnej zamiast systemów opartych na czujnikach sprzętowych (takich jak moduły IMU) jest uzasadniony kilkoma czynnikami technologicznymi:
+        \begin{itemize}
+            \item \textbf{Bezinwazyjność i dostępność}: Ze względu na wykorzystanie danych wizualnych, stosowanie systemów opartych na wizji komputerowej eliminuje konieczność montowania sensorów na każdym stawie zawodnika, co może być konieczne w przypadku precyzyjnych systemów inercyjnych \cite{host2022overview}.
+            \item \textbf{Kompleksowość danych}: Nowoczesne biblioteki, takie jak \textit{TensorFlow} czy \textit{OpenCV} dostarczają szeroką gamę gotowych algorytmów uczenia maszynowego. Pozwala to na automatyczną ekstrakcję cech zamiast ręcznego projektowania deskryptorów, co było domeną starszych metod \cite{host2022overview}.
+        \end{itemize}
+
+        Mimo tych zalet, implementacja HAR w sporcie wiąże się z wyzwaniami takimi jak okluzja, dynamiczne tło oraz konieczność śledzenia wielu osób jednocześnie, co wymaga zastosowania zaawansowanych modeli klasy uczenia maszynowego \cite{host2022overview}.
+
+        Historycznie śledzenie ruchu zawodników opierało się na analizie notacyjnej (ang. \textit{notational analysis}), polegającej na subiektywnej ocenie obserwatora. Był to proces ograniczony do niewielkiej liczby badanych osób i czasochłonny. Współczesna metrologia sportowa dąży do uzyskiwania obiektywnych, ilościowych profili prędkości oraz przyspieszenia co pozwala na głębsze zrozumienie dynamiki koordynacji i strategii taktycznych \cite{barris2008review}.
+
+        Pomimo wysokiej precyzji pomiarowej czujników inercyjnych i akcelerometrów, ich praktyczne zastosowanie w warunkach sportowych napotyka na istotne bariery:
+        \begin{itemize}
+            \item \textbf{Bezpieczeństwo i regulacja}: Barris i Button \cite{barris2008review} zauważają, że czujniki noszone przez sportowców są często niedopuszczane do użytku podczas oficjalnych zawodów i meczów ze względu na restrykcyjne przepisy oraz potencjalne ryzyko kontuzji zawodnika \cite{barris2008review}.
+            \item \textbf{Logistyka i motoryka}: Jak wskazują Ahmadi i inni \cite{ahmadi2015toward}, dla rzetelnej oceny ruchu konieczne jest precyzyjne umieszczanie sensorów na każdym stawie będącym przedmiotem zainteresowania. Proces ten nie tylko jest uciążliwy, ale ingeruje również w naturalne wzorce ruchowe sportowca, co jest szczególne istotne w dyscyplinach wymagających wysokiej zwinności. W przypadku deskorolki, czujniki umieszczane bezpośrednio na niej wpływają na jej wymiary oraz ciężar, co również może mieć wpływ na osiągi atlety \cite{ahmadi2015toward}.
+            \item \textbf{Koszty sprzętowe}: W przeciwieństwie do systemów wizyjnych, które mogą wykorzystywać instniejącą infrastrukturę wideo (np. smartfon), systemy oparte na czujnikach wymagają znacznych nakładów na specjalistyczny sprzęt oraz dedykowane zaplecze obliczeniowe \cite{barris2008review}.
+        \end{itemize}
+
+        Decyzja o wykorzystaniu metod wizyjnych w procesie HAR jest podyktowana potrzebą uzyskania obiektywnych danych, przy jednoczesnym zachowaniu pełnej swobody ruchu sportowca. Ingerowanie w środowisko treningowe zawodników, może mieć negatywny wpływ na ich osiągi. Mimo, że zarówno analiza wizyjna, jak i czujnikowa dążą do tego samego celu, różnią się one znacząco pod względem logistyki wdrożenia oraz wpływu na bezpieczeństwo atlety. Zbiorcze zestawienie kluczowych różnic funkcjonalnych i technicznych pomiędzy tymi metodami przedstawiono w tabeli \ref{tab:porownanie_metod}.
+
+        \begin{table}[!h]
+            \centering
+            \caption{Porównanie wizyjnej i czujnikowej analizy ruchu w sporcie, Źródło [opracowanie własne].}
+            \label{tab:porownanie_metod}
+            \small
+            % tabela lepiej zeby byla na tej samej stronie, zle to wyglada
+            \begin{tabularx}{\textwidth} {| >{\raggedright\arraybackslash}p{4.2cm} | >{\RaggedRight\arraybackslash}X | >{\RaggedRight\arraybackslash}X |} \hline
+                \textbf{Kryterium} & \textbf{Analiza wizyjna (Wideo)} & \textbf{Analiza czujnikowa (IMU)} \\ \hline
+                \textbf{Inwazyjność} & Bezinwazyjna (marker-less), wykorzystuje istniejące dane wizualne \cite{barris2008review, host2022overview}. & Wymaga fizycznego montażu sensorów na ciele lub sprzęcie \cite{barris2008review}. \\ \hline
+                \textbf{Wpływ na motorykę} & Brak ingerencji w naturalne wzorce ruchowe sportowca \cite{ahmadi2015toward}. & Możliwe zakłócenie ruchu przez czujniki lub okablowanie \cite{ahmadi2015toward}. \\ \hline
+                \textbf{Bezpieczeństwo} & Całkowicie bezpieczna dla atlety \cite{barris2008review}. & Ryzyko kontuzji; czujniki często niedopuszczane do oficjalnych zawodów \cite{barris2008review}. \\ \hline
+                \textbf{Logistyka} & Wysoka (np. smartfon); brak konieczności żmudnej kalibracji stawów \cite{host2022overview}. & Uciążliwa; wymaga precyzyjnego umieszczenia sensorów na każdym stawie \cite{ahmadi2015toward}. \\ \hline
+                \textbf{Koszty} & Niskie; wykorzystanie powszechnej infrastruktury wideo \cite{barris2008review}. & Wysokie nakłady na specjalistyczny sprzęt i zaplecze obliczeniowe \cite{barris2008review}. \\ \hline
+                \textbf{Główne wyzwania} & Okluzja, dynamiczne tło, zmiany oświetlenia \cite{barris2008review, host2022overview}. & Błędy dryfu, konieczność rekalibracji, bariery regulaminowe \cite{barris2008review, ahmadi2015toward}. \\ \hline
+            \end{tabularx}
+        \end{table}
+
+        Przejście na zautomatyzowaną analizę wizyjną stwarza jednak własne wyzwania techniczne. Specyfika ruchu w sporcie, charakteryzująca się gwałtownymi zmianami kierunku, wysoką dynamiką oraz, w przypadku sportów zespołowych, kolizjami między zawodnikami, narusza podstawowe założenia o \enquote{płynności ruchu}, na których opierają się klasyczne algorytmy śledzące. Według Barris i Button, głównym wyzwaniem pozostaje stabilna identyfikacja i etykietowanie osób w zatłoczonym środowisku, gdzie jakość obrazu, zmiany oświetlenia oraz okluzja utrudniają nieprzerwany monitoring ewolucji \cite{barris2008review}. Pomimo, że deskorolka nie jest sportem zespołowym, w środowisku zawodów bądź na skateparku, wcześniej wspomniane problemy jak najbardziej występują. Z tych powodów współcześnie badania koncentrują się na metodach głębokiego uczenia, które dzięki automatyzacji ekstrakcji cech pozwalają na coraz skuteczniejszą interpretację zachowań w dynamicznych scenach sportowych. 
+
+    \subsection{Modele wizyjnej analizy ruchu}
+        
+        Ewolucja metod wizyjnych w sporcie rozpoczęła się od systemów śledzenia opierających się na detekcji ruchu i statystycznych modelach kształtu. Klasyczne podejścia wykorzystywały tzw. reprezentację typu \enquote{blob}, która polega na grupowaniu pikseli o podobnych właściwościach spektralnych w celu wyodrębnienia sylwetki zawodnika z tła \cite{barris2008review}. Jednym z wczesnych systemów tego typu był \textit{Pfinder}, który interpretował ruch człowieka przy użyciu wieloklasowych modeli statystycznych koloru i kształtu, choć jego skuteczność drastycznie spadała w przypadku wielu zawodników.
+
+        Przełomem w dziedzinie HAR stało się zastosowanie głębokiego uczenia, które pozwoliło na pełną automatyzację ekstrakcji cech. Współczesne architektury można sklasyfikować według ich roli w przetwarzaniu danych wideo \cite{host2022overview}:
+        \begin{itemize}
+            \item \textbf{Splotowe sieci neuronowe (CNN)}: Wykorzystywane jako klasyfikatory typu \textit{end-to-end}. W analizie sportowej dwuwymiarowe sieci CNN (2D-CNN) służą do ekstrakcji cech przestrzennych z pojedynczych klatek, natomiast trójwymiarowe (3D-CNN) przechwytują informacje czasowo-przestrzenne, co jest kluczowe dla zrozumienia dynamiki ruchu \cite{host2022overview}.
+            \item \textbf{Sieci rekurencyjne (RNN) i LSTM}: Te architektury są projektowane z myślą o przetwarzaniu sekwencji danych, co czyni je idealnymi do analizy wideo klatka po klatce. Sieci LSTM (ang. \textit{Long Short-Term Memory}) wykorzystują specjalne jednostki pamięci do przechowywania stanów czasowych. Pozwala to na klasyfikację złożonych ruchów trwających od kilku do kilkunastu sekund \cite{host2022overview}.
+            \item \textbf{Transformery i mechanizmy uwagi}: Najnowszy trend w badaniach nad HAR, pozwalający na lepsze wychwytywanie długoterminowych zależności niż tradycyjne sieci RNN. Zawdzięcza to mechanizmowi samo-uwagi, który uczy się skupiać na najistotniejszych regionach obrazu (np. kończynach zawodnika) w kontekście całej sceny \cite{host2022overview}.
+        \end{itemize}
+
+        W analizie dyscyplin technicznych i ekstremalnych, takich jak deskorolka, kluczowe znaczenie ma estymacja pozy. Polega ona na ekstrakcji kluczowych punktów szkieletu, najczęściej stawów. Istnieją na rynku rozwiązania, takie jak \textit{OpenPose}, które pozwalają na uzyskanie precyzyjnych danych o ruchach sportowca bez konieczności stosowania znaczników na jego ciele \cite{openpose2025}. Wybór konkretnego modelu (np. z rodziny \textit{MobileNet} lub \textit{ResNet}) jest zawsze podyktowany kompromisem między dokładnością, a wydajnością obliczeniową, co jest szczególnie istotne w przypadku aplikacji mobilnych działających w czasie rzeczywistym \cite{host2022overview}. 
+
+        Przykładem nowoczesnego rozwiązania, które bezpośrednio implementuje zasady optymalizacji opisane przez Host i Ivašić-Kos, jest model \textit{Google MoveNet} \cite{movenet2021}. Wykorzystuje on bibliotekę \textit{TensorFlow}, o której autorki wspominają jako o jednym z kluczowych narzędzi umożliwiających szybki rozwój projektów wizyjnych bez konieczności ich budowy od podstaw \cite{host2022overview}. \textit{MoveNet}, opierając się na architekturze CNN, został zaprojektowany z myślą o urządzeniach o ograniczonej mocy obliczeniowej, biorąc pod uwagę rygorystyczny kompromis między dokładnością i szybkością działania. Takie założenia projektowe powodują, że model ten jest zoptymalizowany pod uruchomienie na urządzeniach mobilnych. Dzięki bezmarkerowej ekstrakcji punktów kluczowych, model ten radzi sobie z wyzwaniami okluzji, dynamicznego i nieustrukturyzowanego tła, wspominanych przez Barris i Button jako jedne z głównych barier tradycyjnych systemów śledzących \cite{barris2008review}. Dodatkowo, \textit{MoveNet} oferuje dwa warianty swojego modelu: \textit{Thunder}, który priorytetyzuje dokładność oraz \textit{Lightning}, w którym większe znaczenie ma szybkość obliczeń. Taki wybór pozwala dostosować model do konkretnego zastosowania \cite{movenet2021}.
+        
+    \subsection{Podsumowanie}
+        Przeprowadzony przegląd istniejących rozwiązań oraz stanu sztuki, wskazuje na postępujący rozwój metod monitorowania sportu - od analizy notacyjnej, w której obserwatorem był człowiek, po zaawansowane systemy automatycznego śledzenia ruchu. W obszarze dyscyplin ekstremalno-technicznych, takich jak deskorolka, wciąż widoczny jest podział na precyzyjne, lecz inwazyjne i kosztowne systemy sprzętowe oraz ogólnodostępne, ale mało zaawansowane platformy społecznościowe.
+
+        Kluczowe wnioski z powyższego rozdziału można ująć w następujących punktach:
+        \begin{itemize}
+            \item \textbf{Ograniczenia systemów inercyjnych}: Pomimo wysokiej dokładności, korzystanie z rozwiązań opartych na czujnikach wiąże się z koniecznością montażu dodatkowego sprzętu na deskorolce, co ingeruje w naturalną motorykę sportowca i wyważenie deski. W przypadku rozwiązań takich jak \textit{Skategrounds} użytkownik musi mieć stale na uwadze obecność czujnika, w przeciwnym wypadku może doprowadzić do permanentnego uszkodzenia kosztownego sprzętu.
+            \item \textbf{Bariery ekonomiczne i regulacyjne}: Profesjonalne systemy wizyjne i czujnikowe wymagają wysokich nakładów pieniężnych i sprzętowych, co ogranicza ich dostępnosć do wąskiej grupy profesjonalistów. Wiele z tych urządzeń nie może być również wykorzystywanych w profesjonalnym środowisku, takim jak zawody sportowe.
+            \item \textbf{Potencjał technologii HAR}: Nowoczesne algorytmy HAR oparte na głębokim uczeniu, takie jak architektury CNN, czy modele estymacji pozy (np. \textit{Google MoveNet}), pozwalają na automatyczną ekstrakcję cech bezpośrednio z obrazu wideo. Eliminuje to potrzebę stosowania markerów i czujników, tym samym znacząco ułatwiając zarówno uprawianie sportu, jak i monitorowanie zawodnika.
+        \end{itemize}
+
+        Podsumowując, na rynku brakuje kompleksowego rozwiązania, które integrowałoby funkcję mapowania infrastruktury sportowej z bezinwazyjną zaawansowaną analizą techniczną trików realizowaną w czasie rzeczywistym na urządzeniu mobilnym. Większość istniejących aplikacji skupia się albo na aspekcie lokalizacyjnym, albo na klasyfikacji ruchu opartej o czujniki sprzętowe, podatne na fizyczne uszkodzenia oraz ingerujące w osiągi sportowca. Niniejszy projekt ma na celu wypełnienie tej luki poprzez implementację platformy do analizy wizyjnej oraz mapowania infrastruktury sportowej, zoptymalizowanej pod urządzenia mobilne. Pozwoli to na obiektywną ocenę postępów treningowych bez nakładów finansowych na dodatkowy sprzęt.
+        

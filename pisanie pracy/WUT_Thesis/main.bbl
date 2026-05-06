@@ -1,0 +1,308 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{wikipedia_skatespots}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=b6aea1a416c89509a7df1cbb69249cb6}{%
+           family={{Wikipedia contributors}},
+           familyi={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{fullhash}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{fullhashraw}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{bibnamehash}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{authorbibnamehash}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{authornamehash}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{authorfullhash}{b6aea1a416c89509a7df1cbb69249cb6}
+      \strng{authorfullhashraw}{b6aea1a416c89509a7df1cbb69249cb6}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Skatespots --- {W}ikipedia{,} The Free Encyclopedia}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://en.wikipedia.org/wiki/Skatespots
+      \endverb
+      \verb{url}
+      \verb https://en.wikipedia.org/wiki/Skatespots
+      \endverb
+    \endentry
+    \entry{findskatespots}{online}{}{}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labeltitlesource}{title}
+      \field{title}{FindSkateSpots.com}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://findskatespots.com
+      \endverb
+      \verb{url}
+      \verb https://findskatespots.com
+      \endverb
+    \endentry
+    \entry{skatespot_home}{online}{}{}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labeltitlesource}{title}
+      \field{title}{SkateSpot – Find Skate Spots Near You}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://skatespot.com/home/
+      \endverb
+      \verb{url}
+      \verb https://skatespot.com/home/
+      \endverb
+    \endentry
+    \entry{skategrounds_tech}{online}{}{}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labeltitlesource}{title}
+      \field{title}{Skategrounds -- Smart Skateboarding Sensor}
+      \field{urlday}{4}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://skategrounds.tech
+      \endverb
+      \verb{url}
+      \verb https://skategrounds.tech
+      \endverb
+    \endentry
+    \entry{spinnax_com}{online}{}{}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labeltitlesource}{title}
+      \field{title}{Spinnax -- Real-time Skateboarding Analytics}
+      \field{urlday}{4}
+      \field{urlmonth}{5}
+      \field{urlyear}{2026}
+      \field{year}{2026}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://spinnax.com
+      \endverb
+      \verb{url}
+      \verb https://spinnax.com
+      \endverb
+    \endentry
+    \entry{host2022overview}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=e613e2ce7d91f577d6a1a2b1d522fb3a}{%
+           family={Host},
+           familyi={H\bibinitperiod},
+           given={Kristina},
+           giveni={K\bibinitperiod}}}%
+        {{hash=f734f7710ba4782d683590fa8a887e53}{%
+           family={Ivašić-Kos},
+           familyi={I\bibinithyphendelim K\bibinitperiod},
+           given={Marina},
+           giveni={M\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Elsevier}%
+      }
+      \strng{namehash}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{fullhash}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{fullhashraw}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{bibnamehash}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{authorbibnamehash}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{authornamehash}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{authorfullhash}{789b3094c831f2b21c9ca59cb343d11c}
+      \strng{authorfullhashraw}{789b3094c831f2b21c9ca59cb343d11c}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Heliyon}
+      \field{number}{8}
+      \field{title}{An overview of {H}uman {A}ction {R}ecognition in sports based on {C}omputer {V}ision}
+      \field{volume}{8}
+      \field{year}{2022}
+      \field{pages}{e09633}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1016/j.heliyon.2022.e09633
+      \endverb
+    \endentry
+    \entry{barris2008review}{article}{}{}
+      \name{author}{2}{}{%
+        {{hash=ffa6fabf173961d7508844fd4edc09bf}{%
+           family={Barris},
+           familyi={B\bibinitperiod},
+           given={Sian},
+           giveni={S\bibinitperiod}}}%
+        {{hash=ad857b7e597f61f71287ffcbdcd6dc48}{%
+           family={Button},
+           familyi={B\bibinitperiod},
+           given={Chris},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{fullhash}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{fullhashraw}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{bibnamehash}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{authorbibnamehash}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{authornamehash}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{authorfullhash}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \strng{authorfullhashraw}{de65d79d0d8de6a63d319c9b05ff93b1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Sports Medicine}
+      \field{number}{12}
+      \field{title}{A {R}eview of {V}ision-{B}ased {M}otion {A}nalysis in {S}port}
+      \field{volume}{38}
+      \field{year}{2008}
+      \field{pages}{1025\bibrangedash 1043}
+      \range{pages}{19}
+      \verb{doi}
+      \verb 10.2165/00007256-200838120-00006
+      \endverb
+    \endentry
+    \entry{ahmadi2015toward}{article}{}{}
+      \name{author}{7}{}{%
+        {{hash=fe4a82a39f9f42c711112fe5bc0478a5}{%
+           family={Ahmadi},
+           familyi={A\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=42ffd760e336b2822579f36bcb2e6c62}{%
+           family={Mitchell},
+           familyi={M\bibinitperiod},
+           given={E.},
+           giveni={E\bibinitperiod}}}%
+        {{hash=903b8cb6fc5dbea370c5ae4953eb1670}{%
+           family={Richter},
+           familyi={R\bibinitperiod},
+           given={C.},
+           giveni={C\bibinitperiod}}}%
+        {{hash=e2a0f50b0945bae595258d732b280a0e}{%
+           family={Destelle},
+           familyi={D\bibinitperiod},
+           given={F.},
+           giveni={F\bibinitperiod}}}%
+        {{hash=36e9144958e91881759d25504fdb67bd}{%
+           family={Gowing},
+           familyi={G\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=35db459254d6c4f3e48201596755b860}{%
+           family={O'Connor},
+           familyi={O\bibinitperiod},
+           given={N.\bibnamedelimi E.},
+           giveni={N\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=52f1b6933e27fdda202808765f0b2892}{%
+           family={Moran},
+           familyi={M\bibinitperiod},
+           given={K.},
+           giveni={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{5dcb8226de514f8ff093e7fd8b2b35e8}
+      \strng{fullhash}{11a4fd5992d9ce5f825830cd61a944f3}
+      \strng{fullhashraw}{11a4fd5992d9ce5f825830cd61a944f3}
+      \strng{bibnamehash}{5dcb8226de514f8ff093e7fd8b2b35e8}
+      \strng{authorbibnamehash}{5dcb8226de514f8ff093e7fd8b2b35e8}
+      \strng{authornamehash}{5dcb8226de514f8ff093e7fd8b2b35e8}
+      \strng{authorfullhash}{11a4fd5992d9ce5f825830cd61a944f3}
+      \strng{authorfullhashraw}{11a4fd5992d9ce5f825830cd61a944f3}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Internet of Things Journal}
+      \field{number}{1}
+      \field{title}{Toward automatic activity classification and movement assessment during a sports training session}
+      \field{volume}{2}
+      \field{year}{2015}
+      \field{pages}{23\bibrangedash 32}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1109/JIOT.2014.2377238
+      \endverb
+    \endentry
+    \entry{openpose2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=93f8bf5308d8dc90f260bc4e8ba58fab}{%
+           family={{CMU Perceptual Computing Lab}},
+           familyi={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{fullhash}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{fullhashraw}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{bibnamehash}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{authorbibnamehash}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{authornamehash}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{authorfullhash}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \strng{authorfullhashraw}{93f8bf5308d8dc90f260bc4e8ba58fab}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{OpenPose}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://github.com/CMU-Perceptual-Computing-Lab/openpose
+      \endverb
+      \verb{url}
+      \verb https://github.com/CMU-Perceptual-Computing-Lab/openpose
+      \endverb
+    \endentry
+    \entry{movenet2021}{online}{}{}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labeltitlesource}{title}
+      \field{title}{MoveNet: Ultra szybki i dokładny model wykrywania pozy}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2021}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.tensorflow.org/hub/tutorials/movenet?hl=pl
+      \endverb
+      \verb{url}
+      \verb https://www.tensorflow.org/hub/tutorials/movenet?hl=pl
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

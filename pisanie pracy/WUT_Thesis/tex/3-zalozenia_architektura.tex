@@ -1,0 +1,70 @@
+\newpage
+\section{Założenia i architektura systemu}
+    Niniejszy rozdział stanowi szczegółowy opis opracowania architektury aplikacji moblilnej integrującej system mapowania infrastruktury sportowej z modułem SI klasyfikującym triki deskorolkowe. Projektowanie systemu poprzedzono porównaniem różnych podejść technologicznych rozważanych przez autora na etapie planowania pracy.
+
+    \subsection{Wymagania funkcjonalne i niefunkcjonalne}
+
+        Wymagania projektowe stanowią fundament modelowania systemu, pozwalający na obiektywną ocenę realizacji założonych celów inżynierskich oraz optymalny dobór technologii pod kątem scenariuszy użycia. W literaturze przedmiotu wymagania te dzieli się na funkcjonalne, opisujące konkretne operacje systemu, oraz niefunkcjonalne, definiujące jakość i parametry jego działania.
+
+        \textbf{Wymagania funkcjonalne} określają kluczowe operacje, jakie system musi wykonywać w celu wsparcia treningu deskorolkowego:
+        \begin{itemize}
+            \item Rejestracja oraz odczyt materiałów wideo zawierających ewolucje sportowe;
+            \item Automatyczna klasyfikacja trików z wykorzystaniem algorytmów głębokiego uczenia w celu poprawy techniki zawodnika;
+            \item Udostępnianie interaktywnej mapy obiektów sportowych („spotów”) wraz z funkcją ich edycji i dodawania nowych lokalizacji;
+            \item Prowadzenie lokalnej bazy danych zawierającej historię postępów i wykonanych ewolucji.
+        \end{itemize}
+
+        \textbf{Wymagania niefunkcjonalne} definiują ograniczenia techniczne i jakościowe, które są niezbędne do zachowania bezinwazyjnego charakteru analizy:
+        \begin{itemize}
+            \item Realizacja obliczeń modułu klasyfikacji w paradygmacie Edge AI (lokalnie na urządzeniu), co umożliwia pracę w miejscach o ograniczonym zasięgu sieciowym;
+            \item Minimalizacja latencji procesu analizy wizyjnej, zapewniająca niemal natychmiastową informację zwrotną dla sportowca;
+            \item Pełna bezinwazyjność – system nie może wymagać posiadania dodatkowych sensorów ani markerów, co gwarantuje zachowanie naturalnej motoryki ruchu;
+            \item Przejrzystość interfejsu użytkownika oraz wysoki poziom użyteczności modułu mapy.
+        \end{itemize}
+
+        Precyzyjne zdefiniowanie powyższych priorytetów determinuje wybór architektury oraz stosu technologicznego wykorzystanego w dalszej części pracy.
+    \subsection{Wybór technologii}
+
+        Proces wyboru technologii opierał się na weryfikacji dwóch skrajnych koncepcji architektury sprzętowo programowej. Wstępne założenia projektowe zakładału wykorzystanie zewnętrzych czujników inercyjnych montowanych bezpośrednio na deskorolce. Na dalszym etapie rozwoju projektu zdecydowano się na podejście analizy wizyjnej, z powodów szerzej rozwiniętych w drugim rozdziale pracy inżynierskiej.
+
+        \subsubsection{Podejście IoT (czujnikowe)}
+
+            W pierwszej fazie rozważano system typu IoT, w którym mikrokontroler (np. ESP32) agregowałby dane z akcelerometru i żyroskopu, przesyłając je do dedykowanego \textit{backendu} opartego na frameworku \textit{FastAPI} za pośrednictwem protokołu \textit{Bluetooth Low Energy} (BLE). Schemat takiego rozwiązania przedstawiono na rysunku \ref{fig:schemat-iot}.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=\linewidth]{Schemat2.png}
+                \caption{Schemat czujnikowej architektury systemu, Źródło: [Opracowanie własne].}
+                \label{fig:schemat-iot}
+            \end{figure}
+
+            Koncepcja ta została rozwinięta w stronę rozwiązania hybrydowego, w którym dane czujnikowe miały służyć jako multimodalny zbiór danych wspierający proces trenowania klasyfikatora. W tym scenariuszu użytkownik końcowy korzystałby wyłącznie z analizy wizyjnej, co eliminowałoby potrzebę montażu dodatkowych urządzeń na sprzęcie sportowym. Zmodyfikowany schemat architektury systemu widoczny jest na rysunku \ref{fig:schemat-czujnik}.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=\linewidth]{Schemat5.png}
+                \caption{Schemat hybrydowej architektury systemu, Źródło: [Opracowanie własne].}
+                \label{fig:schemat-czujnik}
+            \end{figure}   
+            
+            Biorąc jednak pod uwagę bariery logistyczne oraz ryzyko uszkodzenia elektroniki eksploatowanej w trudnych warunkach zewnętrznych, obie koncepcje uznano za nieefektywne. Jak wykazała analiza literatury, sensory montowane bezpośrednio na deskorolce nie pozwalają na analizę ruchu poszczególnych stawów sportowca, co drastycznie obniża precyzję klasyfikacji ewolucji opartych na złożonej rotacji ciała. Wykorzystanie danych czujnikowych jedynie w fazie treningowej również wiązało się z istotnymi wyzwaniami merytorycznymi. Brak obiektywnych wzorców odniesienia wymuszałby oparcie procesu etykietowania danych na analizie notacyjnej, czyli subiektywnej ocenie obserwatora. Taka metodologia jest nie tylko czasochłonna, ale również obarczona błędem ludzkim, co w kontekście budowy rzetelnego systemu automatycznego rozpoznawania akcji (HAR) czyni ją niemiarodajną pod względem naukowym i technicznym. 
+
+        \subsubsection{Podejście wizyjne (\textit{Edge AI})}
+                    
+            W opozycji do systemów inercyjnych, ostateczna koncepcja systemu została oparta na paradygmacie analizy wizyjnej realizowanej w całości na urządzeniu mobilnym (ang. \textit{on-device processing}). Wybór ten podyktowany był dążeniem do pełnej bezinwazyjności pomiarowej, wskazywanej jako kluczowy warunek zachowania naturalnej motoryki ruchu sportowca. Architektura ta, przedstawiona na rysunku \ref{fig:schemat-har}, stanowi implementację systemu HAR, który eliminuje błędy wynikające z braku analizy ułożenia ciała użytkownika.
+
+            Warstwa prezentacji oraz logika biznesowa aplikacji zostały zaimplementowane w frameworku \textit{Flutter}, co zapewnia wysoką wydajność interfejsu przy zachowaniu wieloplatformowości kodu źródłowego. Moduł mapy, kluczowy dla funkcji lokalizowania obiektów sportowych, oparto na bibliotece \textit{flutter\_map}. Wykorzystuje ona dane z otwartego projektu \textit{OpenStreetMap}, co pozwala na elastyczne zarządzanie warstwami wizualnymi i keszowanie kafelków mapy, zwiększając użyteczność systemu w warunkach ograniczonej łączności sieciowej.
+
+            Najistotniejszym elementem technologicznym jest silnik analityczny wykorzystujący bibliotekę \textit{TensorFlow Lite} – zoptymalizowane środowisko uruchomieniowe dla modeli uczenia maszynowego na systemy wbudowane i mobilne. Za proces ekstrakcji cech przestrzennych odpowiada model \textit{Google MoveNet} w wariancie \textit{Thunder}. Został on wybrany ze względu na rygorystyczny kompromis pomiędzy wysoką precyzją lokalizacji punktów kluczowych (stawów), a ograniczonymi zasobami sprzętowymi smartfonów. Tak skonstruowany potok przetwarzania danych (ang. \textit{data pipeline}) pozwala na bezmarkerowe śledzenie sylwetki w czasie rzeczywistym, co stanowi fundament dla warstwy klasyfikacyjnej trików deskorolkowych.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=\linewidth]{Schemat3.png}
+                \caption{Schemat wizyjnej architektury systemu, Źródło: [Opracowanie własne].}
+                \label{fig:schemat-har}
+            \end{figure}     
+
+    \subsection{Architektura systemu}
+
+        Docelowa struktura aplikacji, widoczna na rysunku \ref{fig:schemat-har}, opiera się na realizacji możliwie jak największej ilości procesów logicznych bezpośrednio na urządzeniu mobilnym. Takie zdecentralizowane podejście gwarantuje najwyższy poziom prywatności danych oraz niezawodność systemu w miejscach o ograniczonym zasięgu sieci komórkowej. Struktura aplikacji została podzielona na kilka współpracujących ze sobą modułów.
+
+        Głównym elementem interfejsu jest \textit{frontend}, opracowany w technologii \textit{Flutter}, który odpowiada za nagrywanie i odczyt materiałów wideo, prezentację historii wykonanych ewolucji oraz umożliwienie użytkownikowi korzystanie z mapy skateparków i przeszkód. Dane wejściowe dostarczane są przez moduł aparatu, który umożliwia rejestrację obrazu przy użyciu biblioteki \textit{camera} lub wybór istniejących nagrań za pomocą komponentu \textit{image picker}. Nagranie trafia następnie do modułu SI, gdzie model \textit{MoveNet} dokonuje ekstrakcji pozy. Skonwertowany materiał jest klasyfikowany i oceniany z wykorzystaniem \textit{TensorFlow Lite}. Realizacja tych procesów bezpośrednio na urządzeniu pozwala na szybką identyfikację triku bez konieczności przesyłania dużych plików do zewnętrznego serwera.
+
+        Za aspekt społecznościowy i współdzielenie danych odpowiada moduł mapy, integrujący bibliotekę \textit{flutter\_map} z danymi \textit{OpenStreetMap}. Komunikuje się on z backendem zaimplementowanym w języku \textit{Python}, z wykorzystaniem frameworku \textit{FastAPI}. Warstwa serwerowa zarządza globalną listą miejsc do jazdy, zapewnia szyfrowanie danych oraz udostępnia zasoby przez protokół \textit{REST API} (z ang. \textit{Representational State Transfer Application Programming Interface}). Zgodnie z założeniami projektowymi, system zapewnia dostę do danych bez konieczności tworzenia kont użytkowników i autoryzacji, tym samym znacząco obniżając próg wejścia dla społeczności. Warstwę trwałości danych stanowi baza danych, wykorzystująca serwer \textit{PostgreSQL} do zarządzania zasobami globalnymi (listą \enquote{spotów} deskorolkowych) oraz lokalną bazę \textit{SQLite} do przechowywania historii trików bezpośrednio na urządzeniu.

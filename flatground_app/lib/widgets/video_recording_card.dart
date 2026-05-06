@@ -1,9 +1,17 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:video_player/video_player.dart';
 import '../screens/fullscreen_camera_screen.dart';
+
+typedef VideoSelectionCallback = void Function(
+  String videoPath,
+  int? trimStartMs,
+  int? trimEndMs,
+);
 
 class DashedBorderPainter extends CustomPainter {
   @override
@@ -70,8 +78,8 @@ class DashedBorderPainter extends CustomPainter {
 }
 
 class VideoRecordingCard extends StatefulWidget {
-  final Function(String)? onVideoSelected;
-  final Function(String)? onAnalyzeVideo;
+  final VideoSelectionCallback? onVideoSelected;
+  final VideoSelectionCallback? onAnalyzeVideo;
 
   const VideoRecordingCard({
     super.key,
@@ -91,10 +99,204 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
   bool _isRecordPressed = false;
   bool _isUploadPressed = false;
   bool _isAnalyzePressed = false;
+  int? _trimStartMs;
+  int? _trimEndMs;
+  Uint8List? _trimStartPreview;
+  Uint8List? _trimEndPreview;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _promptTrimForSelectedVideo() async {
+    int totalMs = 0;
+    if (_videoController != null && _videoController!.value.isInitialized) {
+      totalMs = _videoController!.value.duration.inMilliseconds;
+    } else if (_videoFile != null) {
+      // Fallback: ensure trim prompt still appears even if preview init lags/fails.
+      final tempController = VideoPlayerController.file(_videoFile!);
+      try {
+        await tempController.initialize();
+        totalMs = tempController.value.duration.inMilliseconds;
+      } catch (_) {
+        totalMs = 0;
+      } finally {
+        await tempController.dispose();
+      }
+    }
+    if (totalMs <= 0) return;
+
+    RangeValues range = RangeValues(0, totalMs.toDouble());
+    Uint8List? startPreview = _trimStartPreview;
+    Uint8List? endPreview = _trimEndPreview;
+
+    Future<Uint8List?> generatePreviewAt(int timeMs) {
+      if (_videoFile == null) return Future.value(null);
+      return VideoThumbnail.thumbnailData(
+        video: _videoFile!.path,
+        imageFormat: ImageFormat.JPEG,
+        timeMs: timeMs,
+        quality: 70,
+        maxWidth: 160,
+      );
+    }
+
+    Future<void> refreshPreviews(void Function(void Function()) setDialogState) async {
+      final startMs = range.start.round();
+      final endMs = range.end.round();
+      final previews = await Future.wait([
+        generatePreviewAt(startMs),
+        generatePreviewAt(endMs),
+      ]);
+      if (!mounted) return;
+      setDialogState(() {
+        startPreview = previews[0];
+        endPreview = previews[1];
+      });
+    }
+
+    await Future.wait([
+      if (startPreview == null) generatePreviewAt(range.start.round()),
+      if (endPreview == null) generatePreviewAt(range.end.round()),
+    ]).then((result) {
+      if (result.isNotEmpty) {
+        startPreview = result.isNotEmpty ? result[0] : startPreview;
+        if (result.length > 1) {
+          endPreview = result[1];
+        } else if (result.isNotEmpty) {
+          endPreview = result[0];
+        }
+      }
+    });
+
+    String formatMs(double ms) {
+      final totalSeconds = (ms / 1000).round();
+      final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+      final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+      return '$minutes:$seconds';
+    }
+
+    final picked = await showDialog<RangeValues>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+          title: Text(
+            'Trim trick segment',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+          ),
+          content: SizedBox(
+            width: 420,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pick the part that contains the trick.',
+                  style: GoogleFonts.poppins(fontSize: 13),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Start frame',
+                            style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            height: 70,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: const Color(0xFFEDEAF8),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: startPreview == null
+                                ? const Center(child: Icon(Icons.image, color: Color(0xFF2F00FF)))
+                                : Image.memory(startPreview!, fit: BoxFit.cover, width: double.infinity),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'End frame',
+                            style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            height: 70,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: const Color(0xFFEDEAF8),
+                            ),
+                            clipBehavior: Clip.antiAlias,
+                            child: endPreview == null
+                                ? const Center(child: Icon(Icons.image, color: Color(0xFF2F00FF)))
+                                : Image.memory(endPreview!, fit: BoxFit.cover, width: double.infinity),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  '${formatMs(range.start)} - ${formatMs(range.end)}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: const Color(0xFF2F00FF),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                RangeSlider(
+                  values: range,
+                  min: 0,
+                  max: totalMs.toDouble(),
+                  divisions: totalMs > 1000 ? 100 : null,
+                  labels: RangeLabels(
+                    formatMs(range.start),
+                    formatMs(range.end),
+                  ),
+                  onChanged: (value) {
+                    setDialogState(() {
+                      range = value;
+                    });
+                    refreshPreviews(setDialogState);
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Use full video'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, range),
+              child: const Text('Use trimmed segment'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _trimStartMs = picked?.start.round();
+      _trimEndMs = picked?.end.round();
+      _trimStartPreview = startPreview;
+      _trimEndPreview = endPreview;
+    });
   }
 
   Future<void> _recordVideo() async {
@@ -103,13 +305,14 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
       context,
       MaterialPageRoute(
         builder: (context) => FullscreenCameraScreen(
-          onVideoRecorded: (videoPath) {
+          onVideoRecorded: (videoPath) async {
             setState(() {
               _videoFile = File(videoPath);
             });
-            _loadVideoPreview();
+            await _loadVideoPreview();
+            await _promptTrimForSelectedVideo();
             if (widget.onVideoSelected != null) {
-              widget.onVideoSelected!(videoPath);
+              widget.onVideoSelected!(videoPath, _trimStartMs, _trimEndMs);
             }
             // Don't auto-analyze - user will click analyze button
           },
@@ -127,9 +330,10 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
         setState(() {
           _videoFile = File(video.path);
         });
-        _loadVideoPreview();
+        await _loadVideoPreview();
+        await _promptTrimForSelectedVideo();
         if (widget.onVideoSelected != null) {
-          widget.onVideoSelected!(_videoFile!.path);
+          widget.onVideoSelected!(_videoFile!.path, _trimStartMs, _trimEndMs);
         }
         // Don't auto-analyze - user will click analyze button
       }
@@ -138,11 +342,12 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
     }
   }
 
-  void _loadVideoPreview() {
+  Future<void> _loadVideoPreview() async {
     if (_videoFile != null) {
       _videoController?.dispose();
       _videoController = VideoPlayerController.file(_videoFile!);
-      _videoController!.initialize().then((_) {
+      try {
+        await _videoController!.initialize();
         if (mounted) {
           setState(() {
             _isVideoPlaying = false;
@@ -155,9 +360,9 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
             }
           });
         }
-      }).catchError((error) {
+      } catch (error) {
         print('Error loading video: $error');
-      });
+      }
     }
   }
 
@@ -413,12 +618,24 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
                 // Analyze Button (shown when video is loaded)
                 if (_videoFile != null) ...[
                   const SizedBox(height: 12),
+                  if (_trimStartMs != null && _trimEndMs != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: TextButton.icon(
+                        onPressed: _promptTrimForSelectedVideo,
+                        icon: const Icon(Icons.content_cut, size: 16),
+                        label: Text(
+                          'Trim: ${(_trimStartMs! / 1000).toStringAsFixed(1)}s - ${(_trimEndMs! / 1000).toStringAsFixed(1)}s',
+                          style: GoogleFonts.poppins(fontSize: 11),
+                        ),
+                      ),
+                    ),
                   GestureDetector(
                     onTapDown: (_) => setState(() => _isAnalyzePressed = true),
                     onTapUp: (_) {
                       setState(() => _isAnalyzePressed = false);
                       if (_videoFile != null && widget.onAnalyzeVideo != null) {
-                        widget.onAnalyzeVideo!(_videoFile!.path);
+                        widget.onAnalyzeVideo!(_videoFile!.path, _trimStartMs, _trimEndMs);
                       }
                     },
                     onTapCancel: () => setState(() => _isAnalyzePressed = false),

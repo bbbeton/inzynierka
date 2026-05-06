@@ -286,12 +286,13 @@ class _MapScreenState extends State<MapScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
           title: Text(
             'Adjust spot pin',
             style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
           ),
           content: SizedBox(
-            width: 320,
+            width: 420,
             height: 300,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -369,6 +370,7 @@ class _MapScreenState extends State<MapScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
           title: Text(
             'Add Skate Spot',
             style: GoogleFonts.poppins(
@@ -377,8 +379,10 @@ class _MapScreenState extends State<MapScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          content: SingleChildScrollView(
-            child: Column(
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
@@ -620,6 +624,7 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
               ],
+              ),
             ),
           ),
           actions: [
@@ -742,19 +747,26 @@ class _MapScreenState extends State<MapScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(40),
-            topRight: Radius.circular(40),
-          ),
-        ),
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      isScrollControlled: true,
+      builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+        return SafeArea(
+          top: false,
+          child: Container(
+            constraints: BoxConstraints(maxHeight: screenHeight * 0.8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(22),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -858,9 +870,12 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ],
             const SizedBox(height: 20),
-          ],
-        ),
-      ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -882,9 +897,12 @@ class _MapScreenState extends State<MapScreen> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
           title: Text('Edit spot', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-          content: SingleChildScrollView(
-            child: Column(
+          content: SizedBox(
+            width: 420,
+            child: SingleChildScrollView(
+              child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
@@ -1069,6 +1087,7 @@ class _MapScreenState extends State<MapScreen> {
                   label: const Text('Add photo'),
                 ),
               ],
+              ),
             ),
           ),
           actions: [

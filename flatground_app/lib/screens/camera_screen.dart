@@ -16,6 +16,8 @@ class _CameraScreenState extends State<CameraScreen> {
   Map<String, dynamic>? _detectionResult;
   bool _isProcessing = false;
   List<Map<String, dynamic>> _trickHistory = [];
+  int? _selectedTrimStartMs;
+  int? _selectedTrimEndMs;
 
   @override
   void initState() {
@@ -31,7 +33,11 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  Future<void> _onVideoSelected(String videoPath) async {
+  Future<void> _onVideoSelected(
+    String videoPath, {
+    int? trimStartMs,
+    int? trimEndMs,
+  }) async {
     if (_isProcessing) return;
 
     setState(() {
@@ -43,7 +49,11 @@ class _CameraScreenState extends State<CameraScreen> {
       print('Starting analysis for video: $videoPath');
       await Future<void>.delayed(const Duration(milliseconds: 16));
       // Process video with trick detector
-      final result = await _trickDetector.detectTrickFromVideo(videoPath);
+      final result = await _trickDetector.detectTrickFromVideo(
+        videoPath,
+        trimStartMs: trimStartMs,
+        trimEndMs: trimEndMs,
+      );
       
       print('Analysis completed: ${result['trick']}');
       
@@ -120,13 +130,20 @@ class _CameraScreenState extends State<CameraScreen> {
                   const SizedBox(height: 16),
                   // Video Recording Card
                   VideoRecordingCard(
-                    onVideoSelected: (videoPath) {
+                    onVideoSelected: (videoPath, trimStartMs, trimEndMs) {
                       // Just load the video, don't analyze yet
                       setState(() {
                         _detectionResult = null;
+                        _selectedTrimStartMs = trimStartMs;
+                        _selectedTrimEndMs = trimEndMs;
                       });
                     },
-                    onAnalyzeVideo: _onVideoSelected,
+                    onAnalyzeVideo: (videoPath, trimStartMs, trimEndMs) =>
+                        _onVideoSelected(
+                      videoPath,
+                      trimStartMs: trimStartMs ?? _selectedTrimStartMs,
+                      trimEndMs: trimEndMs ?? _selectedTrimEndMs,
+                    ),
                   ),
                   const SizedBox(height: 27),
                   

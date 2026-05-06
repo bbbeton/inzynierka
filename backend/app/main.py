@@ -272,17 +272,28 @@ async def upload_spot_photos(
 
 
 @app.delete("/spots/{spot_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_spot(spot_id: int, db: Session = Depends(get_db)) -> None:
-    spot = db.query(SkateSpot).filter(SkateSpot.id == spot_id).first()
+async def delete_spot(spot_id: int, db: Session = Depends(get_db)) -> None:
+    spot = (
+        db.query(SkateSpot)
+        .options(selectinload(SkateSpot.photos))
+        .filter(SkateSpot.id == spot_id)
+        .first()
+    )
     if spot is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Spot not found")
+    storage: StorageAdapter = app.state.storage_adapter
+    for photo in spot.photos:
+        try:
+            await storage.delete(photo.url)
+        except Exception:  # pragma: no cover - best effort cleanup
+            logger.warning("Storage cleanup failed for deleted spot photo url=%s", photo.url)
     db.delete(spot)
     db.commit()
     return None
 
 
 @app.delete("/spots/{spot_id}/photos/{photo_id}", response_model=SkateSpotRead)
-def delete_spot_photo(spot_id: int, photo_id: int, db: Session = Depends(get_db)) -> SkateSpotRead:
+async def delete_spot_photo(spot_id: int, photo_id: int, db: Session = Depends(get_db)) -> SkateSpotRead:
     spot = (
         db.query(SkateSpot)
         .options(selectinload(SkateSpot.photos))
@@ -294,6 +305,11 @@ def delete_spot_photo(spot_id: int, photo_id: int, db: Session = Depends(get_db)
     photo = db.query(SpotPhoto).filter(SpotPhoto.id == photo_id, SpotPhoto.spot_id == spot_id).first()
     if photo is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
+    storage: StorageAdapter = app.state.storage_adapter
+    try:
+        await storage.delete(photo.url)
+    except Exception:  # pragma: no cover - best effort cleanup
+        logger.warning("Storage cleanup failed for deleted photo url=%s", photo.url)
     db.delete(photo)
     db.commit()
     refreshed = (

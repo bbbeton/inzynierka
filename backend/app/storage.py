@@ -4,6 +4,7 @@ import mimetypes
 import uuid
 from pathlib import Path
 from typing import Protocol
+from urllib.parse import urlparse
 
 import httpx
 from fastapi import HTTPException, UploadFile, status
@@ -14,6 +15,9 @@ from .settings import settings
 class StorageAdapter(Protocol):
     async def save(self, upload: UploadFile) -> tuple[str, str]:
         """Returns tuple[file_name, public_url]."""
+
+    async def delete(self, public_url: str) -> None:
+        """Deletes file by its public URL. Should be best-effort for missing files."""
 
 
 class LocalStorageAdapter:
@@ -28,6 +32,18 @@ class LocalStorageAdapter:
         content = await upload.read()
         destination.write_bytes(content)
         return upload.filename or file_key, f"/uploads/{file_key}"
+
+    async def delete(self, public_url: str) -> None:
+        parsed_path = urlparse(public_url).path
+        uploads_prefix = "/uploads/"
+        if not parsed_path.startswith(uploads_prefix):
+            return
+        file_key = parsed_path[len(uploads_prefix) :]
+        if not file_key:
+            return
+        target = self._upload_dir / file_key
+        if target.exists():
+            target.unlink()
 
 
 class SupabaseStorageAdapter:
@@ -72,6 +88,35 @@ class SupabaseStorageAdapter:
             )
         public_url = f"{self._base_url}/storage/v1/object/public/{self._bucket}/{file_key}"
         return upload.filename or file_key, public_url
+
+    async def delete(self, public_url: str) -> None:
+        parsed_path = urlparse(public_url).path
+        prefix = f"/storage/v1/object/public/{self._bucket}/"
+        if parsed_path.startswith(prefix):
+            file_key = parsed_path[len(prefix) :]
+        else:
+            file_key = public_url.strip()
+        if not file_key:
+            return
+
+        delete_url = f"{self._base_url}/storage/v1/object/{self._bucket}/{file_key}"
+        headers = {
+            "apikey": self._service_key,
+            "Authorization": f"Bearer {self._service_key}",
+        }
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            response = await client.delete(delete_url, headers=headers)
+        if response.status_code in {200, 204, 404}:
+            return
+        upstream_body = response.text.strip()
+        trimmed_body = upstream_body[:500] if upstream_body else "<empty>"
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=(
+                "Photo delete from storage failed "
+                f"(status={response.status_code}, bucket={self._bucket}): {trimmed_body}"
+            ),
+        )
 
 
 def build_storage_adapter() -> StorageAdapter:

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import io
+from pathlib import Path
+from urllib.parse import urlparse
 
 
 def _create_spot(client):
@@ -173,6 +175,22 @@ def test_delete_spot(client):
     assert fetch.status_code == 404
 
 
+def test_delete_spot_removes_uploaded_file(client):
+    created = _create_spot(client)
+    upload = client.post(
+        f"/spots/{created['id']}/photos",
+        files={"files": ("spot.jpg", io.BytesIO(b"fake-image"), "image/jpeg")},
+    )
+    assert upload.status_code == 200
+    photo_url = upload.json()["photo_urls"][0]
+    file_path = Path(client.app.state.upload_dir) / Path(urlparse(photo_url).path).name
+    assert file_path.exists()
+
+    deleted = client.delete(f"/spots/{created['id']}")
+    assert deleted.status_code == 204
+    assert not file_path.exists()
+
+
 def test_update_spot_name_and_description(client):
     created = _create_spot(client)
     response = client.patch(
@@ -191,3 +209,20 @@ def test_update_spot_name_and_description(client):
     body = response.json()
     assert body["name"] == "Updated Name"
     assert body["description"] == "Updated description"
+
+
+def test_delete_photo_removes_uploaded_file(client):
+    created = _create_spot(client)
+    upload = client.post(
+        f"/spots/{created['id']}/photos",
+        files={"files": ("spot.jpg", io.BytesIO(b"fake-image"), "image/jpeg")},
+    )
+    assert upload.status_code == 200
+    payload = upload.json()
+    photo = payload["photos"][0]
+    file_path = Path(client.app.state.upload_dir) / Path(urlparse(photo["url"]).path).name
+    assert file_path.exists()
+
+    response = client.delete(f"/spots/{created['id']}/photos/{photo['id']}")
+    assert response.status_code == 200
+    assert not file_path.exists()
