@@ -1,6 +1,62 @@
 \newpage
 \section{Projekt interfejsu użytkownika}
-\subsection{Założenia projektowe i makiety aplikacji}
-\subsection{Nawigacja i główne ekrany aplikacji}
-\subsection{Interakcja użytkownika z modułem rozpoznawania trików}
+    Niniejszy rozdział opisuje proces projektowania warstwy prezentacji aplikacji mobilnej, ze szczególnym uwzględnieniem zasad użyteczności oraz specyfiki środowiska, w jakim system będzie eksploatowany. Głównym celem projektowym na tym etapie prac było stworzenie intuicyjnego interfejsu, który umożliwi sportowcom intuicyjne znajdowanie miejsc do jazdy oraz szybki dostęp do funkcji analitycznych, bez konieczności przerywania sesji treningowej.
 
+    Istotnym założeniem tego etapu było rozdzielenie fazy koncepcyjnej i prototypowania od samej implementacji kodu źródłowego aplikacji. Umożliwiło to skupienie się na ergonomii i logice \textit{UI/UX} przed przystąpieniem do prac programistycznych, opisanych szczegółowo w rozdziale szóstym.
+    
+    \subsection{Założenia projektowe i makiety aplikacji}
+
+        Proces projektowania interfejsu oparto na paradygmacie projektowania zorientowanego na użytkownika. Głównym narzędziem wykorzystywanym do stworzenia makiet aplikacji było środowisko \textit{Figma}. Za jego pomocą wypracowano wstępny układ elementów graficznych oraz prototyp interakcji z użytkownikiem przed ich wdrożeniem w środowisku \textit{Flutter}.
+
+        Należy podkreślić, że makiety powstałe na tym etapie pracy inżynierskiej stanowią idealizację systemu. Służyły one przede wszystkim jako punkt odniesienia podczas projektowania rzeczywistego interfejsu. Finalny produkt różni się w pewnym stopniu od prototypów zaprezentowanych w tym rozdziale, co wynika z technicznych ograniczeń bibliotek mobilnych oraz optymalizacji interfejsu pod kątem wydajności na urządzeniach o mniejszej mocy obliczeniowej. W tej części pracy przedstawiono wizję projektową i założenia estetyczne, a rzeczywisty wygląd oraz techniczne detale wdrożonych komponentów zostały przedstawione w rozdziale poświęconym implementacji aplikacji.
+
+        Jako komercyjną nazwę aplikacji wybrano angielskie słowo \textit{Flatground}, pisane wielkimi literami. Oznacza ono w dosłownym tłumaczeniu płaską ziemię, natomiast w slangu deskorolkowym, słowo to figuruje jako określenie płaskiego miejsca do jazdy, bez przeszkód, na którym można wykonywać triki. Z racji tego, że projekt skupia się na klasyfiacji trików wykonywanych właśnie na \enquote{flacie} (czyli skrótowym, spolszczonym odpowiedniku angielskiego \textit{flatground}), nazwa ta będzie wywoływała adekwatne skojarzenia i będzie dobrze rezonować ze społecznością deskorolkową.
+
+    \subsection{Nawigacja i główne ekrany aplikacji}
+
+        Projekt interfejsu aplikacji \textit{FLATGROUND} został podporządkowany nadrzędnemu celowi, jakim jest prostota oraz intuicyjność systemu. Zrezygnowano ze skomplikowanych struktur zagnieżdżonych menu na rzecz płaskiej architektury informacji, co pozwala użytkownikowi na natychmiastowe przełączanie się między modułem aplikacji, a mapy. Główną osią nawigacyjną systemu jest górny pasek zakładek, który dzieli aplikacje na dwa kluczowe moduły. W celu trafienia do szerszej grupy odbiorców, ekran aplikacji został zaprojektowany w języku angielskim.
+
+        \subsubsection{Ekran mapy (\textit{Spot Map})}
+            
+            Ekran mapy, widoczny na rysunku \ref{fig:app-map}, stanowi centrum funkcji społecznościowych aplikacji. Interfejs został zaprojektowany tak, aby maksymalnie wykorzystać przestrzeń ekranu na interaktywny widok mapy, na którym naniesiono markery reprezentujące obiekty sportowe.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=0.4\linewidth]{Frame7.png}
+                \caption{Makieta ekranu mapy aplikacji, Źródło: [Opracowanie własne].}
+                \label{fig:app-map}
+            \end{figure} 
+            
+            Zakładka podzielona jest na 2 części: interaktywną mapę, zajmującą większość ekranu oraz listę \enquote{spotów} deskorolkowych zlokalizowanych niedaleko od użytkownika. Na mapie widoczne są markery z lokalizacjami przeszkód i lokalizacja użykownika. Z kolei lista, pozwala na podgląd informacji na temat obiektów sportowych - nazwę, typ oraz adres.
+
+        \subsubsection{Ekran wykrywania trików (\textit{Detect Trick})}
+
+            Ekran dedykowany wykrywaniu trików, widoczny na rysunku \ref{fig:app-detect}, implementuje minimalistyczny i wysokokontrastowy design.
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=0.4\linewidth]{KAMERA.png}
+                \caption{Makieta ekranu detekcji triku aplikacji, Źródło: [Opracowanie własne].}
+                \label{fig:app-detect}
+            \end{figure}
+
+            Ekran aplikacji podzielony został na 3 części:
+            \begin{itemize}
+                \item \textbf{Obsługa materiału wideo} - ta sekcja zawiera ramkę podglądu z dwoma wyraźnie widocznymi przyciskami: \textit{RECORD} (z ang. \enquote{nagraj}) i \textit{UPLOAD} (z ang. \enquote{importuj}). Taki układ dużych, czytelnych elementów minimalizuje ryzyko pomyłki i ułatwia obsługę smartfona jedną ręką;
+                \item \textbf{Wyniki klasyfikacji} - sekcja pojawia się bezpośrednio pod modułem nagrywania. Kluczowa informacja, czyli rozpoznany trik (z ang. \textit{Performed Trick}), w tym przypadku \textit{Ollie}, jest zaprezentowana dużą czcionką. w centralnym miejscu ekranu, wraz z procentowym wskaźnikiem pewności klasyfikacji (z ang. \textit{Accuracy}). Na tym etapie projektowania przewidywano szczegółową analitykę w postaci statystyk technicznych: \textit{Pop} - siła wybicia, \textit{Board rotation} - rotacja deskorolki oraz \textit{Confidence} - pewność wykonywanego triku. Jednak ze względu na brak obiektywnych wzorców, na których można byłoby oprzeć takie statystyki, w późniejszych stadiach zrezygnowano z tych metryk;
+                \item \textbf{Historia trików} - widoczna na rysunku \ref{fig:app-history} sekcja prezentuje użytkownikowi pięć ostatnich przeanalizowanych trików wraz z metryką \textit{Confidence}. Pozwala ona na szybkie przypomnienie ewolucji ćwiczonych w danej sesji treningowej oraz jej ustrukturyzowanie.
+            \end{itemize}
+
+            \begin{figure}[!h]
+                \centering \includegraphics[width=0.4\linewidth]{historia.png}
+                \caption{Makieta ekranu historii trików aplikacji, Źródło: [Opracowanie własne].}
+                \label{fig:app-history}
+            \end{figure}             
+
+            Podział aplikacji na powyższe sekcje został podyktowany motywacją do stworzenia intuicyjnego i przejrzystego narzędzia treningowego. Zastosowana kolorystyka, oparta na odcieniach bieli i fioletu zapewnia wysoki kontrast, co było jednym z wymagań niefunkcjonalnych dotyczących czytelności interfejsu w warunkach oświetlenia zewnętrznego. Całość dąży do bycia \enquote{przezroczystym} narzędziem, które nie odciąga uwagi od treningu, a jedynie dostarcza niezbędnych danych w optymalnej formie.
+
+    \subsection{Interakcja użytkownika z modułem rozpoznawania trików}
+
+        W fazie projektowania w programie \textit{Figma} szczególną uwagę poświęcono interakcji użytkownika z narzędziem do analizy wizyjnej. Zaprojektowano sekwencyjny proces, który prowadzi użytkownika od momentu uruchomienia kamery, przez wybór pliku za pomocą komponentu \textit{image picker}, aż do prezentacji wyniku analizy.
+
+        Interakcja z modułem SI została zaprojektowana w sposób asynchroniczny, co w praktyce inżynierskiej oznacza oddelegowanie zasobochłonnych obliczeń do zadań wykonywanych w tle, poza głównym wątkiem interfejsu użytkownika. Dzięki takiemu podejściu aplikacja zachowuje pełną responsywność - użytkownik nie doświadcza \enquote{zamrożenia} ekranu podczas analizy wizyjnej. W trakcie oczekiwania na wynik, w głównym oknie aplikacji wyświetlany jest podgląd zarejestrowanego materiału wideo, co pozwala na natychmiastową weryfikację nagrania przez sportowca.
+
+        Finalny sposób prezentacji danych skupia się na dostarczeniu czytelnego sprzężenia zwrotnego w formie dashboardu analitycznego. Zamiast surowej reprezentacji szkieletowej, która mogłaby być nieczytelna dla użytkownika, system wyświetla nazwę rozpoznanego triku oraz szczegółowe metryki techniczne. Taka forma prezentacji ma na celu dostarczenie użytkownikowi obiektywnych danych o wykonanej ewolucji, co bezpośrednio realizuje założenie o stworzeniu bezinwazyjnego, mobilnego narzędzia wspomagającego trening. Wizualizacja ta została zoptymalizowana pod kątem użyteczności, zastępując skomplikowane wykresy prostymi wskaźnikami liczbowymi, co ułatwia szybką analizę błędów bezpośrednio po wykonaniu triku.
