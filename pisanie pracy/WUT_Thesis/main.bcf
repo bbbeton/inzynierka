@@ -2422,6 +2422,8 @@
     <bcf:citekey order="67" intorder="1">host2022overview</bcf:citekey>
     <bcf:citekey order="68" intorder="1">barris2008review</bcf:citekey>
     <bcf:citekey order="69" intorder="1">movenet2021</bcf:citekey>
+    <bcf:citekey order="70" intorder="1">kaggle_skateboarding_dataset</bcf:citekey>
+    <bcf:citekey order="71" intorder="1">lightningdrop2024</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">

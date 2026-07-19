@@ -1,9 +1,32 @@
 \newpage
 \section{Opracowanie modułu sztucznej inteligencji}
-\subsection{Zbiór danych treningowych}
-\subsection{Ekstrakcja cech i estymacja pozy}
-\subsection{Preprocessing i normalizacja danych}
-\subsection{Architektura modelu klasyfikacyjnego}
-\subsection{Trenowanie modelu i konwersja TensorFlow Lite}
+    
+    Niniejszy rozdział poświęcono szczegółowemu omówieniu procesu projektowania oraz implementacji modułu sztucznej inteligencji. Stanowi on główny silnik analityczny zaprojektowanej aplikacji mobilnej. Zgodnie z założeniami projektowymi opisanymi w rozdziale trzecim, klasyfikacja trików realizowana jest w oparciu o analizę wizyną działającą bezpośrednio na urządzeniu końcowym (w tym przypadku smarftonie użytkownika). Ze względu na złożoność tego zagadnienia, proces trworzenia systemu rozpoznawania ruchu podzielono na kilka kluczowych etapów, opisanych w kolejnych podrozdziałach. 
+    
+    \subsection{Zbiór danych treningowych}
+
+        Do wytrenowania modelu klasyfikacyjnego wykorzystano ogólnodostępny zbiór danych wideo o nazwie \enquote{\textit{Skateboarding Trick Dataset (120fps)}}, udostępniony na platformie badawczej Kaggle \cite{kaggle_skateboarding_dataset}. Wybrany zbiór zawiera nagrania wideo przedstawiające osiem różnych klas ewolucji deskorolkowych: 
+        \begin{itemize}
+            \item Ollie,
+            \item Kickflip,
+            \item Heelflip,
+            \item Frontside Shuvit,
+            \item Shuvit,
+            \item Backside 180,
+            \item Frontside 180,
+            \item Pressure Flip.
+        \end{itemize}
+        W zbiorze znajduje się po około 50 nagrań do każdej z klas.
+
+        Początkowe plany projektowe zakładały rozbudowę bazy treningowe poprzez połączenie jej z zewnętrznymi materiałami, takimi jak repozytorium \textit{SkateboardML}, udostępnione w serwisie \textit{GitHub} przez użytkownika \textit{LightningDrop} \cite{lightningdrop2024}. Po dokładnej analizie danych źródłowych zdecydowano się jednak na odrzucenie tej koncepcji z uwagi na wysokie ryzyko błędów architektonicznych. Zewnętrzny zbiór zawierał po około 100 próbek wideo i ograniczał się tylko do dwóch klas (Ollie oraz Kickflip). Integracja tak ograniczonych danych ze zbalansowanym zbiorem z platformy \textit{Kaggle} mogłaby doprowadzić do drastycznego zaburzenia równowagi klas. Z punktu widzenia uczenia maszynowego skutkowałoby to wykształceniem przez sieć neuronową tzw. obciążenia (z ang. \textit{bias}) - model zacząłby sztucznie faworyzować te ewolucje, których próbek byłoby znacząco więcej niż innych (w tym przypadku Ollie i Kickflip). Przełożyłoby się to na znaczący wzrost liczby fałszywych detekcji podczas użytkowania aplikacji.
+
+        Istotnym wyzwaniem inżynierskim była również rozbieżność w parametrach nagrań. Filmy z platformy \textit{Kaggle} były nagrywane z częstotliwością 120 klatek na sekundę (FPS - z ang. \textit{Frames per second}), podczas gdy aparaty docelowych urządzeń mobilnych pracują zazwyczaj w standardzie 30 FPS. Aby zapobiec wyuczeniu przez model nienaturalnie wolnej dynamiki ruchu, zastosowano w kodzie mechanizm odrzucania klatek, powodując tym samym konwersję wideo do 30 FPS.
+
+        Należy zauważyć, że choć wielkość zastosowanego zbioru danych jest stosunkowo skromna jak na standardy komercyjnych systemów sztucznej inteligencji, jest to ilość w zupełności wystarczająca do opracowania funkcjonalnego prototypu (z ang. \textit{Proof of Concept}) i poprawnej walidacji koncepcji w ramach pracy inżynierskiej. Ewentualne powiększenie zbioru danych mogłoby w przyszłości zostać zrealizowane poprzez proces tzw. \textit{crowdsourcingu}, wykorzustując nagrania nadsyłane anonimowo przez aktywnych użytkowników aplikacji.
+
+    \subsection{Ekstrakcja cech i estymacja pozy}
+    \subsection{Preprocessing i normalizacja danych}
+    \subsection{Architektura modelu klasyfikacyjnego}
+    \subsection{Trenowanie modelu i konwersja TensorFlow Lite}
 
 %odnieść się do tego czy jest wystarczająca ilość danych treningowych
