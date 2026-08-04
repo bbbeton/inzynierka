@@ -302,6 +302,68 @@
       \verb https://www.tensorflow.org/hub/tutorials/movenet?hl=pl
       \endverb
     \endentry
+    \entry{kaggle_skateboarding_dataset}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=2889c2fd1d9834b91aef1bbb5fed5ed1}{%
+           family={Sensui0731},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{fullhash}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{fullhashraw}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{bibnamehash}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{authorbibnamehash}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{authornamehash}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{authorfullhash}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \strng{authorfullhashraw}{2889c2fd1d9834b91aef1bbb5fed5ed1}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Skateboarding Trick Dataset (120fps)}
+      \field{urlday}{19}
+      \field{urlmonth}{7}
+      \field{urlyear}{2026}
+      \field{year}{2022}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://www.kaggle.com/datasets/sensui0731/skateboarding-trick-dataset-120fps/versions/1?resource=download
+      \endverb
+      \verb{url}
+      \verb https://www.kaggle.com/datasets/sensui0731/skateboarding-trick-dataset-120fps/versions/1?resource=download
+      \endverb
+    \endentry
+    \entry{lightningdrop2024}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=8058a0e57c9f7e975814fa232c49b5be}{%
+           family={LightningDrop},
+           familyi={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{fullhash}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{fullhashraw}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{bibnamehash}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{authorbibnamehash}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{authornamehash}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{authorfullhash}{8058a0e57c9f7e975814fa232c49b5be}
+      \strng{authorfullhashraw}{8058a0e57c9f7e975814fa232c49b5be}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{SkateboardML}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2024}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://github.com/LightningDrop/SkateboardML
+      \endverb
+      \verb{url}
+      \verb https://github.com/LightningDrop/SkateboardML
+      \endverb
+    \endentry
   \enddatalist
 \endrefsection
 \endinput

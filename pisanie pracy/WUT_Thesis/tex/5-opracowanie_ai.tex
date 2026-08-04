@@ -16,7 +16,7 @@
             \item Frontside 180,
             \item Pressure Flip.
         \end{itemize}
-        W zbiorze znajduje się po około 50 nagrań do każdej z klas.
+        W zbiorze znajduje się po około pięćdziesiąt nagrań do każdej z klas.
 
         Początkowe plany projektowe zakładały rozbudowę bazy treningowe poprzez połączenie jej z zewnętrznymi materiałami, takimi jak repozytorium \textit{SkateboardML}, udostępnione w serwisie \textit{GitHub} przez użytkownika \textit{LightningDrop} \cite{lightningdrop2024}. Po dokładnej analizie danych źródłowych zdecydowano się jednak na odrzucenie tej koncepcji z uwagi na wysokie ryzyko błędów architektonicznych. Zewnętrzny zbiór zawierał po około 100 próbek wideo i ograniczał się tylko do dwóch klas (Ollie oraz Kickflip). Integracja tak ograniczonych danych ze zbalansowanym zbiorem z platformy \textit{Kaggle} mogłaby doprowadzić do drastycznego zaburzenia równowagi klas. Z punktu widzenia uczenia maszynowego skutkowałoby to wykształceniem przez sieć neuronową tzw. obciążenia (z ang. \textit{bias}) - model zacząłby sztucznie faworyzować te ewolucje, których próbek byłoby znacząco więcej niż innych (w tym przypadku Ollie i Kickflip). Przełożyłoby się to na znaczący wzrost liczby fałszywych detekcji podczas użytkowania aplikacji.
 
@@ -25,8 +25,42 @@
         Należy zauważyć, że choć wielkość zastosowanego zbioru danych jest stosunkowo skromna jak na standardy komercyjnych systemów sztucznej inteligencji, jest to ilość w zupełności wystarczająca do opracowania funkcjonalnego prototypu (z ang. \textit{Proof of Concept}) i poprawnej walidacji koncepcji w ramach pracy inżynierskiej. Ewentualne powiększenie zbioru danych mogłoby w przyszłości zostać zrealizowane poprzez proces tzw. \textit{crowdsourcingu}, wykorzustując nagrania nadsyłane anonimowo przez aktywnych użytkowników aplikacji.
 
     \subsection{Ekstrakcja cech i estymacja pozy}
+
+        Ze względu na wysoką złożoność obliczeniową surowych plików wideo, zdecydowano się na podejście oparte na detekcji cech przestrzennych szkieletu ludzkiego. Wykorzystano w tym celu model estymacji pozy \textit{Google MoveNet} pobrany z repozytorium \textit{TensorFlow Hub} \cite{openpose2025}. Model ten posiada dwa warianty:
+        \begin{itemize}
+            \item \textbf{Thunder}, w którym priorytetyzowana jest precyzja działania;
+            \item \textbf{Lightning}, w przypadku którego kluczowa jest szybkość działania.
+        \end{itemize}
+        W przypadku niniejszej pracy inżynierskiej zdecydowano się na skorzystanie z wersji \textit{Thunder}, ponieważ w przypadku analizy tak dynamicznego i skomplikowanego ruchu, jakim jest jazda na deskorolce, wysoka precyzja jest kluczowa.
+
+        Proces ekstrakcji pozy przebiegał w sposób ujednolicony dla każdej klatki. Najpierw obraz był skalowany i uzupełniany czarnymi pasami do wymiarów wejściowych wymaganych przez model, tj. 256x256 pikseli. Następnie \textit{MoveNet} przeprowadzał inferencję, lokalizując 17 kluczowych punktów szkieletu, takich jak stawy skokowe, kolanowe, ramiona czy biodra. Dla każdego punktu model zwraca trzy wartości: współrzędną X, współrzędną Y oraz współczynnik pewności wykrycia. W wyniku tej operacji każda klatka obrazu redukowana była do wektora jednowymiarowego składającego się z 51 cech numerycznych, co drastycznie obniżyło objętość danych przesyłanych do głównego klasyfikatora.
+
     \subsection{Preprocessing i normalizacja danych}
+    
+        Po ekstrakcji punkty kluczowe wymagały przekształcenia do postaci zrozumiałej dla modelu analizującego szeregi czasowe. Zebrane dane zostały uporządkowane chronologicznie, a etykiety tekstowe (nazwy trików) poddano kodowaniu numerycznemu za pomocą narzędzia \textit{LabelEncoder}.
+        
+        W celu uchwycenia dynamiki ruchu, zastosowana została technika przesuwnego okna (z ang. \textit{sliding window}). Rozmiar okna wejściowego ustawiono na 30 klatek, co przy znormalizowanej prędkości 30 FPS odpowiada dokładnie jednej sekundzie nagrania, co jest optymalnym czasem na wykonanie triku deskorolkowego. W celu powiększenia liczby unikalnych próbek, zastosowano przesunięcie okna o 2 klatki. Ostateczny zbiór danych składał się z trójwymiarowych tensorów o kształcie (30, 51) (30 klatek wideo, 51 cech w każdej klatce - iloczyn 17 punktów na ciele i 3 informacji dla każdego punktu), który następnie podzielono na zbiór treningowy i walidacyjny w klasycznej proporcji 80:20, gwarantując obiektywną ewaluację modelu. 
+
     \subsection{Architektura modelu klasyfikacyjnego}
+
+        Na etapie doboru algorytmu decyzyjnego odrzucono ciężkie sieci rekurencyjne (np. \textit{LSTM}) na rzecz szybkiej, jednowymiarowej sieci neuronowej \textit{1D-CNN}. Sieci te zostały opisane szerzej w podrodziale 2.3, warto jednak zaznaczyć, iż wybrana architektura charakteryzuje się znacznie mniejszym zapotrzebowaniem na moc obliczeniową oraz zoptymalizowanym procesem wnioskowania, co bezpośrednio wpisuje się w założenia platformy docelowej, umożliwiając płynne działanie klasyfikatora lokalnie, wykorzystując wyłącznie moc obliczeniową procesora smartfona.
+
+        Zaprojektowana sieć neuronowa składa się z następujących elementów operacyjnych:
+
+        \begin{itemize}
+            \item \textbf{Warstwa wejściowa}: przyjmująca sekwencje tensorów czasowo przestrzennych.
+            \item \textbf{Pierwszy blok splotowy}: jednowymiarowa warstwa splotowa, wyodrębniająca lokalne wzorce ruchu przy użyciu 64 filtrów oraz nieliniowej funkcji aktywacji ReLU. Bezpośrednio za nią zastosowano warstwę odrzucania, dezaktywującą 30\% neuronów w celu zapobiegania zjawisku przeuczenia, oraz warstwę łączenia maksymalnego, odpowiedzialną za redukcję wymiarowości czasowej i wygładzenie rejestrowanego sygnału.
+            \item \textbf{Drugi blok splotowy}: kolejna jednowymiarowa warstwa splotowa, poszerzona do 128 filtrów, zintegrowana z analogicznymi mechanizmami regularyzacji i zrzeszania przestrzennego.
+            \item \textbf{Blok w pełni połączony}: warstwa spłaszczająca (z ang. \textit{Flatten}), dokonująca transformacji wyuczonych wielowymiarowych map cech do postaci wektora jednowymiarowego. Tak przetworzone dane przekazywane są do gęstej warstwy ukrytej, zbudowanej z 64 neuronów z funkcją aktywacji ReLU.
+            \item \textbf{Warstwa wyjściowa}: warstwa gęsta wyposażona w 8 neuronów, których liczba odpowiada ilości rozpoznawanych klas ewolucji. Operuje ona na funkcji aktywacji \textit{Softmax}, która poddaje sygnały wyjściowe normalizacji, tworząc ostateczny rozkład prawdopodobieństwa przynależności analizowanej sekwencji do każdej z dyskretnych klas.
+        \end{itemize}
+
     \subsection{Trenowanie modelu i konwersja TensorFlow Lite}
+
+        Proces optymalizacji wag w zaprojektowanej sieci splotowej zrealizowano przy użyciu adaptacyjnego algorytmu optymalizacji \textit{Adam} (z ang. \textit{Adaptive Movement Estimation}). Algorytm ten dynamicznie dostosowuje czynniki uczenia dla poszczególnych wag na podstawie estymacji pierwszego i drugiego momentu gradientu, co pozwala na szybszą i bardziej stabilną zbieżność modelu. Celem optymalizacji była minimalizacja funkcji straty opartej na rzadkiej entropii krzyżowej (z ang. \textit{Sparse Categorical Crossentropy}). Proces uczenia zaplanowano na maksymalnie 50 epok, w trakcie których dane treningowe przetwarzano w mniejszych pakietach liczących po 32 próbki.
+
+        W celu maksymalizacji zdolności modelu do generalizacji (poprawnego rozpoznawania nowych, nieznanych wcześniej nagrań) oraz zapobiegania zjawisku przeuczenia, zastosowano technikę regularyzacji zwaną wczesnym zatrzymywaniem. Polega ona na ciągłym monitorowaniu wartości funkcji straty na niezależnym zbiorze walidacyjnym po każdej epoce. Algorytm został zaprogramowany tak, aby automatycznie przerwać proces uczenia, jeżeli błąd walidacyjny nie uległ zmniejszeniu przez 10 kolejnych iteracji. Po takim zatrzymaniu, przywracane i zapisywane były te wagi sieci, dla których odnotowano najniższą wartość błędu, gwarantując wybór najbardziej optymalnego stanu modelu.
+
+        Finalnym etapem prac nad silnikiem analitycznym była konwersja skomplikowanej sieci do lekkiego formatu binarnego, zoptymalizowanego pod kątem urządzeń o ograniczonych zasobach sprzętowych. W trakcie konwersji zastosowano rygorystyczne reguły kompilacji. Wymuszono mapowanie warstw sieci neuronowej wyłącznie na zbiór podstawowych operacji matematycznych, które są natywnie i sprzętowo wspierane przez procesory smartfonów. Tym samym zrezygnowano z implementacji złożonych, zewnętrznych instrukcji obliczeniowych macierzystej biblioteki programistycznej. Takie ograniczenie przestrzeni operacyjnej pozwoliło na znaczną redukcję objętości pliku wynikowego w formacie \textit{.tflite} oraz zagwarantowało wydajne, bezproblemowe wnioskowenia modelu na mobilnych architekturach procesorów.
 
 %odnieść się do tego czy jest wystarczająca ilość danych treningowych

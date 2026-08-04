@@ -2424,6 +2424,7 @@
     <bcf:citekey order="69" intorder="1">movenet2021</bcf:citekey>
     <bcf:citekey order="70" intorder="1">kaggle_skateboarding_dataset</bcf:citekey>
     <bcf:citekey order="71" intorder="1">lightningdrop2024</bcf:citekey>
+    <bcf:citekey order="72" intorder="1">openpose2025</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="none">
