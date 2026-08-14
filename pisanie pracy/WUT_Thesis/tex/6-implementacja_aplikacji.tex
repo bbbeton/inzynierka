@@ -68,7 +68,7 @@ return 'http://10.0.2.2:8000';
         \begin{lstlisting}[
                 language=Dart,
                 caption={Algorytm \texttt{\_resampleKeypointSequence}},
-                label={lst:resolve_base_url}
+                label={lst:resampleKeypointSequence}
             ]
 List<List<double>> _resampleKeypointSequence(List<List<double>> source,
 int targetLength) {
@@ -104,5 +104,77 @@ return out;
         Pliki wideo nie są przechowywane w pamięci urządzenia ze względu na brak użytecznego uzasadnienia takiego rozwiązania oraz potencjalne zużywanie zasobów pamięci urządzenia w przypadku nagromadzenia znacznej ilości nagrań. Zamiast tego, użytkownik ma dostęp do historii pięciu ostatnich trików, wraz ze stopniem pewności modelu co do klasyfikacji triku, wyrażonej w warości procentowej.
 
     \subsection{Integracja modułu TensorFlow Lite z aplikacją}
+
+            Integrację modeli uczenia maszynowego z kodem aplikacji zrealizowano za pomocą biblioteki \texttt{tflite\_flutter}, która jest oficjalnym interfejsem do środowiska uruchomieniowego \textit{TensorFlow Lite}. Proces wnioskowania przebiega dwuetapowo:
+            
+            \subsubsection{Estymacja pozy}
+                
+                Na tym etapie przetwarzania danych klasa \texttt{MoveNetService} odpowiada za konwersję materiału wideo do lżejszego i łatwiejszego formatu. W pierwszym kroku usługa ładuje model \texttt{movenet\_thunder.tflite}. Ze względu na duże obciążenie obliczeniowe związane z namierzeniem 17 kluczowych punktów ciała, w konfiguracji interpretera przydzielono 4 wątki procesora. Usługa przetwarza klatki nagrania i zwraca spłaszczoną tablicę 51 wartości, która została opisana dokładniej w rozdziale piątym. Tak spreparowane dane są następnie analizowane.
+
+            \subsubsection{Klasyfikacja ewolucji}
+
+                Za klasyfikację ewolucji odpowiada klasa \texttt{TrickDetector}. Przygotowany ciąg 30 klatek przekazywany jest do jednowymiarowej splotowej sieci neuronowej, która przechowywana jest w pamięci jako plik binarny \texttt{trick\_classifier.tflite}. Podczas testów aplikacji na rzeczywistych nagraniach wideo zauważono spadek dokładności klasyfikacji w porównaniu do wyników uzyskanych w środowisku treningowym. Aby poprawić skuteczność rozpoznawania trików bez konieczności ponownego trenowania modelu, w kodzie aplikacji zastosowano dwa mechanizmy wspomagające:
+                \begin{enumerate}
+                    \item \textbf{Korekta prawdopodobieństw klas}: Zdefiniowano mapę współczynników korygujących \texttt{\_baseClassCalibration}, która modyfikuje prawdopodobieństwa wyjściowe zwracane przez sieć. Zwiększa ona wagę dla trików trudniejszych do wykrycia - takich jak \textit{Kickflip}, którego waga wynosi 1.25 - a jednocześnie zmniejsza wagi dla klas, które model skłonny był faworyzować - czyli np. \textit{Frontside 180}, którego waga wynosi 0.88. W poniższym załączniku znajduje się kod tej mapy.
+        \begin{lstlisting}[
+                language=Dart,
+                caption={Mapa \texttt{\_baseClassCalibration}},
+                label={lst:baseClassCalibration}
+            ]
+static const Map<String, double> _baseClassCalibration = {
+'Backside180': 0.90,
+'Frontside180': 0.88,
+'Frontshuvit': 1.08,
+'Pressureflip': 0.92,
+'Kickflip': 1.25,
+'Heelflip': 1.12,
+'Ollie': 0.90,
+'Shuvit': 1.08,
+};
+\end{lstlisting}                    
+
+                    \item \textbf{Analiza kąta rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na poniższym załączniku. Oblicza ona kąt nachylenia klatki piersiowej za pomocą funkcji trygonometrycznej $a\tan 2$, na podstawie piątego i szóstego punktu kluczowego, czyli odpowiednio lewego oraz prawego ramienia. Obserwując zmiany tego kąta na przestrzeni całego nagrania, aplikacja potrafi określić,czy użytkownik wykonał obrót ciałem w przestrzeni. Pozwala to skutecznie odróżnć triki, których obraca się tylko deskorolka, takie jak \textit{Shuvit}, od takich, w których obraca się także skater, czyli np. \textit{Frontside 180}.
+        \begin{lstlisting}[
+                language=Dart,
+                caption={Metoda \texttt{\_torsoAngle}},
+                label={lst:torsoAngle}
+            ]
+double? _torsoAngle(List<double> frame) {
+if (frame.length < 51) return null;
+
+// MoveNet keypoints: 5 leftShoulder, 6 rightShoulder.
+final leftShoulderY = frame[5 * 3];
+final leftShoulderX = frame[5 * 3 + 1];
+final leftShoulderS = frame[5 * 3 + 2];
+final rightShoulderY = frame[6 * 3];
+final rightShoulderX = frame[6 * 3 + 1];
+final rightShoulderS = frame[6 * 3 + 2];
+
+if (leftShoulderS < 0.2 || rightShoulderS < 0.2) return null;
+return math.atan2(rightShoulderY - leftShoulderY, 
+rightShoulderX - leftShoulderX);
+}
+\end{lstlisting}
+                \end{enumerate}
+            Ostateczna klasyfikacja ewolucji następuje w wyniku syntezy wyjścia z sieci neuronowej z zaprezentowanymi wyżej mechanizmami korekcyjnymi. Proces wyznaczenia wyniku przebiega w następujących krokach:
+            \begin{itemize}
+                \item Surowe prawdopodobieństwa zwracane przez funkcję \textit{Softmax} dla poszczególnych klas są skalowane (mnożone) przez odpowiadające im wskaźniki z mapy \\\texttt{\_baseClassCalibration}.
+                \item Algorytm sumuje całkowitą zmianę kąta tułowia na przestrzeni 30 klatek. Jeżeli wykryty obrót przekracza założony próg geometryczny, priorytetowo traktowane są klasy trików z rotacją ciała, natomiast w przypadku braku rotacji - klasy trików stacjonarnych.
+                \item Z tak zmodyfikowanego wektora prawdopodobieństw wyznaczana jest wartość maksymalna (\textit{argmax}), wskazująca najbardziej prawdopodobną ewolucję.
+                \item Jeżeli obliczona pewność predykcji przekracza przyjęty próg akceptacji (ustalony empirycznie na poziomie 70\%), usługa \texttt{TrickDetector} zwraca do interfejsu użytkownika nazwę rozpoznanego triku wraz z poziomem ufności wyrażonym w procentach. W przeciwnym razie ewolucja klasyfikowana jest jako nierozpoznana, co zapobiega wyświetlaniu błędnych wyników.
+            \end{itemize}
+
+            Przekazanie zweryfikowanego wyniku do warstwy prezentacji kończy pełen cykl przetwarzania wideo, umożliwiając natychmiastową prezentację rezultatu na ekranie smartfona.
+
     \subsection{Architektura i impelemtacja warstwy serwerowej}
+
+        Warstwa serwerowa systemu, nazywana \textit{Backend'em}, pełni rolę centralnego węzła zarządzającego danymi o infrastrukturze sportowej oraz komunikacją z aplikacją mobilną. Do jej implementacji wykorzystano język \textit{Python} oraz framework \textit{FastAPI}. Wybór tych technologii, opisany szerzej w rozdziale trzecim, podyktowany był wysoce wydajną, asynchroniczną obsługą zapytań, automatyczną walidacją typów danych za pomocą biblioteki \textit{Pydantic} oraz wbudowaną generacją interaktywnej dokumentacji \textit{OpenAPI} (\textit{SwaggerUI}).
+
+        Komunikacja między aplikacją mobliną a serwerem odbywa się poprzez bezstanowy interfejs programistyczny \textit{REST API} z wykorzystaniem formatu JSON. Interfejs serwera został podzielony na wyizolowane punkty końcowe, odpowiadające za poszczególne zasoby systemu.
+
+        W poniższej tabeli przedstawiono wybrane punkty końcowe \textit{REST API} obsługiwane przez backend:
+
+
+
     \subsection{Baza danych oraz przechowywanie zasobów multimedialnych}
+    \subsection{Finalny wygląd aplikacji}
