@@ -1,6 +1,15 @@
-\newpage
-\section{Budowa aplikacji mobilnej}
-\subsection{Struktura projektu w środowisku Flutter}
-\subsection{Integracja modułu mapy}
-\subsection{Obsługa kamery i zarządzanie plikami wideo}
-\subsection{Integracja modułu TensorFlow Lite z aplikacją}
+\newpage    
+    \section{Budowa aplikacji mobilnej}
+
+        Niniejszy rozdział poświęcono szczegółowemu opisowi architektury oras implementacji warstwy użytkownika systemu w postaci aplikacji mobilnej. Aplikacja ma na celu integrację funkcji mapowania skateparków z modułem analizy wizyjnej, realizującym wnioskowanie w czasie rzeczywistym na urządzeniu końcowym. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz architekturę integracji uczenia maszynowego.
+
+    \subsection{Struktura projektu w środowisku Flutter}
+        Aplikacja mobilna została zrealizowana z wykorzystaniem wielofplatformowego framework'a \textit{Flutter} oraz języka programowania \textit{Dart}. Wybór tej tej technologii ukierunkowany był przede wszystkim uniwersalnością (\textit{Flutter} działa zarówno na telefonach z systemem \textit{Android}, jak i \textit{iOS}). Ponadto posiada on możliwość kompilacji kodu źródłowego bezpośrednio do natywnych instrukcji procesorów o architekturze ARM, co zapewnia wysoką wydajność renderowania interfejsu użytkownika.
+
+        Architekturę oprogramowania została zaprojektowana w oparciu o wzorzec podziału odpowiedzialności (z ang. \textit{Separation of concerns}), wyodrębniający trzy główne warstwy:
+        \begin{enumerate}
+            \item \textbf{Warstwę prezentacji} (\textit{UI}): odpowiedzialną za renderowanie komponentów interfejsu, zarządzanie stanem wudoków oraz obsługę zdarzeń
+        \end{enumerate}
+    \subsection{Integracja modułu mapy}
+    \subsection{Obsługa kamery i zarządzanie plikami wideo}
+    \subsection{Integracja modułu TensorFlow Lite z aplikacją}

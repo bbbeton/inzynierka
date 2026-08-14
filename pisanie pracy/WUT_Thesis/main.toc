@@ -6,7 +6,7 @@
 \contentsline {section}{\numberline {2\relax .\enspace }Przegląd istniejących rozwiązań}{13}{section.2}%
 \contentsline {subsection}{\numberline {2.1\relax .\enspace }Aplikacje dedykowane dla społeczności deskorolkowej}{13}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2\relax .\enspace }Analiza ruchu w sporcie: Wideo a czujniki sprzętowe}{16}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3\relax .\enspace }Modele wizyjnej analizy ruchu}{17}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.3\relax .\enspace }Modele wizyjnej analizy ruchu}{18}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4\relax .\enspace }Podsumowanie}{19}{subsection.2.4}%
 \contentsline {section}{\numberline {3\relax .\enspace }Założenia i architektura systemu}{21}{section.3}%
 \contentsline {subsection}{\numberline {3.1\relax .\enspace }Wymagania funkcjonalne i niefunkcjonalne}{21}{subsection.3.1}%
@@ -42,6 +42,7 @@
 \contentsline {subsection}{\numberline {8.1\relax .\enspace }Wnioski z przeprowadzonych prac}{37}{subsection.8.1}%
 \contentsline {subsection}{\numberline {8.2\relax .\enspace }Ograniczenia stworzonego rozwiązania}{37}{subsection.8.2}%
 \contentsline {subsection}{\numberline {8.3\relax .\enspace }Możliwości dalszego rozwoju}{37}{subsection.8.3}%
-\contentsline {section}{Spis rysunków}{39}{subsection.8.3}%
-\contentsline {section}{Spis tabel}{40}{subsection.8.3}%
-\contentsline {section}{Spis załączników}{41}{section*.12}%
+\contentsline {section}{Bibliografia}{39}{section*.12}%
+\contentsline {section}{Spis rysunków}{40}{section*.12}%
+\contentsline {section}{Spis tabel}{41}{section*.12}%
+\contentsline {section}{Spis załączników}{42}{section*.13}%
