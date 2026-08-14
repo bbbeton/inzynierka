@@ -1,5 +1,5 @@
 \newpage    
-    \section{Budowa aplikacji mobilnej}
+    \section{Budowa aplikacji mobilnej i warstwy serwerowej}
 
         Niniejszy rozdział poświęcono szczegółowemu opisowi architektury oras implementacji warstwy użytkownika systemu w postaci aplikacji mobilnej. Aplikacja ma na celu integrację funkcji mapowania skateparków z modułem analizy wizyjnej, realizującym wnioskowanie w czasie rzeczywistym na urządzeniu końcowym. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz architekturę integracji uczenia maszynowego.
 
@@ -8,8 +8,101 @@
 
         Architekturę oprogramowania została zaprojektowana w oparciu o wzorzec podziału odpowiedzialności (z ang. \textit{Separation of concerns}), wyodrębniający trzy główne warstwy:
         \begin{enumerate}
-            \item \textbf{Warstwę prezentacji} (\textit{UI}): odpowiedzialną za renderowanie komponentów interfejsu, zarządzanie stanem wudoków oraz obsługę zdarzeń
+            \item \textbf{Warstwę prezentacji} (\textit{UI}) odpowiedzialną za renderowanie komponentów interfejsu, zarządzanie stanem widoków oraz obsługę zdarzeń dotykowych użytkownika.
+            \item \textbf{Warstwę logiki biznesowej i dziedzinowej} zawierającą struktury danych oraz algorytmy przetwarzania danych wejściowych.
+            \item \textbf{Warstwę usług} realizującą komunikację sieciową z interfejsem \textit{API} (z ang. \textit{Application Programming Interface} - Interfejs programowania aplikacji) oraz niskopoziomowe operacje na urządzeniu końcowym (kamera, akceleratory uczenia maszynowego).
         \end{enumerate}
+
+        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono trub pełoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to maksymalnie wykorzystać przestrzeń ekranu na potrzeby podglądu kamery oraz interaktywnej mapy. Spójność wizualną interfejsu zapowniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
+
     \subsection{Integracja modułu mapy}
+
+        Moduł mapy odpowiada za wizualizację, rejestrację oraz edycję punktów reprezentujących skateparki, obiekty sportowe i \enquote{spoty} deskorolkowe. Warstwa komunikacji sieciowej została wyizolowana w ramach klasy \texttt{SkateSpotApi} operującej na protokole \texttt{HTTP} z wykorzystaniem architektury \texttt{RESTful}.    
+
+        W celu ułatwienia testowania i wdrażania aplikacji, zaimplementowano funkcję dymanicznego wyboru adresu bazowego serwera (\texttt{\_resolveBaseUrl}). Metod ta sprawdza zmienne środowiskowe przekazane podczas kompilacji i automatycznie dobiera odpowiedni adres URL:
+        \begin{itemize}
+            \item dla środowiska lokalnego (deweloperskiego) kieruje zapytania pod adres IP emulatora Androida - \texttt{http://10.0.2.2:8000},
+            \item dla środowiska produkcyjnego wykorzystuje adres serwera w chmurze (\textit{Render}),
+        \end{itemize}
+            Widoczna na poniższym załączniku metoda \texttt{\_resolveBaseUrl} odpowiada za dynamiczny dobór adresu bazowego \texttt{API}.
+
+\begin{lstlisting}[
+        language=Dart,
+        caption={Metoda \texttt{\_resolveBaseUrl}.},
+        label={lst:resolve_base_url}
+    ]
+static String _resolveBaseUrl({String? override}) {
+if (override != null && override.isNotEmpty) {
+    return override.replaceAll(RegExp(r'/$'), '');
+}
+const explicit = String.fromEnvironment('BACKEND_BASE_URL', defaultValue: '');
+if (explicit.isNotEmpty) {
+    return explicit.replaceAll(RegExp(r'/$'), '');
+}
+const appEnv = String.fromEnvironment('APP_ENV', defaultValue: 'dev');
+if (appEnv == 'prod') {
+    const prodUrl = String.fromEnvironment(
+    'PROD_BACKEND_BASE_URL',
+    defaultValue: 'https://flatground.onrender.com',
+    );
+    return prodUrl.replaceAll(RegExp(r'/$'), '');
+}
+return 'http://10.0.2.2:8000';
+}
+\end{lstlisting}
+
+        Dane przesłane z serwera w formacie JSON są przekształcane na obiekty reprezentujące skateparki za pomocą klasy \texttt{SkateSpot}. \texttt{API} obsługuje pełen zestaw operacji \texttt{CRUD} (z ang. \textit{Create, Read, Update, Delete}), umożliwiając m. in. pobieranie listy obiektów wraz ze współrzędnymi geograficznymi, dodawanie szczegółowych opisów, określanie poziomu trudności oraz dołączanie zdjęć. Aby zapobiec awarii aplikacji w przypadku braku połączenia z internetem, zapytania sieciowe zabezpieczono obsługą błędów opartą na klasie \texttt{HttpException}.
+
     \subsection{Obsługa kamery i zarządzanie plikami wideo}
+    
+        Automatyczne rozpoznawanie trików wymaga pobrania i wstepnej obróbki nagrania z kamery smartfona. Z powodu dużej różnorodności modeli telefonów, powodującej dużą rozbieżność rozdzielczości i proporcji obrazu, materiał wideo przed przekazaniem do modli uczenia maszynowego musi zostać ustandaryzowany.
+
+        Na proces przygotowania danych wideo składają sie dwa główne etapy:
+        \begin{itemize}
+            \item \textbf{Normalizacja przstrzenna klatek}: Każda klatka filmu ulega przeskalowaniu z zachowaniem oryginalnych proporcji obrazu, a następnie umieszczana w kwadratowej macierzy o wymiarach $256 x 256$ pikseli. Ewentualny wolny obszar powstały na skutek tej konwersji, uzupełniany jest czarnymi pasami, co zapobiega rozciąganiu czy spłaszczaniu sylwetki skatera. Takie zniekształcenie nagrania mogłoby zaburzyć dokładność detekcji punktów kluczowych przez model \textit{MoveNet}.
+            \item \textbf{Normalizacja czasowa sekwencji}: Długości nagrań wgrywanych przez użytkowników różnią się od siebie, a główny klasyfikator wymaga wejścia o stałym wymiarze 30 klatek. Aby to osiągnąć, zaimplementowano funkcję \texttt{\_resampleKeypointSequence}, która przekształca sekwencję punktów kluczowych o dowolnej długości do wymaganego rozmiaru 30 klatek za pomocą liniowej interpolacji współrzędnych.
+        \end{itemize}
+
+        Na poniższym załączniku widoczny jest algorytm liniowej interpolacji i resamplingu sekwencji punktów kluczowych \texttt{\_resampleKeypointSequence}.
+
+        \begin{lstlisting}[
+                language=Dart,
+                caption={Algorytm \texttt{\_resampleKeypointSequence}},
+                label={lst:resolve_base_url}
+            ]
+List<List<double>> _resampleKeypointSequence(List<List<double>> source,
+int targetLength) {
+if (source.isEmpty) {
+    return List.generate(targetLength, (_) => List.filled(51, 0.0));
+}
+if (source.length == targetLength) return source;
+if (source.length == 1) {
+    return List.generate(targetLength, (_) => List<double>.from(source.first));
+}
+final List<List<double>> out = [];
+final double step = (source.length - 1) / (targetLength - 1);
+for (int i = 0; i < targetLength; i++) {
+    final pos = i * step;
+    final left = pos.floor();
+    final right = pos.ceil().clamp(0, source.length - 1);
+    if (left == right) {
+    out.add(List<double>.from(source[left]));
+    continue;
+    }
+    final t = pos - left;
+    final leftFrame = source[left];
+    final rightFrame = source[right];
+    final blended = List<double>.generate(
+    51,
+    (j) => leftFrame[j] * (1.0 - t) + rightFrame[j] * t,
+    );
+    out.add(blended);
+}
+return out;
+}\end{lstlisting}
+
+        Pliki wideo nie są przechowywane w pamięci urządzenia ze względu na brak użytecznego uzasadnienia takiego rozwiązania oraz potencjalne zużywanie zasobów pamięci urządzenia w przypadku nagromadzenia znacznej ilości nagrań. Zamiast tego, użytkownik ma dostęp do historii pięciu ostatnich trików, wraz ze stopniem pewności modelu co do klasyfikacji triku, wyrażonej w warości procentowej.
+
     \subsection{Integracja modułu TensorFlow Lite z aplikacją}
+    \subsection{Architektura i impelemtacja warstwy serwerowej}
+    \subsection{Baza danych oraz przechowywanie zasobów multimedialnych}

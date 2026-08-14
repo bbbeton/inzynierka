@@ -26,23 +26,25 @@
 \contentsline {subsection}{\numberline {5.3\relax .\enspace }Preprocessing i normalizacja danych}{32}{subsection.5.3}%
 \contentsline {subsection}{\numberline {5.4\relax .\enspace }Architektura modelu klasyfikacyjnego}{33}{subsection.5.4}%
 \contentsline {subsection}{\numberline {5.5\relax .\enspace }Trenowanie modelu i konwersja TensorFlow Lite}{33}{subsection.5.5}%
-\contentsline {section}{\numberline {6\relax .\enspace }Budowa aplikacji mobilnej}{35}{section.6}%
+\contentsline {section}{\numberline {6\relax .\enspace }Budowa aplikacji mobilnej i warstwy serwerowej}{35}{section.6}%
 \contentsline {subsection}{\numberline {6.1\relax .\enspace }Struktura projektu w środowisku Flutter}{35}{subsection.6.1}%
 \contentsline {subsection}{\numberline {6.2\relax .\enspace }Integracja modułu mapy}{35}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3\relax .\enspace }Obsługa kamery i zarządzanie plikami wideo}{35}{subsection.6.3}%
-\contentsline {subsection}{\numberline {6.4\relax .\enspace }Integracja modułu TensorFlow Lite z aplikacją}{35}{subsection.6.4}%
-\contentsline {section}{\numberline {7\relax .\enspace }Testy oraz analiza wyników}{36}{section.7}%
-\contentsline {subsection}{\numberline {7.1\relax .\enspace }Środowisko i scenariusze testowe}{36}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2\relax .\enspace }Ewaluacja skuteczności modelu SI}{36}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3\relax .\enspace }Testy funkcjonalne aplikacji}{36}{subsection.7.3}%
-\contentsline {subsection}{\numberline {7.4\relax .\enspace }Podsumowanie}{36}{subsection.7.4}%
-\contentsline {subsubsection}{\numberline {7.4.1\relax .\enspace }Napotkane trudności}{36}{subsubsection.7.4.1}%
-\contentsline {subsubsection}{\numberline {7.4.2\relax .\enspace }Wdrożone poprawki}{36}{subsubsection.7.4.2}%
-\contentsline {section}{\numberline {8\relax .\enspace }Podsumowanie}{37}{section.8}%
-\contentsline {subsection}{\numberline {8.1\relax .\enspace }Wnioski z przeprowadzonych prac}{37}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2\relax .\enspace }Ograniczenia stworzonego rozwiązania}{37}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3\relax .\enspace }Możliwości dalszego rozwoju}{37}{subsection.8.3}%
-\contentsline {section}{Bibliografia}{39}{section*.12}%
-\contentsline {section}{Spis rysunków}{40}{section*.12}%
-\contentsline {section}{Spis tabel}{41}{section*.12}%
-\contentsline {section}{Spis załączników}{42}{section*.13}%
+\contentsline {subsection}{\numberline {6.3\relax .\enspace }Obsługa kamery i zarządzanie plikami wideo}{36}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4\relax .\enspace }Integracja modułu TensorFlow Lite z aplikacją}{38}{subsection.6.4}%
+\contentsline {subsection}{\numberline {6.5\relax .\enspace }Architektura i impelemtacja warstwy serwerowej}{38}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6\relax .\enspace }Baza danych oraz przechowywanie zasobów multimedialnych}{38}{subsection.6.6}%
+\contentsline {section}{\numberline {7\relax .\enspace }Testy oraz analiza wyników}{39}{section.7}%
+\contentsline {subsection}{\numberline {7.1\relax .\enspace }Środowisko i scenariusze testowe}{39}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2\relax .\enspace }Ewaluacja skuteczności modelu SI}{39}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3\relax .\enspace }Testy funkcjonalne aplikacji}{39}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4\relax .\enspace }Podsumowanie}{39}{subsection.7.4}%
+\contentsline {subsubsection}{\numberline {7.4.1\relax .\enspace }Napotkane trudności}{39}{subsubsection.7.4.1}%
+\contentsline {subsubsection}{\numberline {7.4.2\relax .\enspace }Wdrożone poprawki}{39}{subsubsection.7.4.2}%
+\contentsline {section}{\numberline {8\relax .\enspace }Podsumowanie}{40}{section.8}%
+\contentsline {subsection}{\numberline {8.1\relax .\enspace }Wnioski z przeprowadzonych prac}{40}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2\relax .\enspace }Ograniczenia stworzonego rozwiązania}{40}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3\relax .\enspace }Możliwości dalszego rozwoju}{40}{subsection.8.3}%
+\contentsline {section}{Bibliografia}{41}{section*.12}%
+\contentsline {section}{Spis rysunków}{42}{section*.12}%
+\contentsline {section}{Spis tabel}{43}{section*.12}%
+\contentsline {section}{Spis załączników}{44}{section*.13}%

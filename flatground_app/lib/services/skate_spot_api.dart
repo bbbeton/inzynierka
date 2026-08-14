@@ -27,7 +27,7 @@ class SkateSpotApi {
     if (appEnv == 'prod') {
       const prodUrl = String.fromEnvironment(
         'PROD_BACKEND_BASE_URL',
-        defaultValue: 'https://flatground-map-backend.onrender.com',
+        defaultValue: 'https://flatground.onrender.com',
       );
       return prodUrl.replaceAll(RegExp(r'/$'), '');
     }

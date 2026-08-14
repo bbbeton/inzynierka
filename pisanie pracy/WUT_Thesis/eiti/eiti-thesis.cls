@@ -56,6 +56,47 @@
 \RequirePackage{kantlipsum} % English kantian-style lipsum
 \RequirePackage{lipsum}     % Lorem ipsum
 \RequirePackage{listings}   % Code listings
+\lstdefinelanguage{Dart}{
+  morekeywords={abstract,as,assert,async,await,break,case,catch,class,const,continue,default,deferred,do,dynamic,else,enum,export,extends,extension,external,factory,false,final,finally,for,get,if,implements,import,in,is,library,mixin,new,null,on,operator,part,rethrow,return,set,show,static,super,switch,sync,this,throw,true,try,typedef,var,void,while,with,yield,late,required,String,int,double,bool,List,Map,Set,Future,Stream},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  sensitive=true
+}
+\usepackage{xcolor}
+\usepackage{xurl} % Pozwala na ładne dzielenie i zawijanie linków URL w tekście
+
+% Definicja kolorów dla kodu
+\definecolor{atombg}{RGB}{250, 250, 250}         % Tło #fafafa
+\definecolor{atomkeyword}{RGB}{166, 38, 164}     % Słowa kluczowe (fiolet)
+\definecolor{atomstring}{RGB}{80, 161, 79}       % Stringi/Napisy (zielony)
+\definecolor{atomcomment}{RGB}{160, 161, 167}    % Komentarze (szary)
+\definecolor{atomidentifier}{RGB}{64, 120, 242}  % Identyfikatory/Funkcje (niebieski)
+\definecolor{atomnumber}{RGB}{193, 132, 1}       % Liczby (bursztynowy)
+\definecolor{atomframe}{RGB}{220, 224, 230}      % Ramka (jasnoszary)
+% Globalna konfiguracja wyglądu bloków listing
+\lstset{
+    backgroundcolor=\color{atombg},
+    keywordstyle=\color{atomkeyword}\bfseries,
+    stringstyle=\color{atomstring},
+    commentstyle=\color{atomcomment}\itshape,
+    numberstyle=\tiny\color{atomcomment},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,                  % <--- Automatyczne zawijanie długich linii kodu
+    breakatwhitespace=false,          % Zawijaj na spacjach
+    columns=flexible,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=8pt,
+    showspaces=false,
+    showstringspaces=false,
+    tabsize=2,
+    xleftmargin=6mm,
+    frame=single,                     % Estetyczna ramka wokół kodu
+    rulecolor=\color{lightgray}
+}
 \RequirePackage{longtable}  % Multi-page tables
 \RequirePackage{multirow}   % Advanced table cells
 \RequirePackage{setspace}   % Set space between lines
