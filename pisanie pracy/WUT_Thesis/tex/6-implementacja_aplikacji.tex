@@ -13,7 +13,7 @@
             \item \textbf{Warstwę usług} realizującą komunikację sieciową z interfejsem \textit{API} (z ang. \textit{Application Programming Interface} - Interfejs programowania aplikacji) oraz niskopoziomowe operacje na urządzeniu końcowym (kamera, akceleratory uczenia maszynowego).
         \end{enumerate}
 
-        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono tryb pełoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to maksymalnie wykorzystać przestrzeń ekranu na potrzeby podglądu kamery oraz interaktywnej mapy. Spójność wizualną interfejsu zapewniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
+        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono tryb pełnoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to maksymalnie wykorzystać przestrzeń ekranu na potrzeby podglądu kamery oraz interaktywnej mapy. Spójność wizualną interfejsu zapewniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
 
     \subsection{Integracja modułu mapy}
 
@@ -57,7 +57,7 @@ return 'http://10.0.2.2:8000';
     
         Automatyczne rozpoznawanie trików wymaga pobrania i wstępnej obróbki nagrania z kamery smartfona. Z powodu dużej różnorodności modeli telefonów, powodującej dużą rozbieżność rozdzielczości i proporcji obrazu, materiał wideo przed przekazaniem do modeli uczenia maszynowego musi zostać ustandaryzowany.
 
-        Na proces przygotowania danych wideo składają sie dwa główne etapy:
+        Na proces przygotowania danych wideo składają się dwa główne etapy:
         \begin{itemize}
             \item \textbf{Normalizacja przestrzenna klatek}: Każda klatka filmu ulega przeskalowaniu z zachowaniem oryginalnych proporcji obrazu, a następnie umieszczana w kwadratowej macierzy o wymiarach $256 \times 256$ pikseli. Ewentualny wolny obszar powstały na skutek tej konwersji, uzupełniany jest czarnymi pasami, co zapobiega rozciąganiu czy spłaszczaniu sylwetki skatera. Takie zniekształcenie nagrania mogłoby zaburzyć dokładność detekcji punktów kluczowych przez model \textit{MoveNet}.
             \item \textbf{Normalizacja czasowa sekwencji}: Długości nagrań wgrywanych przez użytkowników różnią się od siebie, a główny klasyfikator wymaga wejścia o stałym wymiarze 30 klatek. Aby to osiągnąć, zaimplementowano funkcję \texttt{\_resampleKeypointSequence}, która przekształca sekwencję punktów kluczowych o dowolnej długości do wymaganego rozmiaru 30 klatek za pomocą liniowej interpolacji współrzędnych.
@@ -172,7 +172,7 @@ rightShoulderX - leftShoulderX);
 
         Komunikacja między aplikacją mobliną a serwerem odbywa się poprzez bezstanowy interfejs programistyczny \textit{REST API} z wykorzystaniem formatu JSON. Interfejs serwera został podzielony na wyizolowane punkty końcowe, odpowiadające za poszczególne zasoby systemu.
 
-        W tabeli \ref{tab:porownanie_metod} przedstawiono wybrane punkty końcowe \textit{REST API} obsługiwane przez backend:
+        W tabeli \ref{tab:endpoints} przedstawiono wybrane punkty końcowe \textit{REST API} obsługiwane przez backend:
 
         \begin{table}[!h] \centering
             \caption{Przykładowa tabela pokazująca wybrane punkty końcowe REST API.}
@@ -278,7 +278,7 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
     return upload.filename or file_key, public_url
 \end{lstlisting} 
 
-        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie są zapisywane bezpośredno w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane są jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
+        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie są zapisywane bezpośrednio w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane są jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
 
         Zarówno platforma chmurowa \textit{Render} odpowiadająca za hosting backendu, jak i usługa \textit{Supabase} pełniąca rolę bazy danych i magazynu plików, wykorzystywane są w projekcie w darmowych planach taryfowych. Jest to rozwiązanie w zupełności wystarczające na etapie deweloperskim i testowym. Należy jednak podkreślić, że obie te platformy to wysoce skalowalne, komercyjne usługi chmurowe. Pozwala to na łatwe i błyskawiczne zwiększenie zasobów obliczeniowych (skalowanie wertykalne i horyzontalne) w przypadku przyrostu bazy użytkowników, poprzez przejście na wyższe pakiety subskrypcyjne. Dzięki tak zaprojektowanej architekturze, aplikacja stanowi pełnowymiarowy dowód słuszności koncepcji (z ang. \textit{Proof of Concept - PoC}), który może zostać płynnie przekształcony w komercyjny, odporny na duże obciążenia produkt, bez konieczności kosztownego przepisywania kodu infrastruktury.
 
@@ -288,7 +288,7 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
         
         Na rysunkach \ref{fig:map1} i \ref{fig:map_screens} zaprezentowano główne ekrany działającej aplikacji. Priorytetem pozostawała prostota i intuicyjność, dlatego aplikacja posiada dwa ekrany, z paskiem nawigacji na górze ekranu. Zakładka po lewej stronie nawiguje do ekranu mapy, podzielonego na dwie części:
         \begin{itemize}
-            \item \textbf{Interaktywną mapę}, widoczną na rysunku \ref{fig:map1} (a) na której znajduje się lokalizacja smarftonu użytkownika, a także pinezki oznaczające miejsca do jazdy na deskorolce. Po kliknięciu w którąś z nich na ekranie pojawia się szczegółowy opis \enquote{spotu}, przedstawiony na rysunku \ref{fig:map_screens} (a). Opis składa się ze zdjęcia, adresu, stopnia trudności oraz rodzajów przeszkód. Użytkownik ma również możliwość edycji lub usunięcia miejsca do jazdy. W prawym górnym rogu ekranu znajduje się przycisk oznaczony plusem, który umożliwia dodanie nowego miejsca do jazdy przez użytkownika. Czynność ta może zostać wykonana również poprzez kliknięcie w dowolny punkt na mapie. Po kliknięciu przycisku dodania \enquote{spotu} na ekranie pojawia się okienko edycji, widoczne na rysunku \ref{fig:map1} (b). Użytkownik ma możliwość wprowadzenia danych na temat \enquote{spotu}: nazwy, stopnia trudności, rodzajów przeszkód, adresu, opisu oraz zdjęcia (rysunek \ref{fig:map1} (c)).  W prawym dolnym rogu znajduje się ikona kompasu, kliknięcie której powoduje wycentrowanie mapy względem lokalizacji smartfona.
+            \item \textbf{Interaktywną mapę}, widoczną na rysunku \ref{fig:map1} (a) na której znajduje się lokalizacja smartfonu użytkownika, a także pinezki oznaczające miejsca do jazdy na deskorolce. Po kliknięciu w którąś z nich na ekranie pojawia się szczegółowy opis \enquote{spotu}, przedstawiony na rysunku \ref{fig:map_screens} (a). Opis składa się ze zdjęcia, adresu, stopnia trudności oraz rodzajów przeszkód. Użytkownik ma również możliwość edycji lub usunięcia miejsca do jazdy. W prawym górnym rogu ekranu znajduje się przycisk oznaczony plusem, który umożliwia dodanie nowego miejsca do jazdy przez użytkownika. Czynność ta może zostać wykonana również poprzez kliknięcie w dowolny punkt na mapie. Po kliknięciu przycisku dodania \enquote{spotu} na ekranie pojawia się okienko edycji, widoczne na rysunku \ref{fig:map1} (b). Użytkownik ma możliwość wprowadzenia danych na temat \enquote{spotu}: nazwy, stopnia trudności, rodzajów przeszkód, adresu, opisu oraz zdjęcia (rysunek \ref{fig:map1} (c)).  W prawym dolnym rogu znajduje się ikona kompasu, kliknięcie której powoduje wycentrowanie mapy względem lokalizacji smartfona.
             \item \textbf{Listę \enquote{spotów}} widoczną na rysunku \ref{fig:map_screens} (b). Wyświetla ona listę miejsc do jazdy w kolejności od najbliższej użytkownikowi do najdalszej. Zaimplementowano również intuicyjny mechanizm filtrowania wyników, widoczny na rysunku \ref{fig:map_screens} (c). Użytkownik ma możliwość selekcji dowolnej liczby rodzajów przeszkód, a lista dostosowuje się do wybranych filtrów, co pozwala na precyzyjniejsze i szybsze decyzje wyboru miejsca do treningu.
         \end{itemize}
 
@@ -342,12 +342,12 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
         \begin{itemize}
         \item \textbf{Record} (z ang. Nagraj) służący do nagrania triku bezpośrednio w aplikacji,
         \item \textbf{Upload} (z ang. Prześlij) służący do przesłania już nagranego materiału wideo,
-        \item \textbf{Analyze trick} (z ang. Analizuj trik) służacy do wywołania analizy przesłanego już materiału wideo.
+        \item \textbf{Analyze trick} (z ang. Analizuj trik) służący do wywołania analizy przesłanego już materiału wideo.
         \end{itemize}
 
         Gdy użytkownik wybierze nagranie, na ekranie pojawia się okienko edycji (rysunek \ref{fig:trick-detector} (b)), które pozwala użytkownikowi dostosować długość analizowanego nagrania, tak aby model klasyfikował jedynie wykonywany trik. Pozwala to na zwiększenie precyzji działania modelu.
 
-        Po przesłaniu nagrania i kliknięciu w przycisk wywołujący analizę triku, pod widżetem do analizy trików wyświetla się wykryty trik, wraz z procentową wartością pewności modelu, widoczny na rysunku \ref{fig:trick-detector} (c). Pod wykrytym trikiem znajduje się historia wykonywanych trików, wraz z czasem miniętym od wykonania, pewnością modelu oraz nazwą triku.
+        Po przesłaniu nagrania i kliknięciu w przycisk wywołujący analizę triku, pod widżetem do analizy trików wyświetla się wykryty trik, wraz z procentową wartością pewności modelu, widoczny na rysunku \ref{fig:trick-detector} (c). Pod wykrytym trikiem znajduje się historia wykonywanych trików, wraz z czasem, jaki minął od ich wykonania, pewnością modelu oraz nazwą triku.
 
         \begin{figure}[!ht]
             \begin{subfigure}{0.3\textwidth}
