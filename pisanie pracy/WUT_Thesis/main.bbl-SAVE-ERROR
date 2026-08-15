@@ -365,6 +365,7 @@
       \endverb
     \endentry
   \enddatalist
+  \missing{lst:resolve_base_url}
 \endrefsection
 \endinput
 

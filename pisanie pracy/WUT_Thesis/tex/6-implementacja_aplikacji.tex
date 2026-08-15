@@ -1,12 +1,12 @@
 \newpage    
     \section{Budowa aplikacji mobilnej i warstwy serwerowej}
 
-        Niniejszy rozdział poświęcono szczegółowemu opisowi architektury oras implementacji warstwy użytkownika systemu w postaci aplikacji mobilnej. Aplikacja ma na celu integrację funkcji mapowania skateparków z modułem analizy wizyjnej, realizującym wnioskowanie w czasie rzeczywistym na urządzeniu końcowym. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz architekturę integracji uczenia maszynowego.
+        Niniejszy rozdział poświęcono szczegółowemu opisowi architektury oraz implementacji warstwy użytkownika systemu w postaci aplikacji mobilnej. Aplikacja ma na celu integrację funkcji mapowania skateparków z modułem analizy wizyjnej, realizującym wnioskowanie w czasie rzeczywistym na urządzeniu końcowym. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz architekturę integracji uczenia maszynowego.
 
     \subsection{Struktura projektu w środowisku Flutter}
-        Aplikacja mobilna została zrealizowana z wykorzystaniem wielofplatformowego framework'a \textit{Flutter} oraz języka programowania \textit{Dart}. Wybór tej tej technologii ukierunkowany był przede wszystkim uniwersalnością (\textit{Flutter} działa zarówno na telefonach z systemem \textit{Android}, jak i \textit{iOS}). Ponadto posiada on możliwość kompilacji kodu źródłowego bezpośrednio do natywnych instrukcji procesorów o architekturze ARM, co zapewnia wysoką wydajność renderowania interfejsu użytkownika.
+        Aplikacja mobilna została zrealizowana z wykorzystaniem wieloplatformowego framework'a \textit{Flutter} oraz języka programowania \textit{Dart}. Wybór tej technologii ukierunkowany był przede wszystkim uniwersalnością (\textit{Flutter} działa zarówno na telefonach z systemem \textit{Android}, jak i \textit{iOS}). Ponadto posiada on możliwość kompilacji kodu źródłowego bezpośrednio do natywnych instrukcji procesorów o architekturze ARM, co zapewnia wysoką wydajność renderowania interfejsu użytkownika.
 
-        Architekturę oprogramowania została zaprojektowana w oparciu o wzorzec podziału odpowiedzialności (z ang. \textit{Separation of concerns}), wyodrębniający trzy główne warstwy:
+        Architektura oprogramowania została zaprojektowana w oparciu o wzorzec podziału odpowiedzialności (z ang. \textit{Separation of concerns}), wyodrębniający trzy główne warstwy:
         \begin{enumerate}
             \item \textbf{Warstwę prezentacji} (\textit{UI}) odpowiedzialną za renderowanie komponentów interfejsu, zarządzanie stanem widoków oraz obsługę zdarzeń dotykowych użytkownika.
             \item \textbf{Warstwę logiki biznesowej i dziedzinowej} zawierającą struktury danych oraz algorytmy przetwarzania danych wejściowych.
@@ -19,7 +19,7 @@
 
         Moduł mapy odpowiada za wizualizację, rejestrację oraz edycję punktów reprezentujących skateparki, obiekty sportowe i \enquote{spoty} deskorolkowe. Warstwa komunikacji sieciowej została wyizolowana w ramach klasy \texttt{SkateSpotApi} operującej na protokole \texttt{HTTP} z wykorzystaniem architektury \texttt{RESTful}.    
 
-        W celu ułatwienia testowania i wdrażania aplikacji, zaimplementowano funkcję dymanicznego wyboru adresu bazowego serwera (\texttt{\_resolveBaseUrl}). Metod ta sprawdza zmienne środowiskowe przekazane podczas kompilacji i automatycznie dobiera odpowiedni adres URL:
+        W celu ułatwienia testowania i wdrażania aplikacji, zaimplementowano funkcję dynamicznego wyboru adresu bazowego serwera (\texttt{\_resolveBaseUrl}). Metoda ta sprawdza zmienne środowiskowe przekazane podczas kompilacji i automatycznie dobiera odpowiedni adres URL:
         \begin{itemize}
             \item dla środowiska lokalnego (deweloperskiego) kieruje zapytania pod adres IP emulatora Androida - \texttt{http://10.0.2.2:8000},
             \item dla środowiska produkcyjnego wykorzystuje adres serwera w chmurze (\textit{Render}),
@@ -55,11 +55,11 @@ return 'http://10.0.2.2:8000';
 
     \subsection{Obsługa kamery i zarządzanie plikami wideo}
     
-        Automatyczne rozpoznawanie trików wymaga pobrania i wstepnej obróbki nagrania z kamery smartfona. Z powodu dużej różnorodności modeli telefonów, powodującej dużą rozbieżność rozdzielczości i proporcji obrazu, materiał wideo przed przekazaniem do modli uczenia maszynowego musi zostać ustandaryzowany.
+        Automatyczne rozpoznawanie trików wymaga pobrania i wstępnej obróbki nagrania z kamery smartfona. Z powodu dużej różnorodności modeli telefonów, powodującej dużą rozbieżność rozdzielczości i proporcji obrazu, materiał wideo przed przekazaniem do modeli uczenia maszynowego musi zostać ustandaryzowany.
 
         Na proces przygotowania danych wideo składają sie dwa główne etapy:
         \begin{itemize}
-            \item \textbf{Normalizacja przstrzenna klatek}: Każda klatka filmu ulega przeskalowaniu z zachowaniem oryginalnych proporcji obrazu, a następnie umieszczana w kwadratowej macierzy o wymiarach $256 x 256$ pikseli. Ewentualny wolny obszar powstały na skutek tej konwersji, uzupełniany jest czarnymi pasami, co zapobiega rozciąganiu czy spłaszczaniu sylwetki skatera. Takie zniekształcenie nagrania mogłoby zaburzyć dokładność detekcji punktów kluczowych przez model \textit{MoveNet}.
+            \item \textbf{Normalizacja przestrzenna klatek}: Każda klatka filmu ulega przeskalowaniu z zachowaniem oryginalnych proporcji obrazu, a następnie umieszczana w kwadratowej macierzy o wymiarach $256 \times 256$ pikseli. Ewentualny wolny obszar powstały na skutek tej konwersji, uzupełniany jest czarnymi pasami, co zapobiega rozciąganiu czy spłaszczaniu sylwetki skatera. Takie zniekształcenie nagrania mogłoby zaburzyć dokładność detekcji punktów kluczowych przez model \textit{MoveNet}.
             \item \textbf{Normalizacja czasowa sekwencji}: Długości nagrań wgrywanych przez użytkowników różnią się od siebie, a główny klasyfikator wymaga wejścia o stałym wymiarze 30 klatek. Aby to osiągnąć, zaimplementowano funkcję \texttt{\_resampleKeypointSequence}, która przekształca sekwencję punktów kluczowych o dowolnej długości do wymaganego rozmiaru 30 klatek za pomocą liniowej interpolacji współrzędnych.
         \end{itemize}
 
@@ -133,7 +133,7 @@ static const Map<String, double> _baseClassCalibration = {
 };
 \end{lstlisting}                    
 
-                    \item \textbf{Analiza kąta rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na poniższym załączniku. Oblicza ona kąt nachylenia klatki piersiowej za pomocą funkcji trygonometrycznej $a\tan 2$, na podstawie piątego i szóstego punktu kluczowego, czyli odpowiednio lewego oraz prawego ramienia. Obserwując zmiany tego kąta na przestrzeni całego nagrania, aplikacja potrafi określić,czy użytkownik wykonał obrót ciałem w przestrzeni. Pozwala to skutecznie odróżnć triki, których obraca się tylko deskorolka, takie jak \textit{Shuvit}, od takich, w których obraca się także skater, czyli np. \textit{Frontside 180}.
+                    \item \textbf{Analiza kąta rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na poniższym załączniku. Oblicza ona kąt nachylenia klatki piersiowej za pomocą funkcji trygonometrycznej $a\tan 2$, na podstawie piątego i szóstego punktu kluczowego, czyli odpowiednio lewego oraz prawego ramienia. Obserwując zmiany tego kąta na przestrzeni całego nagrania, aplikacja potrafi określić,czy użytkownik wykonał obrót ciałem w przestrzeni. Pozwala to skutecznie odróżnić triki, w których obraca się tylko deskorolka, takie jak \textit{Shuvit}, od takich, w których obraca się także skater, czyli np. \textit{Frontside 180}.
         \begin{lstlisting}[
                 language=Dart,
                 caption={Metoda \texttt{\_torsoAngle}},
@@ -166,15 +166,120 @@ rightShoulderX - leftShoulderX);
 
             Przekazanie zweryfikowanego wyniku do warstwy prezentacji kończy pełen cykl przetwarzania wideo, umożliwiając natychmiastową prezentację rezultatu na ekranie smartfona.
 
-    \subsection{Architektura i impelemtacja warstwy serwerowej}
+    \subsection{Architektura i implentacja warstwy serwerowej}
 
-        Warstwa serwerowa systemu, nazywana \textit{Backend'em}, pełni rolę centralnego węzła zarządzającego danymi o infrastrukturze sportowej oraz komunikacją z aplikacją mobilną. Do jej implementacji wykorzystano język \textit{Python} oraz framework \textit{FastAPI}. Wybór tych technologii, opisany szerzej w rozdziale trzecim, podyktowany był wysoce wydajną, asynchroniczną obsługą zapytań, automatyczną walidacją typów danych za pomocą biblioteki \textit{Pydantic} oraz wbudowaną generacją interaktywnej dokumentacji \textit{OpenAPI} (\textit{SwaggerUI}).
+        Warstwa serwerowa systemu (nazywana \textit{backendem}), pełni rolę centralnego węzła zarządzającego danymi o infrastrukturze sportowej oraz komunikacją z aplikacją mobilną. Do jej implementacji wykorzystano język \textit{Python} oraz framework \textit{FastAPI}. Wybór tych technologii, opisany szerzej w rozdziale trzecim, podyktowany był wysoce wydajną, asynchroniczną obsługą zapytań, automatyczną walidacją typów danych za pomocą biblioteki \textit{Pydantic} oraz wbudowaną generacją interaktywnej dokumentacji \textit{OpenAPI} (\textit{SwaggerUI}).
 
         Komunikacja między aplikacją mobliną a serwerem odbywa się poprzez bezstanowy interfejs programistyczny \textit{REST API} z wykorzystaniem formatu JSON. Interfejs serwera został podzielony na wyizolowane punkty końcowe, odpowiadające za poszczególne zasoby systemu.
 
         W poniższej tabeli przedstawiono wybrane punkty końcowe \textit{REST API} obsługiwane przez backend:
 
+        \begin{table}[!h] \centering
+            \caption{Przykładowa tabela pokazująca wybrane punkty końcowe REST API.}
+            \label{tab:endpoints} 
+            \begin{tabularx}{\textwidth}{ | c | c | X | } \hline
+                \textbf{Metoda HTTP} & \textbf{Ścieżka} & \multicolumn{1}{c|}{\textbf{Opis funkcjonalny}} \\ \hline
+                \texttt{GET} & \texttt{/spots} & Pobranie listy wszystkich \enquote{spotów} wraz ze współrzędnymi geograficznymi, opisem, zdjęciami, nazwą, stopniem trudności oraz unikalnym numerem identyfikacyjnym. \\ \hline
+                \texttt{POST} & \texttt{/spots} & Rejestracja nowego obiektu sportowego przez użytkownika. \\ \hline
+                \texttt{PATCH} & \texttt{/spots/\{spot\_id\}} & Aktualizacja danych szczegółowych wybranego obiektu, takich jak nazwa, stopień trudności, opis. \\ \hline
+                \texttt{DELETE} & \texttt{/spots/\{spot\_id\}} & Usunięcie wybranego obiektu z bazy danych. \\ \hline
+                \texttt{POST} & \texttt{/spots/\{spot\_id\}/photos} & Przesłanie nowego zdjęcia dokumentującego stan techniczny obiektu. \\ \hline
+            \end{tabularx}
+        \end{table}
 
+        Wykonywanie instrukcji po stronie serwera zostało zabezpieczone przed nieoczekiwanymi błędami. Zapytania zawierające niepoprawne struktury danych (takie jak błędny format współrzędnych geograficznych) są automatycznie odrzucane z odpowiednim kodem odpowiedzi \texttt{HTTP} (np. \texttt{422 Unprocessable Entity}), co zapobiega naruszeniu spójności danych oraz ewentualnym błędom w bazie danych.
 
+        Aplikacja serwerowa została osadzona w środowisku chmurowym na platformie \textit{Render}. Wykorzystanie kontenerów oraz ciągłej integracji pozwala na automatyczne budowanie i uruchamianie nowej wersji backendu po każdej zmianie w repozytorium kodu.  
+
+        Jako przykład implementacji, na poniższym załączniku przedstawiono definicję \textit{endpointu} służącego do pobierania szczegółowych danych o obiekcie na podstawie jego identyfikatora. Widoczne jest tu wykorzystanie mechanizmu wstrzykiwania zależności, do uzyskania sesji bazy danych oraz obsługa błędów w wprzypadku braku żądanego zasobu.
+
+        \begin{lstlisting}[
+                language=Python,
+                caption={\textit{Endpoint} \texttt{get\_spot}.},
+                label={lst:getspot}
+            ]
+@app.get("/spots/{spot_id}", response_model=SkateSpotRead)
+def get_spot(spot_id: int, db: Session = Depends(get_db)) -> SkateSpotRead:
+    spot = (
+        db.query(SkateSpot)
+        .options(selectinload(SkateSpot.photos))
+        .filter(SkateSpot.id == spot_id)
+        .first()
+    )
+    if spot is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        detail="Spot not found")
+    return _serialize_spot(spot)
+\end{lstlisting} 
+        
     \subsection{Baza danych oraz przechowywanie zasobów multimedialnych}
+
+        Do trwałego przechowywania danych o obiektach sportowych oraz danych relacyjnych wykorzystano relacyjną bazę danych \textit{PostgreSQL}. Została ona skonfigurowana w chmurze, co zapewnia ciągłą dostępność zasobów niezależnie od lokalizacji użytkownika. 
+
+        Struktura bazy danych opiera się na relacyjnym modelu danych. Główna tabela przechowująca informacje o \enquote{spotach} zawiera m.in. następujące pola:
+        \begin{itemize}
+            \item unikalny identyfikator obiektu (\texttt{id} - klucz główny),
+            \item nazwę obiektu oraz kategorię do jakiej się klasyfikuje (np. skatepark, rurka, schody),
+            \item współrzędne geograficzne w postaci wartości zmiennoprzecinkowych,
+            \item poziom trudności (początkujący, średniozaawansowany oraz zaawansowany),
+            \item opcjonalny opis oraz adres obiektu
+            \item znacznik czasu utworzenia oraz modyfikacji.
+        \end{itemize}
+
+        Strukturę tabeli bazy danych w warstwie aplikacyjnej zdefiniowano za pomocą narzędzia \textit{SQLAlchemy}, co przedstawiono na poniższym załączniku.
+
+                \begin{lstlisting}[
+                language=Python,
+                caption={Struktura tabeli bazy danych.},
+                label={lst:struktura-tabeli}
+            ]
+class SkateSpot(Base):
+    __tablename__ = "skate_spots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    type: Mapped[str] = mapped_column(String(80), nullable=False)
+    address: Mapped[str] = mapped_column(String(255), nullable=False)
+    latitude: Mapped[float] = mapped_column(Float, nullable=False)
+    longitude: Mapped[float] = mapped_column(Float, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    difficulty: Mapped[str] = mapped_column(String(32), nullable=False,
+    default="beginner")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True),
+    default=utc_now, nullable=False)
+\end{lstlisting}  
+
+        Wysyłanie plików multimedialnych realizowane jest asynchronicznie za pomocą zaimplementowanej klasy adaptera. Na poniższym załączniku przedstawiono fragment logiki odpowiadającej za autoryzację i transfer pliku z serwera do chmurowego magazynu danych.
+
+                        \begin{lstlisting}[
+                language=Python,
+                caption={Logika transferu plików.},
+                label={lst:logika-transferu}
+            ]
+async def save(self, upload: UploadFile) -> tuple[str, str]:
+    suffix = Path(upload.filename or "").suffix or ".jpg"
+    file_key = f"spots/{uuid.uuid4().hex}{suffix}"
+    binary = await upload.read()
+    
+    upload_url = f"{self._base_url}/storage/v1/object/
+    {self._bucket}/{file_key}"
+    headers = {
+        "apikey": self._service_key,
+        "Authorization": f"Bearer {self._service_key}",
+        "Content-Type": "image/jpeg",
+        "x-upsert": "false",
+    }
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        response = await client.post(upload_url,
+        headers=headers, content=binary)
+        
+    public_url = f"{self._base_url}/storage/v1/object/public/
+    {self._bucket}/{file_key}"
+    return upload.filename or file_key, public_url
+\end{lstlisting} 
+
+    Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie sa zapisywane bezpośredno w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane sa jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
+
+    Zarówno platforma chmurowa \textit{Render} odpowiadająca za hosting backendu, jak i usługa \textit{Supabase} pełniąca rolę bazy danych i magazynu plików, wykorzystywane są w projekcie w darmowych planach taryfowych. Jest to rozwiązanie w zupełności wystarczające na etapie deweloperskim i testowym. Należy jednak podkreślić, że obie te platformy to wysoce skalowalne, komercyjne usługi chmurowe. Pozwala to na łatwe i błyskawiczne zwiększenie zasobów obliczeniowych (skalowanie wertykalne i horyzontalne) w przypadku przyrostu bazy użytkowników, poprzez przejście na wyższe pakiety subskrypcyjne. Dzięki tak zaprojektowanej architekturze, aplikacja stanowi pełnowymiarowy dowód słuszności koncepcji (z ang. \textit{Proof of Concept - PoC}), który może zostać płynnie przekształcony w komercyjny, odporny na duże obciążenia produkt, bez konieczności kosztownego przepisywania kodu infrastruktury.
+
     \subsection{Finalny wygląd aplikacji}

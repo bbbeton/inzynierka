@@ -65,6 +65,7 @@
   sensitive=true
 }
 \usepackage{xcolor}
+\usepackage{tabularx}
 \usepackage{xurl} % Pozwala na ładne dzielenie i zawijanie linków URL w tekście
 
 % Definicja kolorów dla kodu

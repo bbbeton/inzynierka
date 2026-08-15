@@ -6,7 +6,7 @@
 \contentsline {section}{\numberline {2\relax .\enspace }Przegląd istniejących rozwiązań}{13}{section.2}%
 \contentsline {subsection}{\numberline {2.1\relax .\enspace }Aplikacje dedykowane dla społeczności deskorolkowej}{13}{subsection.2.1}%
 \contentsline {subsection}{\numberline {2.2\relax .\enspace }Analiza ruchu w sporcie: Wideo a czujniki sprzętowe}{16}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3\relax .\enspace }Modele wizyjnej analizy ruchu}{18}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.3\relax .\enspace }Modele wizyjnej analizy ruchu}{17}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4\relax .\enspace }Podsumowanie}{19}{subsection.2.4}%
 \contentsline {section}{\numberline {3\relax .\enspace }Założenia i architektura systemu}{21}{section.3}%
 \contentsline {subsection}{\numberline {3.1\relax .\enspace }Wymagania funkcjonalne i niefunkcjonalne}{21}{subsection.3.1}%
@@ -33,21 +33,20 @@
 \contentsline {subsection}{\numberline {6.4\relax .\enspace }Integracja modułu TensorFlow Lite z aplikacją}{38}{subsection.6.4}%
 \contentsline {subsubsection}{\numberline {6.4.1\relax .\enspace }Estymacja pozy}{38}{subsubsection.6.4.1}%
 \contentsline {subsubsection}{\numberline {6.4.2\relax .\enspace }Klasyfikacja ewolucji}{38}{subsubsection.6.4.2}%
-\contentsline {subsection}{\numberline {6.5\relax .\enspace }Architektura i impelemtacja warstwy serwerowej}{40}{subsection.6.5}%
-\contentsline {subsection}{\numberline {6.6\relax .\enspace }Baza danych oraz przechowywanie zasobów multimedialnych}{40}{subsection.6.6}%
-\contentsline {subsection}{\numberline {6.7\relax .\enspace }Finalny wygląd aplikacji}{40}{subsection.6.7}%
-\contentsline {section}{\numberline {7\relax .\enspace }Testy oraz analiza wyników}{41}{section.7}%
-\contentsline {subsection}{\numberline {7.1\relax .\enspace }Środowisko i scenariusze testowe}{41}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2\relax .\enspace }Ewaluacja skuteczności modelu SI}{41}{subsection.7.2}%
-\contentsline {subsection}{\numberline {7.3\relax .\enspace }Testy funkcjonalne aplikacji}{41}{subsection.7.3}%
-\contentsline {subsection}{\numberline {7.4\relax .\enspace }Podsumowanie}{41}{subsection.7.4}%
-\contentsline {subsubsection}{\numberline {7.4.1\relax .\enspace }Napotkane trudności}{41}{subsubsection.7.4.1}%
-\contentsline {subsubsection}{\numberline {7.4.2\relax .\enspace }Wdrożone poprawki}{41}{subsubsection.7.4.2}%
-\contentsline {section}{\numberline {8\relax .\enspace }Podsumowanie}{42}{section.8}%
-\contentsline {subsection}{\numberline {8.1\relax .\enspace }Wnioski z przeprowadzonych prac}{42}{subsection.8.1}%
-\contentsline {subsection}{\numberline {8.2\relax .\enspace }Ograniczenia stworzonego rozwiązania}{42}{subsection.8.2}%
-\contentsline {subsection}{\numberline {8.3\relax .\enspace }Możliwości dalszego rozwoju}{42}{subsection.8.3}%
-\contentsline {section}{Bibliografia}{43}{section*.12}%
-\contentsline {section}{Spis rysunków}{44}{section*.12}%
-\contentsline {section}{Spis tabel}{45}{section*.12}%
-\contentsline {section}{Spis załączników}{46}{section*.13}%
+\contentsline {subsection}{\numberline {6.5\relax .\enspace }Architektura i implentacja warstwy serwerowej}{40}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6\relax .\enspace }Baza danych oraz przechowywanie zasobów multimedialnych}{41}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7\relax .\enspace }Finalny wygląd aplikacji}{43}{subsection.6.7}%
+\contentsline {section}{\numberline {7\relax .\enspace }Testy oraz analiza wyników}{44}{section.7}%
+\contentsline {subsection}{\numberline {7.1\relax .\enspace }Środowisko i scenariusze testowe}{44}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2\relax .\enspace }Ewaluacja skuteczności modelu SI}{44}{subsection.7.2}%
+\contentsline {subsection}{\numberline {7.3\relax .\enspace }Testy funkcjonalne aplikacji}{44}{subsection.7.3}%
+\contentsline {subsection}{\numberline {7.4\relax .\enspace }Podsumowanie}{44}{subsection.7.4}%
+\contentsline {subsubsection}{\numberline {7.4.1\relax .\enspace }Napotkane trudności}{44}{subsubsection.7.4.1}%
+\contentsline {subsubsection}{\numberline {7.4.2\relax .\enspace }Wdrożone poprawki}{44}{subsubsection.7.4.2}%
+\contentsline {section}{\numberline {8\relax .\enspace }Podsumowanie}{45}{section.8}%
+\contentsline {subsection}{\numberline {8.1\relax .\enspace }Wnioski z przeprowadzonych prac}{45}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2\relax .\enspace }Ograniczenia stworzonego rozwiązania}{45}{subsection.8.2}%
+\contentsline {subsection}{\numberline {8.3\relax .\enspace }Możliwości dalszego rozwoju}{45}{subsection.8.3}%
+\contentsline {section}{Spis rysunków}{47}{subsection.8.3}%
+\contentsline {section}{Spis tabel}{48}{subsection.8.3}%
+\contentsline {section}{Spis załączników}{49}{section*.13}%
