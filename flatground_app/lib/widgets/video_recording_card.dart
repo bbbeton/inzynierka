@@ -101,8 +101,6 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
   bool _isAnalyzePressed = false;
   int? _trimStartMs;
   int? _trimEndMs;
-  Uint8List? _trimStartPreview;
-  Uint8List? _trimEndPreview;
 
   @override
   void initState() {
@@ -127,9 +125,17 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
     }
     if (totalMs <= 0) return;
 
-    RangeValues range = RangeValues(0, totalMs.toDouble());
-    Uint8List? startPreview = _trimStartPreview;
-    Uint8List? endPreview = _trimEndPreview;
+    RangeValues range = RangeValues(
+      (_trimStartMs ?? 0).clamp(0, totalMs).toDouble(),
+      (_trimEndMs ?? totalMs).clamp(0, totalMs).toDouble(),
+    );
+    if (range.end <= range.start) {
+      range = RangeValues(0, totalMs.toDouble());
+    }
+    // Always regenerate for the currently selected video (never reuse previous clip frames).
+    Uint8List? startPreview;
+    Uint8List? endPreview;
+    int previewGeneration = 0;
 
     Future<Uint8List?> generatePreviewAt(int timeMs) {
       if (_videoFile == null) return Future.value(null);
@@ -143,32 +149,26 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
     }
 
     Future<void> refreshPreviews(void Function(void Function()) setDialogState) async {
+      final generation = ++previewGeneration;
       final startMs = range.start.round();
       final endMs = range.end.round();
       final previews = await Future.wait([
         generatePreviewAt(startMs),
         generatePreviewAt(endMs),
       ]);
-      if (!mounted) return;
+      if (!mounted || generation != previewGeneration) return;
       setDialogState(() {
         startPreview = previews[0];
         endPreview = previews[1];
       });
     }
 
-    await Future.wait([
-      if (startPreview == null) generatePreviewAt(range.start.round()),
-      if (endPreview == null) generatePreviewAt(range.end.round()),
-    ]).then((result) {
-      if (result.isNotEmpty) {
-        startPreview = result.isNotEmpty ? result[0] : startPreview;
-        if (result.length > 1) {
-          endPreview = result[1];
-        } else if (result.isNotEmpty) {
-          endPreview = result[0];
-        }
-      }
-    });
+    final initialPreviews = await Future.wait([
+      generatePreviewAt(range.start.round()),
+      generatePreviewAt(range.end.round()),
+    ]);
+    startPreview = initialPreviews[0];
+    endPreview = initialPreviews[1];
 
     String formatMs(double ms) {
       final totalSeconds = (ms / 1000).round();
@@ -217,7 +217,15 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
                             clipBehavior: Clip.antiAlias,
                             child: startPreview == null
                                 ? const Center(child: Icon(Icons.image, color: Color(0xFF2F00FF)))
-                                : Image.memory(startPreview!, fit: BoxFit.cover, width: double.infinity),
+                                : Image.memory(
+                                    startPreview!,
+                                    key: ValueKey(
+                                      'start-${_videoFile!.path}-${range.start.round()}-${startPreview!.length}',
+                                    ),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    gaplessPlayback: true,
+                                  ),
                           ),
                         ],
                       ),
@@ -241,7 +249,15 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
                             clipBehavior: Clip.antiAlias,
                             child: endPreview == null
                                 ? const Center(child: Icon(Icons.image, color: Color(0xFF2F00FF)))
-                                : Image.memory(endPreview!, fit: BoxFit.cover, width: double.infinity),
+                                : Image.memory(
+                                    endPreview!,
+                                    key: ValueKey(
+                                      'end-${_videoFile!.path}-${range.end.round()}-${endPreview!.length}',
+                                    ),
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    gaplessPlayback: true,
+                                  ),
                           ),
                         ],
                       ),
@@ -294,8 +310,6 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
     setState(() {
       _trimStartMs = picked?.start.round();
       _trimEndMs = picked?.end.round();
-      _trimStartPreview = startPreview;
-      _trimEndPreview = endPreview;
     });
   }
 
@@ -308,6 +322,8 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
           onVideoRecorded: (videoPath) async {
             setState(() {
               _videoFile = File(videoPath);
+              _trimStartMs = null;
+              _trimEndMs = null;
             });
             await _loadVideoPreview();
             await _promptTrimForSelectedVideo();
@@ -329,6 +345,8 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
       if (video != null) {
         setState(() {
           _videoFile = File(video.path);
+          _trimStartMs = null;
+          _trimEndMs = null;
         });
         await _loadVideoPreview();
         await _promptTrimForSelectedVideo();
@@ -387,11 +405,12 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
 
   @override
   Widget build(BuildContext context) {
+    final hasTrimChip = _trimStartMs != null && _trimEndMs != null;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 26),
       constraints: const BoxConstraints(maxWidth: 360),
       width: double.infinity,
-      height: 369,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(40),
@@ -401,12 +420,13 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 22),
           // Video Preview Area
           Container(
             width: 308,
-            height: 246,
+            height: hasTrimChip ? 210 : 246,
             decoration: BoxDecoration(
               color: const Color(0xFFC7C1E4).withOpacity(0.1),
               borderRadius: BorderRadius.circular(27),
@@ -473,12 +493,13 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
               ],
             ),
           ),
-          const SizedBox(height: 19),
+          const SizedBox(height: 16),
 
           // Action Buttons
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -617,12 +638,18 @@ class _VideoRecordingCardState extends State<VideoRecordingCard> {
                 ),
                 // Analyze Button (shown when video is loaded)
                 if (_videoFile != null) ...[
-                  const SizedBox(height: 12),
-                  if (_trimStartMs != null && _trimEndMs != null)
+                  const SizedBox(height: 10),
+                  if (hasTrimChip)
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.only(bottom: 4),
                       child: TextButton.icon(
                         onPressed: _promptTrimForSelectedVideo,
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
                         icon: const Icon(Icons.content_cut, size: 16),
                         label: Text(
                           'Trim: ${(_trimStartMs! / 1000).toStringAsFixed(1)}s - ${(_trimEndMs! / 1000).toStringAsFixed(1)}s',

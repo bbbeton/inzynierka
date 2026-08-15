@@ -110,7 +110,7 @@
 \RequirePackage{float}
 \RequirePackage{tabularx}
 \RequirePackage{ragged2e}
-
+\usepackage{subcaption}
 %--------------------------------------
 % PdfTeX specific configuration
 %--------------------------------------

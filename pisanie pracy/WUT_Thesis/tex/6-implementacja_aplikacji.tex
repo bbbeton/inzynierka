@@ -24,7 +24,7 @@
             \item dla środowiska lokalnego (deweloperskiego) kieruje zapytania pod adres IP emulatora Androida - \texttt{http://10.0.2.2:8000},
             \item dla środowiska produkcyjnego wykorzystuje adres serwera w chmurze (\textit{Render}),
         \end{itemize}
-            Widoczna na poniższym załączniku metoda \texttt{\_resolveBaseUrl} odpowiada za dynamiczny dobór adresu bazowego \texttt{API}.
+            Widoczna na listingu \ref{lst:resolve_base_url} metoda \texttt{\_resolveBaseUrl} odpowiada za dynamiczny dobór adresu bazowego \texttt{API}.
 
 \begin{lstlisting}[
         language=Dart,
@@ -63,7 +63,7 @@ return 'http://10.0.2.2:8000';
             \item \textbf{Normalizacja czasowa sekwencji}: Długości nagrań wgrywanych przez użytkowników różnią się od siebie, a główny klasyfikator wymaga wejścia o stałym wymiarze 30 klatek. Aby to osiągnąć, zaimplementowano funkcję \texttt{\_resampleKeypointSequence}, która przekształca sekwencję punktów kluczowych o dowolnej długości do wymaganego rozmiaru 30 klatek za pomocą liniowej interpolacji współrzędnych.
         \end{itemize}
 
-        Na poniższym załączniku widoczny jest algorytm liniowej interpolacji i resamplingu sekwencji punktów kluczowych \texttt{\_resampleKeypointSequence}.
+        Na listingu \ref{lst:resampleKeypointSequence} widoczny jest algorytm liniowej interpolacji i resamplingu sekwencji punktów kluczowych \texttt{\_resampleKeypointSequence}.
 
         \begin{lstlisting}[
                 language=Dart,
@@ -115,7 +115,7 @@ return out;
 
                 Za klasyfikację ewolucji odpowiada klasa \texttt{TrickDetector}. Przygotowany ciąg 30 klatek przekazywany jest do jednowymiarowej splotowej sieci neuronowej, która przechowywana jest w pamięci jako plik binarny \texttt{trick\_classifier.tflite}. Podczas testów aplikacji na rzeczywistych nagraniach wideo zauważono spadek dokładności klasyfikacji w porównaniu do wyników uzyskanych w środowisku treningowym. Aby poprawić skuteczność rozpoznawania trików bez konieczności ponownego trenowania modelu, w kodzie aplikacji zastosowano dwa mechanizmy wspomagające:
                 \begin{enumerate}
-                    \item \textbf{Korekta prawdopodobieństw klas}: Zdefiniowano mapę współczynników korygujących \texttt{\_baseClassCalibration}, która modyfikuje prawdopodobieństwa wyjściowe zwracane przez sieć. Zwiększa ona wagę dla trików trudniejszych do wykrycia - takich jak \textit{Kickflip}, którego waga wynosi 1.25 - a jednocześnie zmniejsza wagi dla klas, które model skłonny był faworyzować - czyli np. \textit{Frontside 180}, którego waga wynosi 0.88. W poniższym załączniku znajduje się kod tej mapy.
+                    \item \textbf{Korekta prawdopodobieństw klas}: Zdefiniowano mapę współczynników korygujących \texttt{\_baseClassCalibration}, która modyfikuje prawdopodobieństwa wyjściowe zwracane przez sieć. Zwiększa ona wagę dla trików trudniejszych do wykrycia - takich jak \textit{Kickflip}, którego waga wynosi 1.25 - a jednocześnie zmniejsza wagi dla klas, które model skłonny był faworyzować - czyli np. \textit{Frontside 180}, którego waga wynosi 0.88. Na listingu \ref{lst:baseClassCalibration} znajduje się kod tej mapy.
         \begin{lstlisting}[
                 language=Dart,
                 caption={Mapa \texttt{\_baseClassCalibration}},
@@ -133,7 +133,7 @@ static const Map<String, double> _baseClassCalibration = {
 };
 \end{lstlisting}                    
 
-                    \item \textbf{Analiza kąta rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na poniższym załączniku. Oblicza ona kąt nachylenia klatki piersiowej za pomocą funkcji trygonometrycznej $a\tan 2$, na podstawie piątego i szóstego punktu kluczowego, czyli odpowiednio lewego oraz prawego ramienia. Obserwując zmiany tego kąta na przestrzeni całego nagrania, aplikacja potrafi określić,czy użytkownik wykonał obrót ciałem w przestrzeni. Pozwala to skutecznie odróżnić triki, w których obraca się tylko deskorolka, takie jak \textit{Shuvit}, od takich, w których obraca się także skater, czyli np. \textit{Frontside 180}.
+            \item \textbf{Analiza kąta rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na listingu \ref{lst:torsoAngle}. Oblicza ona kąt nachylenia klatki piersiowej za pomocą funkcji trygonometrycznej $a\tan 2$, na podstawie piątego i szóstego punktu kluczowego, czyli odpowiednio lewego oraz prawego ramienia. Obserwując zmiany tego kąta na przestrzeni całego nagrania, aplikacja potrafi określić,czy użytkownik wykonał obrót ciałem w przestrzeni. Pozwala to skutecznie odróżnić triki, w których obraca się tylko deskorolka, takie jak \textit{Shuvit}, od takich, w których obraca się także skater, czyli np. \textit{Frontside 180}.
         \begin{lstlisting}[
                 language=Dart,
                 caption={Metoda \texttt{\_torsoAngle}},
@@ -172,7 +172,7 @@ rightShoulderX - leftShoulderX);
 
         Komunikacja między aplikacją mobliną a serwerem odbywa się poprzez bezstanowy interfejs programistyczny \textit{REST API} z wykorzystaniem formatu JSON. Interfejs serwera został podzielony na wyizolowane punkty końcowe, odpowiadające za poszczególne zasoby systemu.
 
-        W poniższej tabeli przedstawiono wybrane punkty końcowe \textit{REST API} obsługiwane przez backend:
+        W tabeli \ref{tab:porownanie_metod} przedstawiono wybrane punkty końcowe \textit{REST API} obsługiwane przez backend:
 
         \begin{table}[!h] \centering
             \caption{Przykładowa tabela pokazująca wybrane punkty końcowe REST API.}
@@ -191,7 +191,7 @@ rightShoulderX - leftShoulderX);
 
         Aplikacja serwerowa została osadzona w środowisku chmurowym na platformie \textit{Render}. Wykorzystanie kontenerów oraz ciągłej integracji pozwala na automatyczne budowanie i uruchamianie nowej wersji backendu po każdej zmianie w repozytorium kodu.  
 
-        Jako przykład implementacji, na poniższym załączniku przedstawiono definicję \textit{endpointu} służącego do pobierania szczegółowych danych o obiekcie na podstawie jego identyfikatora. Widoczne jest tu wykorzystanie mechanizmu wstrzykiwania zależności, do uzyskania sesji bazy danych oraz obsługa błędów w wprzypadku braku żądanego zasobu.
+        Jako przykład implementacji, na listingu \ref{lst:getspot} przedstawiono definicję \textit{endpointu} służącego do pobierania szczegółowych danych o obiekcie na podstawie jego identyfikatora. Widoczne jest tu wykorzystanie mechanizmu wstrzykiwania zależności, do uzyskania sesji bazy danych oraz obsługa błędów w wprzypadku braku żądanego zasobu.
 
         \begin{lstlisting}[
                 language=Python,
@@ -226,7 +226,7 @@ def get_spot(spot_id: int, db: Session = Depends(get_db)) -> SkateSpotRead:
             \item znacznik czasu utworzenia oraz modyfikacji.
         \end{itemize}
 
-        Strukturę tabeli bazy danych w warstwie aplikacyjnej zdefiniowano za pomocą narzędzia \textit{SQLAlchemy}, co przedstawiono na poniższym załączniku.
+        Strukturę tabeli bazy danych w warstwie aplikacyjnej zdefiniowano za pomocą narzędzia \textit{SQLAlchemy}, co przedstawiono na listingu \ref{lst:struktura-tabeli}.
 
                 \begin{lstlisting}[
                 language=Python,
@@ -249,7 +249,7 @@ class SkateSpot(Base):
     default=utc_now, nullable=False)
 \end{lstlisting}  
 
-        Wysyłanie plików multimedialnych realizowane jest asynchronicznie za pomocą zaimplementowanej klasy adaptera. Na poniższym załączniku przedstawiono fragment logiki odpowiadającej za autoryzację i transfer pliku z serwera do chmurowego magazynu danych.
+        Wysyłanie plików multimedialnych realizowane jest asynchronicznie za pomocą zaimplementowanej klasy adaptera. Na listingu \ref{lst:logika-transferu} przedstawiono fragment logiki odpowiadającej za autoryzację i transfer pliku z serwera do chmurowego magazynu danych.
 
                         \begin{lstlisting}[
                 language=Python,
@@ -278,8 +278,97 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
     return upload.filename or file_key, public_url
 \end{lstlisting} 
 
-    Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie sa zapisywane bezpośredno w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane sa jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
+        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie sa zapisywane bezpośredno w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane sa jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
 
-    Zarówno platforma chmurowa \textit{Render} odpowiadająca za hosting backendu, jak i usługa \textit{Supabase} pełniąca rolę bazy danych i magazynu plików, wykorzystywane są w projekcie w darmowych planach taryfowych. Jest to rozwiązanie w zupełności wystarczające na etapie deweloperskim i testowym. Należy jednak podkreślić, że obie te platformy to wysoce skalowalne, komercyjne usługi chmurowe. Pozwala to na łatwe i błyskawiczne zwiększenie zasobów obliczeniowych (skalowanie wertykalne i horyzontalne) w przypadku przyrostu bazy użytkowników, poprzez przejście na wyższe pakiety subskrypcyjne. Dzięki tak zaprojektowanej architekturze, aplikacja stanowi pełnowymiarowy dowód słuszności koncepcji (z ang. \textit{Proof of Concept - PoC}), który może zostać płynnie przekształcony w komercyjny, odporny na duże obciążenia produkt, bez konieczności kosztownego przepisywania kodu infrastruktury.
+        Zarówno platforma chmurowa \textit{Render} odpowiadająca za hosting backendu, jak i usługa \textit{Supabase} pełniąca rolę bazy danych i magazynu plików, wykorzystywane są w projekcie w darmowych planach taryfowych. Jest to rozwiązanie w zupełności wystarczające na etapie deweloperskim i testowym. Należy jednak podkreślić, że obie te platformy to wysoce skalowalne, komercyjne usługi chmurowe. Pozwala to na łatwe i błyskawiczne zwiększenie zasobów obliczeniowych (skalowanie wertykalne i horyzontalne) w przypadku przyrostu bazy użytkowników, poprzez przejście na wyższe pakiety subskrypcyjne. Dzięki tak zaprojektowanej architekturze, aplikacja stanowi pełnowymiarowy dowód słuszności koncepcji (z ang. \textit{Proof of Concept - PoC}), który może zostać płynnie przekształcony w komercyjny, odporny na duże obciążenia produkt, bez konieczności kosztownego przepisywania kodu infrastruktury.
 
     \subsection{Finalny wygląd aplikacji}
+
+        Zwieńczeniem prac nad poszczególnymi modułami - od integracji map, przez obsługę strumienia wideo, aż po implementację sieci neuronowej i komunikację z serwerem chmurowym - było połączenie ich w spójny, natywny interfejs użytkownika.
+        
+        Na rysunkach \ref{fig:map1} i \ref{fig:map_screens} zaprezentowano główne ekrany działającej aplikacji. Priorytetem pozostawała prostota i intuicyjność, dlatego aplikacja posiada dwa ekrany, z paskiem nawigacji na górze ekranu. Zakładka po lewej stronie nawiguje do ekranu mapy, podzielonego na dwie części:
+        \begin{itemize}
+            \item \textbf{Interaktywną mapę}, widoczną na rysunku \ref{fig:map1} (a) na której znajduje się lokalizacja smarftonu użytkownika, a także pinezki oznaczające miejsca do jazdy na deskorolce. Po kliknięciu w którąś z nich na ekranie pojawia się szczegółowy opis \enquote{spotu}, przedstawiony na rysunku \ref{fig:map_screens} (a). Opis składa się ze zdjęcia, adresu, stopnia trudności oraz rodzajów przeszkód. Użytkownik ma również możliwość edycji lub usunięcia miejsca do jazdy. W prawym górnym rogu ekranu znajduje się przycisk oznaczony plusem, który umożliwia dodanie nowego miejsca do jazdy przez użytkownika. Czynność ta może zostać wykonana również poprzez kliknięcie w dowolny punkt na mapie. Po kliknięciu przycisku dodania \enquote{spotu} na ekranie pojawia się okienko edycji, widoczne na rysunku \ref{fig:map1} (b). Użytkownik ma możliwość wprowadzenia danych na temat \enquote{spotu}: nazwy, stopnia trudności, rodzajów przeszkód, adresu, opisu oraz zdjęcia (rysunek \ref{fig:map1} (c)).  W prawym dolnym rogu znajduje się ikona kompasu, kliknięcie której powoduje wycentrowanie mapy względem lokalizacji smartfona.
+            \item \textbf{Listę \enquote{spotów}} widoczną na rysunku \ref{fig:spot-list}. Wyświetla ona listę miejsc do jazdy w kolejności od najbliższej użytkownikowi do najdalszej. Zaimplementowano również intuicyjny mechanizm filtrowania wyników, widoczny na rysunku \ref{fig:spot-list} (b). Użytkownik ma możliwość selekcji dowolnej liczby rodzajów przeszkód, a lista dostosowuje się do wybranych filtrów, co pozwala na precyzyjniejsze i szybsze decyzje wyboru miejsca do treningu.
+        \end{itemize}
+
+        \begin{figure}[!ht]
+            \centering
+           
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/mapa.png}
+                \caption{Interaktywna mapa.}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/add-spot.png}
+                \caption{Ekran dodawania \enquote{spotu}.}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/add-spot-pic.png}
+                \caption{Dodawanie zdjęcia.}
+            \end{subfigure}
+             \caption{Ekrany zakładki mapy w aplikacji, Źródło: [Opracowanie własne].}
+                \label{fig:map1}
+        \end{figure}
+    
+        \begin{figure}[!ht]
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/iglica-spot.png}
+                \caption{Szczegóły miejsca.}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/lista-spotow.png}
+                \caption{Lista \enquote{spotów}.}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/filtr.png}
+                \caption{Filtrowanie listy.}
+            \end{subfigure}
+            \caption{Główne ekrany modułu mapy aplikacji, Źródło: [Opracowanie własne].}
+            \label{fig:map_screens}
+        \end{figure}
+        
+        Po kliknięciu w prawą zakładkę na pasku nawigacji, użytkownik jest przekierowany do modułu analizy trików, widocznego na rysunku \ref{fig:trick-detector}. Na rysunku \ref{fig:trick-detector} (a) widoczny jest widżet służący do przesyłania nagrań wideo posiadający 3 przyciski:
+        \begin{itemize}
+        \item \textbf{Record} (z ang. Nagraj) służący do nagrania triku bezpośrednio w aplikacji,
+        \item \textbf{Upload} (z ang. Prześlij) służący do przesłania już nagranego materiału wideo,
+        \item \textbf{Analyze trick} (z ang. Analizuj trik) służacy do wywołania analizy przesłanego już materiału wideo.
+        \end{itemize}
+
+        Gdy użytkownik wybierze nagranie, na ekranie pojawia się okienko edycji (rysunek \ref{fig:trick-detector} (b)), które pozwala użytkownikowi dostosować długość analizowanego nagrania, tak aby model klasyfikował jedynie wykonywany trik. Pozwala to na zwiększenie precyzji działania modelu.
+
+        Po przesłaniu nagrania i kliknięciu w przycisk wywołujący analizę triku, pod widżetem do analizy trików wyświetla się wykryty trik, wraz z procentową wartością pewności modelu, widoczny na rysunku \ref{fig:trick-detector} (c). Pod wykrytym trikiem znajduje się historia wykonywanych trików, wraz z czasem miniętym od wykonania, pewnością modelu oraz nazwą triku.
+
+        \begin{figure}[!ht]
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/analyze-trick.png}
+                \caption{Analiza triku.}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/video-edit.png}
+                \caption{Edycja nagrania.}
+            \end{subfigure}
+            \hfill
+            \begin{subfigure}{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{img/trick-history.png}
+                \caption{Wynik analizy, historia.}
+            \end{subfigure}
+            \caption{Ekrany zakładki analizy trików deskorolkowych, Źródło: [Opracowanie własne].}
+            \label{fig:trick-detector}
+        \end{figure}
+
+        Aplikacja charakteryzuje się płynnym działaniem, intuicyjną nawigacją opartą o górny pasek zakładek oraz jasnym, czytelnym motywem graficznym opartym na palecie barw z dominującym kolorem fioletowym, który zapewnia dobrą widoczność interfejsu.

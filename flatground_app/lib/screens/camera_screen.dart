@@ -55,18 +55,32 @@ class _CameraScreenState extends State<CameraScreen> {
         trimEndMs: trimEndMs,
       );
       
-      print('Analysis completed: ${result['trick']}');
-      
+      print('Analysis completed: ${result['trick']} (${result['confidence']}%)');
+
+      final confidence = (result['confidence'] as num?)?.toInt() ?? 0;
+      final isConfident = confidence >= 75;
+      final displayResult = isConfident
+          ? result
+          : <String, dynamic>{
+              'trick': "Couldn't detect trick from uploaded video",
+              'confidence': confidence,
+              'statistics': {
+                'confidence': confidence,
+              },
+            };
+
       setState(() {
-        _detectionResult = result;
+        _detectionResult = displayResult;
         _isProcessing = false;
-        
-        // Add to history
-        _trickHistory.insert(0, {
-          'name': result['trick'],
-          'percentage': '${result['confidence']}%',
-          'time': 'Just now',
-        });
+
+        // Only confident detections go into history.
+        if (isConfident) {
+          _trickHistory.insert(0, {
+            'name': result['trick'],
+            'percentage': '$confidence%',
+            'time': 'Just now',
+          });
+        }
       });
     } catch (e, stackTrace) {
       print('Error processing video: $e');

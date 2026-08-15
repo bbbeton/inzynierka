@@ -15,7 +15,10 @@ class TrickDetectionCard extends StatelessWidget {
 
   String _formatTrickName(String rawName) {
     final normalized = rawName.trim();
-    if (normalized.isEmpty || normalized == '---' || normalized == 'Unknown') {
+    if (normalized.isEmpty ||
+        normalized == '---' ||
+        normalized == 'Unknown' ||
+        normalized.toLowerCase().contains("couldn't detect")) {
       return normalized;
     }
     const named = {
@@ -40,7 +43,9 @@ class TrickDetectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayTrick = _formatTrickName(trickName ?? '---');
+    final rawTrick = trickName ?? '---';
+    final isUndetected = rawTrick.toLowerCase().contains("couldn't detect");
+    final displayTrick = _formatTrickName(rawTrick);
     final displayAccuracy = accuracy ?? 0;
     final stats = statistics ?? {'confidence': 0};
 
@@ -87,7 +92,7 @@ class TrickDetectionCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Performed Trick',
+                      isUndetected ? 'Detection result' : 'Performed Trick',
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         color: const Color(0xFFC7C1E4),
@@ -128,7 +133,7 @@ class TrickDetectionCard extends StatelessWidget {
                   child: Text(
                     displayTrick,
                     style: GoogleFonts.poppins(
-                      fontSize: 28,
+                      fontSize: isUndetected ? 18 : 28,
                       color: const Color(0xFF2F00FF),
                       fontWeight: FontWeight.w600,
                     ),
@@ -168,7 +173,7 @@ class TrickDetectionCard extends StatelessWidget {
                     Flexible(
                       flex: 1,
                       child: Text(
-                        '${stats['confidence'] ?? 56}%',
+                        '${stats['confidence'] ?? 0}%',
                         style: GoogleFonts.poppins(
                           fontSize: 24,
                           color: const Color(0xFF180081).withOpacity(0.44),
