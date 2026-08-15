@@ -1,7 +1,7 @@
 \newpage
 \section{Opracowanie modułu sztucznej inteligencji}
     
-    Niniejszy rozdział poświęcono szczegółowemu omówieniu procesu projektowania oraz implementacji modułu sztucznej inteligencji. Stanowi on główny silnik analityczny zaprojektowanej aplikacji mobilnej. Zgodnie z założeniami projektowymi opisanymi w rozdziale trzecim, klasyfikacja trików realizowana jest w oparciu o analizę wizyną działającą bezpośrednio na urządzeniu końcowym (w tym przypadku smarftonie użytkownika). Ze względu na złożoność tego zagadnienia, proces trworzenia systemu rozpoznawania ruchu podzielono na kilka kluczowych etapów, opisanych w kolejnych podrozdziałach. 
+    Niniejszy rozdział poświęcono szczegółowemu omówieniu procesu projektowania oraz implementacji modułu sztucznej inteligencji. Stanowi on główny silnik analityczny zaprojektowanej aplikacji mobilnej. Zgodnie z założeniami projektowymi opisanymi w rozdziale trzecim, klasyfikacja trików realizowana jest w oparciu o analizę wizyną działającą bezpośrednio na urządzeniu końcowym (w tym przypadku smartfonie użytkownika). Ze względu na złożoność tego zagadnienia, proces tworzenia systemu rozpoznawania ruchu podzielono na kilka kluczowych etapów, opisanych w kolejnych podrozdziałach. 
     
     \subsection{Zbiór danych treningowych}
 
@@ -18,11 +18,11 @@
         \end{itemize}
         W zbiorze znajduje się po około pięćdziesiąt nagrań do każdej z klas.
 
-        Początkowe plany projektowe zakładały rozbudowę bazy treningowe poprzez połączenie jej z zewnętrznymi materiałami, takimi jak repozytorium \textit{SkateboardML}, udostępnione w serwisie \textit{GitHub} przez użytkownika \textit{LightningDrop} \cite{lightningdrop2024}. Po dokładnej analizie danych źródłowych zdecydowano się jednak na odrzucenie tej koncepcji z uwagi na wysokie ryzyko błędów architektonicznych. Zewnętrzny zbiór zawierał po około 100 próbek wideo i ograniczał się tylko do dwóch klas (Ollie oraz Kickflip). Integracja tak ograniczonych danych ze zbalansowanym zbiorem z platformy \textit{Kaggle} mogłaby doprowadzić do drastycznego zaburzenia równowagi klas. Z punktu widzenia uczenia maszynowego skutkowałoby to wykształceniem przez sieć neuronową tzw. obciążenia (z ang. \textit{bias}) - model zacząłby sztucznie faworyzować te ewolucje, których próbek byłoby znacząco więcej niż innych (w tym przypadku Ollie i Kickflip). Przełożyłoby się to na znaczący wzrost liczby fałszywych detekcji podczas użytkowania aplikacji.
+        Początkowe plany projektowe zakładały rozbudowę bazy treningowej poprzez połączenie jej z zewnętrznymi materiałami, takimi jak repozytorium \textit{SkateboardML}, udostępnione w serwisie \textit{GitHub} przez użytkownika \textit{LightningDrop} \cite{lightningdrop2024}. Po dokładnej analizie danych źródłowych zdecydowano się jednak na odrzucenie tej koncepcji z uwagi na wysokie ryzyko błędów architektonicznych. Zewnętrzny zbiór zawierał po około 100 próbek wideo i ograniczał się tylko do dwóch klas (Ollie oraz Kickflip). Integracja tak ograniczonych danych ze zbalansowanym zbiorem z platformy \textit{Kaggle} mogłaby doprowadzić do drastycznego zaburzenia równowagi klas. Z punktu widzenia uczenia maszynowego skutkowałoby to wykształceniem przez sieć neuronową tzw. obciążenia (z ang. \textit{bias}) - model zacząłby sztucznie faworyzować te ewolucje, których próbek byłoby znacząco więcej niż innych (w tym przypadku Ollie i Kickflip). Przełożyłoby się to na znaczący wzrost liczby fałszywych detekcji podczas użytkowania aplikacji.
 
         Istotnym wyzwaniem inżynierskim była również rozbieżność w parametrach nagrań. Filmy z platformy \textit{Kaggle} były nagrywane z częstotliwością 120 klatek na sekundę (FPS - z ang. \textit{Frames per second}), podczas gdy aparaty docelowych urządzeń mobilnych pracują zazwyczaj w standardzie 30 FPS. Aby zapobiec wyuczeniu przez model nienaturalnie wolnej dynamiki ruchu, zastosowano w kodzie mechanizm odrzucania klatek, powodując tym samym konwersję wideo do 30 FPS.
 
-        Należy zauważyć, że choć wielkość zastosowanego zbioru danych jest stosunkowo skromna jak na standardy komercyjnych systemów sztucznej inteligencji, jest to ilość w zupełności wystarczająca do opracowania funkcjonalnego prototypu (z ang. \textit{Proof of Concept}) i poprawnej walidacji koncepcji w ramach pracy inżynierskiej. Ewentualne powiększenie zbioru danych mogłoby w przyszłości zostać zrealizowane poprzez proces tzw. \textit{crowdsourcingu}, wykorzustując nagrania nadsyłane anonimowo przez aktywnych użytkowników aplikacji.
+        Należy zauważyć, że choć wielkość zastosowanego zbioru danych jest stosunkowo skromna jak na standardy komercyjnych systemów sztucznej inteligencji, jest to ilość w zupełności wystarczająca do opracowania funkcjonalnego prototypu (z ang. \textit{Proof of Concept}) i poprawnej walidacji koncepcji w ramach pracy inżynierskiej. Ewentualne powiększenie zbioru danych mogłoby w przyszłości zostać zrealizowane poprzez proces tzw. \textit{crowdsourcingu}, wykorzystując nagrania nadsyłane anonimowo przez aktywnych użytkowników aplikacji.
 
     \subsection{Ekstrakcja cech i estymacja pozy}
 
@@ -41,6 +41,34 @@
         
         W celu uchwycenia dynamiki ruchu, zastosowana została technika przesuwnego okna (z ang. \textit{sliding window}). Rozmiar okna wejściowego ustawiono na 30 klatek, co przy znormalizowanej prędkości 30 FPS odpowiada dokładnie jednej sekundzie nagrania, co jest optymalnym czasem na wykonanie triku deskorolkowego. W celu powiększenia liczby unikalnych próbek, zastosowano przesunięcie okna o 2 klatki. Ostateczny zbiór danych składał się z trójwymiarowych tensorów o kształcie (30, 51) (30 klatek wideo, 51 cech w każdej klatce - iloczyn 17 punktów na ciele i 3 informacji dla każdego punktu), który następnie podzielono na zbiór treningowy i walidacyjny w klasycznej proporcji 80:20, gwarantując obiektywną ewaluację modelu. 
 
+        Na listingu \ref{lst:sliding_window} zaprezentowano kod w języku \textit{Python}, realizujący proces transformacji etykiet za pomocą narzędzia \texttt{LabelEncoder} oraz podział sekwencji wideo na nachodzące na siebie okna (z ang. \textit{sliding window}) o rozmiarze 30 klatek. Zastosowano tu skok przesunięcia równy 2 w celu lepszego pokrycia danych.
+        
+        \begin{lstlisting}[
+    language=Python,
+    caption={Kod implementujący mechanizm przesuwnego okna oraz kodowanie etykiet.},
+    label={lst:sliding_window}
+]
+grouped = df.groupby(['label', 'video_name'])
+
+for keys, group in grouped:
+    group = group.sort_values('frame_index')
+    data = group.iloc[:, 3:].values
+    label_str = keys[0]
+
+    if len(data) >= SEQUENCE_LENGTH:
+        for i in range(0, len(data) - SEQUENCE_LENGTH, 2):
+            window = data[i : i + SEQUENCE_LENGTH]
+            features.append(window)
+            labels.append(label_str)
+
+X = np.array(features)
+y_raw = np.array(labels)
+
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(y_raw)
+num_classes = len(label_encoder.classes_)
+\end{lstlisting}
+
     \subsection{Architektura modelu klasyfikacyjnego}
 
         Na etapie doboru algorytmu decyzyjnego odrzucono ciężkie sieci rekurencyjne (np. \textit{LSTM}) na rzecz szybkiej, jednowymiarowej sieci neuronowej \textit{1D-CNN}. Sieci te zostały opisane szerzej w podrodziale 2.3, warto jednak zaznaczyć, iż wybrana architektura charakteryzuje się znacznie mniejszym zapotrzebowaniem na moc obliczeniową oraz zoptymalizowanym procesem wnioskowania, co bezpośrednio wpisuje się w założenia platformy docelowej, umożliwiając płynne działanie klasyfikatora lokalnie, wykorzystując wyłącznie moc obliczeniową procesora smartfona.
@@ -55,12 +83,111 @@
             \item \textbf{Warstwa wyjściowa}: warstwa gęsta wyposażona w 8 neuronów, których liczba odpowiada ilości rozpoznawanych klas ewolucji. Operuje ona na funkcji aktywacji \textit{Softmax}, która poddaje sygnały wyjściowe normalizacji, tworząc ostateczny rozkład prawdopodobieństwa przynależności analizowanej sekwencji do każdej z dyskretnych klas.
         \end{itemize}
 
+        Praktyczną implementację opisanej architektury w środowisku \textit{TensorFlow/Keras} przedstawiono na listingu \ref{lst:model_architecture}. Wykorzystanie jednowymiarowych warstw splotowych pozwala na znalezienie wzorców ruchu w czasie, takich jak np. szybki ruch w górę.
+
+        \begin{lstlisting}[
+    language=Python,
+    caption={Definicja architektury sieci 1D-CNN w bibliotece TensorFlow.},
+    label={lst:model_architecture}
+]
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(SEQUENCE_LENGTH, NUM_KEYPOINTS)),
+
+    tf.keras.layers.Conv1D(filters=64, kernel_size=3, activation='relu'),
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.MaxPooling1D(pool_size=2),
+
+    tf.keras.layers.Conv1D(filters=128, kernel_size=3, activation='relu'),
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.MaxPooling1D(pool_size=2),
+
+    tf.keras.layers.Flatten(),
+
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(num_classes, activation='softmax')
+])
+
+model.compile(loss='sparse_categorical_crossentropy', 
+optimizer='adam', metrics=['accuracy'])
+\end{lstlisting}
+
     \subsection{Trenowanie modelu i konwersja TensorFlow Lite}
 
         Proces optymalizacji wag w zaprojektowanej sieci splotowej zrealizowano przy użyciu adaptacyjnego algorytmu optymalizacji \textit{Adam} (z ang. \textit{Adaptive Movement Estimation}). Algorytm ten dynamicznie dostosowuje czynniki uczenia dla poszczególnych wag na podstawie estymacji pierwszego i drugiego momentu gradientu, co pozwala na szybszą i bardziej stabilną zbieżność modelu. Celem optymalizacji była minimalizacja funkcji straty opartej na rzadkiej entropii krzyżowej (z ang. \textit{Sparse Categorical Crossentropy}). Proces uczenia zaplanowano na maksymalnie 50 epok, w trakcie których dane treningowe przetwarzano w mniejszych pakietach liczących po 32 próbki.
 
         W celu maksymalizacji zdolności modelu do generalizacji (poprawnego rozpoznawania nowych, nieznanych wcześniej nagrań) oraz zapobiegania zjawisku przeuczenia, zastosowano technikę regularyzacji zwaną wczesnym zatrzymywaniem. Polega ona na ciągłym monitorowaniu wartości funkcji straty na niezależnym zbiorze walidacyjnym po każdej epoce. Algorytm został zaprogramowany tak, aby automatycznie przerwać proces uczenia, jeżeli błąd walidacyjny nie uległ zmniejszeniu przez 10 kolejnych iteracji. Po takim zatrzymaniu, przywracane i zapisywane były te wagi sieci, dla których odnotowano najniższą wartość błędu, gwarantując wybór najbardziej optymalnego stanu modelu.
 
-        Finalnym etapem prac nad silnikiem analitycznym była konwersja skomplikowanej sieci do lekkiego formatu binarnego, zoptymalizowanego pod kątem urządzeń o ograniczonych zasobach sprzętowych. W trakcie konwersji zastosowano rygorystyczne reguły kompilacji. Wymuszono mapowanie warstw sieci neuronowej wyłącznie na zbiór podstawowych operacji matematycznych, które są natywnie i sprzętowo wspierane przez procesory smartfonów. Tym samym zrezygnowano z implementacji złożonych, zewnętrznych instrukcji obliczeniowych macierzystej biblioteki programistycznej. Takie ograniczenie przestrzeni operacyjnej pozwoliło na znaczną redukcję objętości pliku wynikowego w formacie \textit{.tflite} oraz zagwarantowało wydajne, bezproblemowe wnioskowenia modelu na mobilnych architekturach procesorów.
+        Kod realizujący definicję mechanizmu wczesnego zatrzymywania oraz właściwy proces uczenia sieci został zaprezentowany na listingu \ref{lst:model_training}.
 
+        \begin{lstlisting}[
+    language=Python,
+    caption={Konfiguracja procesu uczenia i mechanizmu wczesnego zatrzymywania.},
+    label={lst:model_training}
+]
+es = tf.keras.callbacks.EarlyStopping(monitor='val_loss', 
+patience=10, restore_best_weights=True)
+
+history = model.fit(X_train, y_train, epochs=50, batch_size=32,
+validation_data=(X_test, y_test), callbacks=[es])
+\end{lstlisting}
+
+        Finalnym etapem prac nad silnikiem analitycznym była konwersja skompilowanej sieci do lekkiego formatu binarnego, zoptymalizowanego pod kątem urządzeń o ograniczonych zasobach sprzętowych. W trakcie konwersji zastosowano rygorystyczne reguły kompilacji. Wymuszono mapowanie warstw sieci neuronowej wyłącznie na zbiór podstawowych operacji matematycznych, które są natywnie i sprzętowo wspierane przez procesory smartfonów. Tym samym zrezygnowano z implementacji złożonych, zewnętrznych instrukcji obliczeniowych macierzystej biblioteki programistycznej. Takie ograniczenie przestrzeni operacyjnej pozwoliło na znaczną redukcję objętości pliku wynikowego w formacie \texttt{.tflite} oraz zagwarantowało wydajne, bezproblemowe wnioskowania modelu na mobilnych architekturach procesorów.
+
+        Kod wykonujący opisaną konwersję do formatu \textit{TensorFlow Lite} z wymuszeniem użycia standardowych operacji przedstawiono na listingu \ref{lst:tflite_conversion}.
+
+\begin{lstlisting}[
+    language=Python,
+    caption={Konwersja modelu do zoptymalizowanego formatu TensorFlow Lite.},
+    label={lst:tflite_conversion}
+]
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+
+converter.target_spec.supported_ops = [
+  tf.lite.OpsSet.TFLITE_BUILTINS
+]
+
+tflite_model = converter.convert()
+
+with open('cnn_skate_model.tflite', 'wb') as f:
+    f.write(tflite_model)
+\end{lstlisting}
+
+Na podstawie zebranych danych analitycznych sporządzono krzywe uczenia: dokładność modelu, widoczna na rysunku \ref{fig:learning_curves} (a) oraz funkcja straty, widoczna na rysunku \ref{fig:learning_curves} (b). Wizualizują one zmianę dokładności oraz funkcji straty na przestrzeni kolejnych epok. 
+
+\begin{figure}[!ht]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/accuracy_plot.png}
+        \caption{Wykres dokładności (Accuracy)}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/loss_plot.png}
+        \caption{Wykres funkcji straty (Loss)}
+    \end{subfigure}
+    \caption{Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego.}
+    \label{fig:learning_curves}
+\end{figure}
+
+Krzywa dokładności wykazuje szybki i stabilny wzrost, osiągając wysoki pułap poprawnych klasyfikacji, przekraczający 90\%. Z kolei krzywa funkcji straty prezentuje gwałtowny spadek, szybko stabilizując się na bardzo niskim poziomie. Kluczowym wskaźnikiem świadczącym o wysokiej jakości modelu jest zachowanie krzywej walidacyjnej, która na obu wykresach niemal idealnie podąża za krzywą treningową. Brak znaczącego odchylenia (rozchodzenia się obu linii) w późniejszych epokach dowodzi, że sieć znakomicie generalizuje wiedzę i nie ulega zjawisku przeuczenia (ang. \textit{overfitting}). Oznacza to, że algorytm skutecznie wyodrębnił uniwersalne wzorce w sekwencjach ruchu, a nie zaledwie \enquote{nauczył się na pamięć} próbek ze zbioru treningowego. Zaimplementowany mechanizm wczesnego zatrzymywania skutecznie kontrolował ten proces, gwarantując zapisanie najbardziej optymalnych wag.
+
+W celu ostatecznej ewaluacji skuteczności modelu na danych niewidzianych podczas treningu, wygenerowano macierz pomyłek (ang. \textit{Confusion Matrix}), widoczną na rysunku \ref{fig:confusion_matrix}. Macierz ta jest specjalistycznym narzędziem analitycznym w formie tabeli, służącym do wizualizacji skuteczności algorytmu poprzez zestawienie rzeczywistych klas ze zbioru testowego z predykcjami dokonanymi przez model. Wartości leżące na głównej przekątnej (od lewego górnego do prawego dolnego rogu) reprezentują próbki sklasyfikowane całkowicie poprawnie. Wszelkie wartości znajdujące się poza tą przekątną wskazują na detekcje błędne, co pozwala precyzyjnie zdiagnozować, mylenie których klas ewolucji sprawia sieci największą trudność. Obrazuje ona precyzję, z jaką sieć rozpoznaje poszczególne ewolucje deskorolkowe.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=0.6
+    \textwidth]{img/macierz-pomylek.png}
+    \caption{Macierz pomyłek klasyfikatora na zbiorze testowym.}
+    \label{fig:confusion_matrix}
+\end{figure}
+
+Analiza wykonanej macierzy jednoznacznie potwierdza wysoką skutecznosc zaprojektowanego silnika klasyfikacyjnego. Główna przekątna macierzy, reprezentująca zbiór poprawnych predykcji jest silnie zarysowana, podczas gdy wartości leżące poza nią (oznaczające błędne klasyfikacje) są śladowe lub zerowe.
+
+Na szczególną uwagę zasługuje fakt, iż model wykazuje perfekcyjną skuteczność w rozpoznawaniu ewolucji z grupy \textit{Frontshuvit} (0 błędów na 233 próby) oraz doskonałe wyniki dla trików typu \textit{Shuvit} czy \textit{Backside 180}. Niewielkie pomyłki decyzyjne koncentują się wokół ewolucji o bardzo zbliżonej kinematyce ruchu. Przykładem jest sporadyczne mylenie triku \textit{Kickflip} z \textit{Ollie} (7 przypadków błędnej klasyfikacji) lub z \textit{Shuvit}(5 przypadków). Zjawisko to jest w pełni uzasadnione z punktu widzenia biomechaniki - faza najazdu oraz wyskoku w obu przypadkach jest niemal identyczna, a różnica wynika z subtelnego ruchu stopy w przestrzeni, który mogł zostać zakłócony przez obniżoną jakość obrazu, czy gorsze warunki oświetleniowe w materiale wideo.
+
+Wygenerowana macierz pomyłek dowodzi, że zastosowanie sieci splotowej \textit{1D-CNN} połączonej z przestrzenną normalizacją punktów kluczowych sylwetki pozwala na stabilne i trafne wnioskowanie, w pełni spełniając restrykcyjne wymagania aplikacji mobilnej operującej na obrazie w czasie rzeczywistym. 
+
+Proces projektowania i ewaluacji modułu sztucznej inteligencji dowodzi słuszności przyjętych założeń architektonicznych. Zastosowanie jednowymiarowych sieci splotowych (\textit{1D-CNN}), w połączeniu z odpowiednim przygotowaniem danych przestrzennych (ekstrakcja punktów kluczowych sylwetki przez model \textit{MoveNet} i mechanizm przesuwnego okna), pozwoliło na stworzenie wysoce skutecznego klasyfikatora ruchu. Analiza wykresów uczenia oraz macierzy pomyłek potwierdza, że model dobrze generalizuje pozyskaną wiedzę, nie ulega zjawisku przeuczenia i z dużą precyzją odróżnia od siebie ewolucje deskorolkowe o bardzo zbliżonej kinematyce. Ostateczna kompilacja i konwersja wyuczonej sieci do zoptymalizowanego formatu \textit{TensorFlow Lite} gwarantuje, że otrzymany silnik analityczny jest wystarczająco lekki i wydajny, aby bezproblemowo funkcjonować na urządzeniach mobilnych, realizując precyzyjną ocenę trików w czasie rzeczywistym.
 %odnieść się do tego czy jest wystarczająca ilość danych treningowych

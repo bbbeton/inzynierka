@@ -4,7 +4,7 @@
         Niniejszy rozdział poświęcono szczegółowemu opisowi architektury oraz implementacji warstwy użytkownika systemu w postaci aplikacji mobilnej. Aplikacja ma na celu integrację funkcji mapowania skateparków z modułem analizy wizyjnej, realizującym wnioskowanie w czasie rzeczywistym na urządzeniu końcowym. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz architekturę integracji uczenia maszynowego.
 
     \subsection{Struktura projektu w środowisku Flutter}
-        Aplikacja mobilna została zrealizowana z wykorzystaniem wieloplatformowego framework'a \textit{Flutter} oraz języka programowania \textit{Dart}. Wybór tej technologii ukierunkowany był przede wszystkim uniwersalnością (\textit{Flutter} działa zarówno na telefonach z systemem \textit{Android}, jak i \textit{iOS}). Ponadto posiada on możliwość kompilacji kodu źródłowego bezpośrednio do natywnych instrukcji procesorów o architekturze ARM, co zapewnia wysoką wydajność renderowania interfejsu użytkownika.
+        Aplikacja mobilna została zrealizowana z wykorzystaniem wieloplatformowego frameworka \textit{Flutter} oraz języka programowania \textit{Dart}. Wybór tej technologii ukierunkowany był przede wszystkim uniwersalnością (\textit{Flutter} działa zarówno na telefonach z systemem \textit{Android}, jak i \textit{iOS}). Ponadto posiada on możliwość kompilacji kodu źródłowego bezpośrednio do natywnych instrukcji procesorów o architekturze ARM, co zapewnia wysoką wydajność renderowania interfejsu użytkownika.
 
         Architektura oprogramowania została zaprojektowana w oparciu o wzorzec podziału odpowiedzialności (z ang. \textit{Separation of concerns}), wyodrębniający trzy główne warstwy:
         \begin{enumerate}
@@ -13,7 +13,7 @@
             \item \textbf{Warstwę usług} realizującą komunikację sieciową z interfejsem \textit{API} (z ang. \textit{Application Programming Interface} - Interfejs programowania aplikacji) oraz niskopoziomowe operacje na urządzeniu końcowym (kamera, akceleratory uczenia maszynowego).
         \end{enumerate}
 
-        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono trub pełoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to maksymalnie wykorzystać przestrzeń ekranu na potrzeby podglądu kamery oraz interaktywnej mapy. Spójność wizualną interfejsu zapowniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
+        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono tryb pełoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to maksymalnie wykorzystać przestrzeń ekranu na potrzeby podglądu kamery oraz interaktywnej mapy. Spójność wizualną interfejsu zapewniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
 
     \subsection{Integracja modułu mapy}
 
@@ -101,7 +101,7 @@ for (int i = 0; i < targetLength; i++) {
 return out;
 }\end{lstlisting}
 
-        Pliki wideo nie są przechowywane w pamięci urządzenia ze względu na brak użytecznego uzasadnienia takiego rozwiązania oraz potencjalne zużywanie zasobów pamięci urządzenia w przypadku nagromadzenia znacznej ilości nagrań. Zamiast tego, użytkownik ma dostęp do historii pięciu ostatnich trików, wraz ze stopniem pewności modelu co do klasyfikacji triku, wyrażonej w warości procentowej.
+        Pliki wideo nie są przechowywane w pamięci urządzenia ze względu na brak użytecznego uzasadnienia takiego rozwiązania oraz potencjalne zużywanie zasobów pamięci urządzenia w przypadku nagromadzenia znacznej ilości nagrań. Zamiast tego, użytkownik ma dostęp do historii pięciu ostatnich trików, wraz ze stopniem pewności modelu co do klasyfikacji triku, wyrażonej w wartości procentowej.
 
     \subsection{Integracja modułu TensorFlow Lite z aplikacją}
 
@@ -166,7 +166,7 @@ rightShoulderX - leftShoulderX);
 
             Przekazanie zweryfikowanego wyniku do warstwy prezentacji kończy pełen cykl przetwarzania wideo, umożliwiając natychmiastową prezentację rezultatu na ekranie smartfona.
 
-    \subsection{Architektura i implentacja warstwy serwerowej}
+    \subsection{Architektura i implementacja warstwy serwerowej}
 
         Warstwa serwerowa systemu (nazywana \textit{backendem}), pełni rolę centralnego węzła zarządzającego danymi o infrastrukturze sportowej oraz komunikacją z aplikacją mobilną. Do jej implementacji wykorzystano język \textit{Python} oraz framework \textit{FastAPI}. Wybór tych technologii, opisany szerzej w rozdziale trzecim, podyktowany był wysoce wydajną, asynchroniczną obsługą zapytań, automatyczną walidacją typów danych za pomocą biblioteki \textit{Pydantic} oraz wbudowaną generacją interaktywnej dokumentacji \textit{OpenAPI} (\textit{SwaggerUI}).
 
@@ -191,7 +191,7 @@ rightShoulderX - leftShoulderX);
 
         Aplikacja serwerowa została osadzona w środowisku chmurowym na platformie \textit{Render}. Wykorzystanie kontenerów oraz ciągłej integracji pozwala na automatyczne budowanie i uruchamianie nowej wersji backendu po każdej zmianie w repozytorium kodu.  
 
-        Jako przykład implementacji, na listingu \ref{lst:getspot} przedstawiono definicję \textit{endpointu} służącego do pobierania szczegółowych danych o obiekcie na podstawie jego identyfikatora. Widoczne jest tu wykorzystanie mechanizmu wstrzykiwania zależności, do uzyskania sesji bazy danych oraz obsługa błędów w wprzypadku braku żądanego zasobu.
+        Jako przykład implementacji, na listingu \ref{lst:getspot} przedstawiono definicję \textit{endpointu} służącego do pobierania szczegółowych danych o obiekcie na podstawie jego identyfikatora. Widoczne jest tu wykorzystanie mechanizmu wstrzykiwania zależności, do uzyskania sesji bazy danych oraz obsługa błędów w przypadku braku żądanego zasobu.
 
         \begin{lstlisting}[
                 language=Python,
@@ -278,7 +278,7 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
     return upload.filename or file_key, public_url
 \end{lstlisting} 
 
-        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie sa zapisywane bezpośredno w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane sa jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
+        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie są zapisywane bezpośredno w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane są jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
 
         Zarówno platforma chmurowa \textit{Render} odpowiadająca za hosting backendu, jak i usługa \textit{Supabase} pełniąca rolę bazy danych i magazynu plików, wykorzystywane są w projekcie w darmowych planach taryfowych. Jest to rozwiązanie w zupełności wystarczające na etapie deweloperskim i testowym. Należy jednak podkreślić, że obie te platformy to wysoce skalowalne, komercyjne usługi chmurowe. Pozwala to na łatwe i błyskawiczne zwiększenie zasobów obliczeniowych (skalowanie wertykalne i horyzontalne) w przypadku przyrostu bazy użytkowników, poprzez przejście na wyższe pakiety subskrypcyjne. Dzięki tak zaprojektowanej architekturze, aplikacja stanowi pełnowymiarowy dowód słuszności koncepcji (z ang. \textit{Proof of Concept - PoC}), który może zostać płynnie przekształcony w komercyjny, odporny na duże obciążenia produkt, bez konieczności kosztownego przepisywania kodu infrastruktury.
 
@@ -289,7 +289,7 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
         Na rysunkach \ref{fig:map1} i \ref{fig:map_screens} zaprezentowano główne ekrany działającej aplikacji. Priorytetem pozostawała prostota i intuicyjność, dlatego aplikacja posiada dwa ekrany, z paskiem nawigacji na górze ekranu. Zakładka po lewej stronie nawiguje do ekranu mapy, podzielonego na dwie części:
         \begin{itemize}
             \item \textbf{Interaktywną mapę}, widoczną na rysunku \ref{fig:map1} (a) na której znajduje się lokalizacja smarftonu użytkownika, a także pinezki oznaczające miejsca do jazdy na deskorolce. Po kliknięciu w którąś z nich na ekranie pojawia się szczegółowy opis \enquote{spotu}, przedstawiony na rysunku \ref{fig:map_screens} (a). Opis składa się ze zdjęcia, adresu, stopnia trudności oraz rodzajów przeszkód. Użytkownik ma również możliwość edycji lub usunięcia miejsca do jazdy. W prawym górnym rogu ekranu znajduje się przycisk oznaczony plusem, który umożliwia dodanie nowego miejsca do jazdy przez użytkownika. Czynność ta może zostać wykonana również poprzez kliknięcie w dowolny punkt na mapie. Po kliknięciu przycisku dodania \enquote{spotu} na ekranie pojawia się okienko edycji, widoczne na rysunku \ref{fig:map1} (b). Użytkownik ma możliwość wprowadzenia danych na temat \enquote{spotu}: nazwy, stopnia trudności, rodzajów przeszkód, adresu, opisu oraz zdjęcia (rysunek \ref{fig:map1} (c)).  W prawym dolnym rogu znajduje się ikona kompasu, kliknięcie której powoduje wycentrowanie mapy względem lokalizacji smartfona.
-            \item \textbf{Listę \enquote{spotów}} widoczną na rysunku \ref{fig:spot-list}. Wyświetla ona listę miejsc do jazdy w kolejności od najbliższej użytkownikowi do najdalszej. Zaimplementowano również intuicyjny mechanizm filtrowania wyników, widoczny na rysunku \ref{fig:spot-list} (b). Użytkownik ma możliwość selekcji dowolnej liczby rodzajów przeszkód, a lista dostosowuje się do wybranych filtrów, co pozwala na precyzyjniejsze i szybsze decyzje wyboru miejsca do treningu.
+            \item \textbf{Listę \enquote{spotów}} widoczną na rysunku \ref{fig:map_screens} (b). Wyświetla ona listę miejsc do jazdy w kolejności od najbliższej użytkownikowi do najdalszej. Zaimplementowano również intuicyjny mechanizm filtrowania wyników, widoczny na rysunku \ref{fig:map_screens} (c). Użytkownik ma możliwość selekcji dowolnej liczby rodzajów przeszkód, a lista dostosowuje się do wybranych filtrów, co pozwala na precyzyjniejsze i szybsze decyzje wyboru miejsca do treningu.
         \end{itemize}
 
         \begin{figure}[!ht]
