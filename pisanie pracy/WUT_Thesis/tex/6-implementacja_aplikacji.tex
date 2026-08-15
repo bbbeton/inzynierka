@@ -1,25 +1,25 @@
 \newpage    
     \section{Budowa aplikacji mobilnej i warstwy serwerowej}
 
-        Niniejszy rozdział poświęcono szczegółowemu opisowi architektury oraz implementacji warstwy użytkownika systemu w postaci aplikacji mobilnej. Aplikacja ma na celu integrację funkcji mapowania skateparków z modułem analizy wizyjnej, realizującym wnioskowanie w czasie rzeczywistym na urządzeniu końcowym. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz architekturę integracji uczenia maszynowego.
+        W tym rozdziale przedstawiono architekturę oraz implementację aplikacji mobilnej i warstwy serwerowej systemu. Aplikacja łączy moduł mapy skateparków z modułem analizy wideo, który wykonuje klasyfikację trików bezpośrednio na urządzeniu użytkownika. W dalszej części rozdziału przedstawiono organizację kodu źródłowego, integrację interaktywnego modułu mapy,  sposób działania modułu analizującego i klasyfikującego nagrania trików deskorolkowych oraz sposób wykorzystania modeli uczenia maszynowego w aplikacji.
 
     \subsection{Struktura projektu w środowisku Flutter}
-        Aplikacja mobilna została zrealizowana z wykorzystaniem wieloplatformowego frameworka \textit{Flutter} oraz języka programowania \textit{Dart}. Wybór tej technologii ukierunkowany był przede wszystkim uniwersalnością (\textit{Flutter} działa zarówno na telefonach z systemem \textit{Android}, jak i \textit{iOS}). Ponadto posiada on możliwość kompilacji kodu źródłowego bezpośrednio do natywnych instrukcji procesorów o architekturze ARM, co zapewnia wysoką wydajność renderowania interfejsu użytkownika.
+        Aplikacja mobilna została zrealizowana z wykorzystaniem wieloplatformowego frameworka \textit{Flutter} oraz języka programowania \textit{Dart}. \textit{Flutter} wybrano ze względu na możliwość tworzenia aplikacji dla systemów \textit{Android} i \textit{iOS} przy wykorzystaniu wspólnego kodu. Pozwala to ograniczyć konieczność implementowania i utrzymywania dwóch niezależnych wersji aplikacji.
 
-        Architektura oprogramowania została zaprojektowana w oparciu o wzorzec podziału odpowiedzialności (z ang. \textit{Separation of concerns}), wyodrębniający trzy główne warstwy:
+        Architektura oprogramowania została zaprojektowana zgodnie z zasadą podziału odpowiedzialności (z ang. \textit{Separation of Concerns}), wyodrębniając trzy główne warstwy:
         \begin{enumerate}
             \item \textbf{Warstwę prezentacji} (\textit{UI}) odpowiedzialną za renderowanie komponentów interfejsu, zarządzanie stanem widoków oraz obsługę zdarzeń dotykowych użytkownika.
             \item \textbf{Warstwę logiki biznesowej i dziedzinowej} zawierającą struktury danych oraz algorytmy przetwarzania danych wejściowych.
             \item \textbf{Warstwę usług} realizującą komunikację sieciową z interfejsem \textit{API} (z ang. \textit{Application Programming Interface} - Interfejs programowania aplikacji) oraz niskopoziomowe operacje na urządzeniu końcowym (kamera, akceleratory uczenia maszynowego).
         \end{enumerate}
 
-        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono tryb pełnoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to maksymalnie wykorzystać przestrzeń ekranu na potrzeby podglądu kamery oraz interaktywnej mapy. Spójność wizualną interfejsu zapewniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
+        W głównej funkcji programu (\texttt{main ()}) zaimplementowano wstępną konfigurację aplikacji. Za pomocą klasy \textit{SystemChrome} włączono tryb pełnoekranowy, ukrywając systemowe paski nawigacyjne. Pozwoliło to zwiększyć obszar dostępny dla podglądu kamery oraz mapy. Spójność wizualną interfejsu zapewniono poprzez zdefiniowanie motywu głównego opartego na kroju pisma \textit{Poppins}.
 
     \subsection{Integracja modułu mapy}
 
-        Moduł mapy odpowiada za wizualizację, rejestrację oraz edycję punktów reprezentujących skateparki, obiekty sportowe i \enquote{spoty} deskorolkowe. Warstwa komunikacji sieciowej została wyizolowana w ramach klasy \texttt{SkateSpotApi} operującej na protokole \texttt{HTTP} z wykorzystaniem architektury \texttt{RESTful}.    
+        Moduł mapy odpowiada za wizualizację, rejestrację oraz edycję punktów reprezentujących skateparki, obiekty sportowe i \enquote{spoty} deskorolkowe. Do komunikacji z backendem wykorzystano protokół \texttt{HTTP} oraz interfejs \textit{REST API}. Warstwę komunikacji zaimplementowano w klasie \texttt{SkateSpotApi}.   
 
-        W celu ułatwienia testowania i wdrażania aplikacji, zaimplementowano funkcję dynamicznego wyboru adresu bazowego serwera (\texttt{\_resolveBaseUrl}). Metoda ta sprawdza zmienne środowiskowe przekazane podczas kompilacji i automatycznie dobiera odpowiedni adres URL:
+        Adres serwera jest wybierany dynamicznie za pomocą metody \texttt{\_resolveBaseUrl}, dzięki czemu aplikacja może korzystać z różnych środowisk. Metoda ta sprawdza zmienne środowiskowe przekazane podczas kompilacji i automatycznie dobiera odpowiedni adres URL:
         \begin{itemize}
             \item dla środowiska lokalnego (deweloperskiego) kieruje zapytania pod adres IP emulatora Androida - \texttt{http://10.0.2.2:8000},
             \item dla środowiska produkcyjnego wykorzystuje adres serwera w chmurze (\textit{Render}),
@@ -51,15 +51,15 @@ return 'http://10.0.2.2:8000';
 }
 \end{lstlisting}
 
-        Dane przesłane z serwera w formacie JSON są przekształcane na obiekty reprezentujące skateparki za pomocą klasy \texttt{SkateSpot}. \texttt{API} obsługuje pełen zestaw operacji \texttt{CRUD} (z ang. \textit{Create, Read, Update, Delete}), umożliwiając m. in. pobieranie listy obiektów wraz ze współrzędnymi geograficznymi, dodawanie szczegółowych opisów, określanie poziomu trudności oraz dołączanie zdjęć. Aby zapobiec awarii aplikacji w przypadku braku połączenia z internetem, zapytania sieciowe zabezpieczono obsługą błędów opartą na klasie \texttt{HttpException}.
+        Dane przesłane z serwera w formacie JSON są przekształcane na obiekty reprezentujące skateparki za pomocą klasy \texttt{SkateSpot}. \texttt{API} obsługuje pełen zestaw operacji \texttt{CRUD} (z ang. \textit{Create, Read, Update, Delete}), umożliwiając m. in. pobieranie listy obiektów wraz ze współrzędnymi geograficznymi, dodawanie szczegółowych opisów, określanie poziomu trudności oraz dołączanie zdjęć. Błędy połączenia sieciowego są obsługiwane za pomocą klasy \texttt{HttpException}, dzięki czemu aplikacja może wyświetlić użytkownikowi odpowiedni komunikat.
 
     \subsection{Obsługa kamery i zarządzanie plikami wideo}
     
-        Automatyczne rozpoznawanie trików wymaga pobrania i wstępnej obróbki nagrania z kamery smartfona. Z powodu dużej różnorodności modeli telefonów, powodującej dużą rozbieżność rozdzielczości i proporcji obrazu, materiał wideo przed przekazaniem do modeli uczenia maszynowego musi zostać ustandaryzowany.
+        Automatyczne rozpoznawanie trików wymaga pobrania i wstępnej obróbki nagrania z kamery smartfona. Z powodu dużej różnorodności modeli telefonów, powodującej dużą rozbieżność rozdzielczości i proporcji obrazu, przed przekazaniem nagrania do modeli dane są przekształcane do ustalonego formatu wejściowego.
 
         Na proces przygotowania danych wideo składają się dwa główne etapy:
         \begin{itemize}
-            \item \textbf{Normalizacja przestrzenna klatek}: Każda klatka filmu ulega przeskalowaniu z zachowaniem oryginalnych proporcji obrazu, a następnie umieszczana w kwadratowej macierzy o wymiarach $256 \times 256$ pikseli. Ewentualny wolny obszar powstały na skutek tej konwersji, uzupełniany jest czarnymi pasami, co zapobiega rozciąganiu czy spłaszczaniu sylwetki skatera. Takie zniekształcenie nagrania mogłoby zaburzyć dokładność detekcji punktów kluczowych przez model \textit{MoveNet}.
+            \item \textbf{Normalizacja przestrzenna klatek}: Każda klatka filmu ulega przeskalowaniu z zachowaniem oryginalnych proporcji obrazu, a następnie umieszczana w kwadratowej macierzy o wymiarach $256 \times 256$ pikseli. Ewentualny wolny obszar powstały na skutek tej konwersji, uzupełniany jest czarnymi pasami, co zapobiega rozciąganiu czy spłaszczaniu sylwetki skatera. Zachowanie proporcji obrazu ogranicza zniekształcenia sylwetki, które mogłyby wpływać na detekcję punktów kluczowych przez \textit{MoveNet}.
             \item \textbf{Normalizacja czasowa sekwencji}: Długości nagrań wgrywanych przez użytkowników różnią się od siebie, a główny klasyfikator wymaga wejścia o stałym wymiarze 30 klatek. Aby to osiągnąć, zaimplementowano funkcję \texttt{\_resampleKeypointSequence}, która przekształca sekwencję punktów kluczowych o dowolnej długości do wymaganego rozmiaru 30 klatek za pomocą liniowej interpolacji współrzędnych.
         \end{itemize}
 
@@ -101,21 +101,21 @@ for (int i = 0; i < targetLength; i++) {
 return out;
 }\end{lstlisting}
 
-        Pliki wideo nie są przechowywane w pamięci urządzenia ze względu na brak użytecznego uzasadnienia takiego rozwiązania oraz potencjalne zużywanie zasobów pamięci urządzenia w przypadku nagromadzenia znacznej ilości nagrań. Zamiast tego, użytkownik ma dostęp do historii pięciu ostatnich trików, wraz ze stopniem pewności modelu co do klasyfikacji triku, wyrażonej w wartości procentowej.
+        Nagrania wideo nie są przechowywane na urządzeniu po zakończeniu analizy. Pozwala to ograniczyć zużycie pamięci telefonu. Zamiast tego, użytkownik ma dostęp do historii pięciu ostatnich trików, wraz ze stopniem pewności modelu co do klasyfikacji triku, wyrażonej w wartości procentowej.
 
     \subsection{Integracja modułu TensorFlow Lite z aplikacją}
 
-            Integrację modeli uczenia maszynowego z kodem aplikacji zrealizowano za pomocą biblioteki \texttt{tflite\_flutter}, która jest oficjalnym interfejsem do środowiska uruchomieniowego \textit{TensorFlow Lite}. Proces wnioskowania przebiega dwuetapowo:
+            Integrację modeli uczenia maszynowego z kodem aplikacji zrealizowano za pomocą biblioteki \texttt{tflite\_flutter}, umożliwiającej wykorzystanie środowiska uruchomieniowego \textit{TensorFlow Lite} w aplikacji napisanej w języku \textit{Dart}. Proces wnioskowania przebiega dwuetapowo:
             
             \subsubsection{Estymacja pozy}
                 
-                Na tym etapie przetwarzania danych klasa \texttt{MoveNetService} odpowiada za konwersję materiału wideo do lżejszego i łatwiejszego formatu. W pierwszym kroku usługa ładuje model \texttt{movenet\_thunder.tflite}. Ze względu na duże obciążenie obliczeniowe związane z namierzeniem 17 kluczowych punktów ciała, w konfiguracji interpretera przydzielono 4 wątki procesora. Usługa przetwarza klatki nagrania i zwraca spłaszczoną tablicę 51 wartości, która została opisana dokładniej w rozdziale piątym. Tak spreparowane dane są następnie analizowane.
+                Na tym etapie przetwarzania danych klasa \texttt{MoveNetService} przetwarza kolejne klatki nagrania i wyznacza dla nich punkty kluczowe sylwetki. W pierwszym kroku usługa ładuje model \texttt{movenet\_thunder.tflite}. Ze względu na duże obciążenie obliczeniowe związane z wyznaczeniem 17 kluczowych punktów ciała, w konfiguracji interpretera przydzielono 4 wątki procesora. Usługa przetwarza klatki nagrania i zwraca spłaszczoną tablicę 51 wartości, która została opisana dokładniej w rozdziale piątym. Otrzymana sekwencja punktów kluczowych jest następnie przekazywana do klasyfikatora.
 
-            \subsubsection{Klasyfikacja ewolucji}
+            \subsubsection{Klasyfikacja trików}
 
-                Za klasyfikację ewolucji odpowiada klasa \texttt{TrickDetector}. Przygotowany ciąg 30 klatek przekazywany jest do jednowymiarowej splotowej sieci neuronowej, która przechowywana jest w pamięci jako plik binarny \texttt{trick\_classifier.tflite}. Podczas testów aplikacji na rzeczywistych nagraniach wideo zauważono spadek dokładności klasyfikacji w porównaniu do wyników uzyskanych w środowisku treningowym. Aby poprawić skuteczność rozpoznawania trików bez konieczności ponownego trenowania modelu, w kodzie aplikacji zastosowano dwa mechanizmy wspomagające:
+                Za klasyfikację trików deskorolkowych odpowiada klasa \texttt{TrickDetector}. Przygotowany ciąg 30 klatek przekazywany jest do jednowymiarowej splotowej sieci neuronowej, której model zapisano w pliku binarnym \texttt{trick\_classifier.tflite}. Podczas testów aplikacji na rzeczywistych nagraniach wideo zauważono spadek dokładności klasyfikacji w porównaniu do wyników uzyskanych w środowisku treningowym. Aby poprawić skuteczność rozpoznawania trików bez konieczności ponownego trenowania modelu, w kodzie aplikacji zastosowano dwa dodatkowe mechanizmy wpływające na wynik klasyfikacji:
                 \begin{enumerate}
-                    \item \textbf{Korekta prawdopodobieństw klas}: Zdefiniowano mapę współczynników korygujących \texttt{\_baseClassCalibration}, która modyfikuje prawdopodobieństwa wyjściowe zwracane przez sieć. Zwiększa ona wagę dla trików trudniejszych do wykrycia - takich jak \textit{Kickflip}, którego waga wynosi 1.25 - a jednocześnie zmniejsza wagi dla klas, które model skłonny był faworyzować - czyli np. \textit{Frontside 180}, którego waga wynosi 0.88. Na listingu \ref{lst:baseClassCalibration} znajduje się kod tej mapy.
+                    \item \textbf{Korekta prawdopodobieństw klas}: Zdefiniowano mapę współczynników korygujących \texttt{\_baseClassCalibration}, która modyfikuje prawdopodobieństwa wyjściowe zwracane przez sieć. Dla wybranych klas zastosowano współczynniki większe od 1, natomiast dla innych mniejsze od 1. Przykładowo dla \textit{Kickflip} zastosowano wartość 1.25, a dla \textit{Frontside180} 0.88. Na listingu \ref{lst:baseClassCalibration} znajduje się kod tej mapy.
         \begin{lstlisting}[
                 language=Dart,
                 caption={Mapa \texttt{\_baseClassCalibration}},
@@ -132,8 +132,7 @@ static const Map<String, double> _baseClassCalibration = {
 'Shuvit': 1.08,
 };
 \end{lstlisting}                    
-
-            \item \textbf{Analiza kąta rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na listingu \ref{lst:torsoAngle}. Oblicza ona kąt nachylenia klatki piersiowej za pomocą funkcji trygonometrycznej $a\tan 2$, na podstawie piątego i szóstego punktu kluczowego, czyli odpowiednio lewego oraz prawego ramienia. Obserwując zmiany tego kąta na przestrzeni całego nagrania, aplikacja potrafi określić,czy użytkownik wykonał obrót ciałem w przestrzeni. Pozwala to skutecznie odróżnić triki, w których obraca się tylko deskorolka, takie jak \textit{Shuvit}, od takich, w których obraca się także skater, czyli np. \textit{Frontside 180}.
+    \item \textbf{Wykrywanie rotacji tułowia}: Zaimplementowano funkcję \texttt{\_torsoAngle}, widoczną na listingu \ref{lst:torsoAngle}. Na podstawie współrzędnych piątego i szóstego punktu kluczowego, odpowiadających odpowiednio lewemu i prawemu ramieniu, funkcja wyznacza kąt odcinka łączącego oba punkty za pomocą funkcji $\operatorname{atan2}$. Zmiana wyznaczonego kąta między kolejnymi klatkami służy do określenia wystąpienia rotacji tułowia podczas wykonywania triku. Informacja ta jest następnie wykorzystywana do rozróżnienia trików z rotacją ciała, takich jak \textit{Frontside 180}, od trików, w których rotacji podlega deskorolka, takich jak \textit{Shuvit}.
         \begin{lstlisting}[
                 language=Dart,
                 caption={Metoda \texttt{\_torsoAngle}},
@@ -156,19 +155,19 @@ rightShoulderX - leftShoulderX);
 }
 \end{lstlisting}
                 \end{enumerate}
-            Ostateczna klasyfikacja ewolucji następuje w wyniku syntezy wyjścia z sieci neuronowej z zaprezentowanymi wyżej mechanizmami korekcyjnymi. Proces wyznaczenia wyniku przebiega w następujących krokach:
+            Końcowy wynik klasyfikacji jest wyznaczany na podstawie wyników sieci oraz dodatkowych reguł zaimplementowanych w aplikacji. Proces wyznaczenia wyniku przebiega w następujących krokach:
             \begin{itemize}
-                \item Surowe prawdopodobieństwa zwracane przez funkcję \textit{Softmax} dla poszczególnych klas są skalowane (mnożone) przez odpowiadające im wskaźniki z mapy \\\texttt{\_baseClassCalibration}.
+                \item Wyniki funkcji \textit{Softmax} dla poszczególnych klas są skalowane przez odpowiadające im wskaźniki z mapy \\\texttt{\_baseClassCalibration}.
                 \item Algorytm sumuje całkowitą zmianę kąta tułowia na przestrzeni 30 klatek. Jeżeli wykryty obrót przekracza założony próg geometryczny, priorytetowo traktowane są klasy trików z rotacją ciała, natomiast w przypadku braku rotacji - klasy trików stacjonarnych.
-                \item Z tak zmodyfikowanego wektora prawdopodobieństw wyznaczana jest wartość maksymalna (\textit{argmax}), wskazująca najbardziej prawdopodobną ewolucję.
-                \item Jeżeli obliczona pewność predykcji przekracza przyjęty próg akceptacji (ustalony empirycznie na poziomie 70\%), usługa \texttt{TrickDetector} zwraca do interfejsu użytkownika nazwę rozpoznanego triku wraz z poziomem ufności wyrażonym w procentach. W przeciwnym razie ewolucja klasyfikowana jest jako nierozpoznana, co zapobiega wyświetlaniu błędnych wyników.
+                \item Z tak zmodyfikowanego wektora wyników wyznaczana jest wartość maksymalna (\textit{argmax}), wskazująca najbardziej prawdopodobny trik.
+                \item Jeżeli obliczona pewność predykcji przekracza przyjęty próg akceptacji (ustalony empirycznie na poziomie 70\%), usługa \texttt{TrickDetector} zwraca do interfejsu użytkownika nazwę rozpoznanego triku wraz z poziomem ufności wyrażonym w procentach. W przeciwnym razie trik klasyfikowany jest jako nierozpoznany, co zapobiega wyświetlaniu błędnych wyników.
             \end{itemize}
 
-            Przekazanie zweryfikowanego wyniku do warstwy prezentacji kończy pełen cykl przetwarzania wideo, umożliwiając natychmiastową prezentację rezultatu na ekranie smartfona.
+            Po zakończeniu klasyfikacji wynik jest przekazywany do interfejsu użytkownika i wyświetlany na ekranie.
 
     \subsection{Architektura i implementacja warstwy serwerowej}
 
-        Warstwa serwerowa systemu (nazywana \textit{backendem}), pełni rolę centralnego węzła zarządzającego danymi o infrastrukturze sportowej oraz komunikacją z aplikacją mobilną. Do jej implementacji wykorzystano język \textit{Python} oraz framework \textit{FastAPI}. Wybór tych technologii, opisany szerzej w rozdziale trzecim, podyktowany był wysoce wydajną, asynchroniczną obsługą zapytań, automatyczną walidacją typów danych za pomocą biblioteki \textit{Pydantic} oraz wbudowaną generacją interaktywnej dokumentacji \textit{OpenAPI} (\textit{SwaggerUI}).
+        Warstwa serwerowa odpowiada za obsługę danych o \enquote{spotach} oraz komunikację z aplikacją mobilną. Do jej implementacji wykorzystano język \textit{Python} oraz framework \textit{FastAPI}. \textit{FastAPI} wykorzystano ze względu na obsługę asynchronicznych żądań, walidację danych za pomocą \textit{Pydantic} oraz automatyczne generowanie dokumentacji \textit{OpenAPI}.
 
         Komunikacja między aplikacją mobliną a serwerem odbywa się poprzez bezstanowy interfejs programistyczny \textit{REST API} z wykorzystaniem formatu JSON. Interfejs serwera został podzielony na wyizolowane punkty końcowe, odpowiadające za poszczególne zasoby systemu.
 
@@ -187,9 +186,9 @@ rightShoulderX - leftShoulderX);
             \end{tabularx}
         \end{table}
 
-        Wykonywanie instrukcji po stronie serwera zostało zabezpieczone przed nieoczekiwanymi błędami. Zapytania zawierające niepoprawne struktury danych (takie jak błędny format współrzędnych geograficznych) są automatycznie odrzucane z odpowiednim kodem odpowiedzi \texttt{HTTP} (np. \texttt{422 Unprocessable Entity}), co zapobiega naruszeniu spójności danych oraz ewentualnym błędom w bazie danych.
+        Dane wejściowe są walidowane przed zapisaniem ich w bazie danych. Zapytania zawierające niepoprawne struktury danych (takie jak błędny format współrzędnych geograficznych) są automatycznie odrzucane z odpowiednim kodem odpowiedzi \texttt{HTTP} (np. \texttt{422 Unprocessable Entity}), co zapobiega zapisywaniu w bazie niepoprawnych danych.
 
-        Aplikacja serwerowa została osadzona w środowisku chmurowym na platformie \textit{Render}. Wykorzystanie kontenerów oraz ciągłej integracji pozwala na automatyczne budowanie i uruchamianie nowej wersji backendu po każdej zmianie w repozytorium kodu.  
+        Aplikacja serwerowa została osadzona w środowisku chmurowym na platformie \textit{Render}. Backend jest uruchamiany w kontenerze, a po zmianach w repozytorium proces wdrożenia automatycznie buduje i uruchamia jego nową wersję. 
 
         Jako przykład implementacji, na listingu \ref{lst:getspot} przedstawiono definicję \textit{endpointu} służącego do pobierania szczegółowych danych o obiekcie na podstawie jego identyfikatora. Widoczne jest tu wykorzystanie mechanizmu wstrzykiwania zależności, do uzyskania sesji bazy danych oraz obsługa błędów w przypadku braku żądanego zasobu.
 
@@ -214,7 +213,7 @@ def get_spot(spot_id: int, db: Session = Depends(get_db)) -> SkateSpotRead:
         
     \subsection{Baza danych oraz przechowywanie zasobów multimedialnych}
 
-        Do trwałego przechowywania danych o obiektach sportowych oraz danych relacyjnych wykorzystano relacyjną bazę danych \textit{PostgreSQL}. Została ona skonfigurowana w chmurze, co zapewnia ciągłą dostępność zasobów niezależnie od lokalizacji użytkownika. 
+        Do trwałego przechowywania danych o obiektach sportowych oraz danych relacyjnych wykorzystano relacyjną bazę danych \textit{PostgreSQL}. Jest ona uruchomiona w usłudze chmurowej, dzięki czemu aplikacja może korzystać z niej niezależnie od lokalizacji urządzenia. 
 
         Struktura bazy danych opiera się na relacyjnym modelu danych. Główna tabela przechowująca informacje o \enquote{spotach} zawiera m.in. następujące pola:
         \begin{itemize}
@@ -278,21 +277,17 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
     return upload.filename or file_key, public_url
 \end{lstlisting} 
 
-        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki binarne zdjęć nie są zapisywane bezpośrednio w strukturach relacyjnych bazy danych, ponieważ mogłoby to negatywnie wpłynąć na wydajność zapytań. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane są jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych. Pozwala to na szybkie i lekkie pobieranie struktur JSON przez aplikację mobilną oraz asynchroniczne dociąganie obrazów w miarę potrzeb interfejsu użytkownika.
+        Przechowywanie zdjęć skateparków dodawanych przez użytkowników zorganizowano w sposób hybrydowy. Same pliki zdjęć nie są zapisywane bezpośrednio w strukturach relacyjnych bazy danych. Zamiast tego trafiają one do wydzielonego magazynu plików, a w bazie danych zapisywane są jedynie unikalne identyfikatory oraz adresy \texttt{URL} odwołujące się do konkretnych plików graficznych.
 
-        Zarówno platforma chmurowa \textit{Render} odpowiadająca za hosting backendu, jak i usługa \textit{Supabase} pełniąca rolę bazy danych i magazynu plików, wykorzystywane są w projekcie w darmowych planach taryfowych. Jest to rozwiązanie w zupełności wystarczające na etapie deweloperskim i testowym. Należy jednak podkreślić, że obie te platformy to wysoce skalowalne, komercyjne usługi chmurowe. Pozwala to na łatwe i błyskawiczne zwiększenie zasobów obliczeniowych (skalowanie wertykalne i horyzontalne) w przypadku przyrostu bazy użytkowników, poprzez przejście na wyższe pakiety subskrypcyjne. Dzięki tak zaprojektowanej architekturze, aplikacja stanowi pełnowymiarowy dowód słuszności koncepcji (z ang. \textit{Proof of Concept - PoC}), który może zostać płynnie przekształcony w komercyjny, odporny na duże obciążenia produkt, bez konieczności kosztownego przepisywania kodu infrastruktury.
+        W projekcie wykorzystano darmowe plany usług \textit{Render} i \textit{Supabase}, które były wystarczające podczas tworzenia i testowania aplikacji. Aplikacja mobilna, backend, baza danych oraz magazyn plików są uruchomione jako oddzielne komponenty. Poszczególne komponenty mogą być rozwijane niezależnie, a w przypadku zwiększenia obciążenia dostępne zasoby usług chmurowych mogą zostać zwiększone poprzez zmianę planu.
 
-    \subsection{Finalny wygląd aplikacji}
+    \subsection{Interfejs użytkownika aplikacji}
 
-        Zwieńczeniem prac nad poszczególnymi modułami - od integracji map, przez obsługę strumienia wideo, aż po implementację sieci neuronowej i komunikację z serwerem chmurowym - było połączenie ich w spójny, natywny interfejs użytkownika.
+        Poszczególne moduły zostały następnie połączone w jedną aplikację mobilną.
+
+        Na rysunkach \ref{fig:map1} i \ref{fig:map_screens} zaprezentowano główne ekrany działającej aplikacji. 
         
-        Na rysunkach \ref{fig:map1} i \ref{fig:map_screens} zaprezentowano główne ekrany działającej aplikacji. Priorytetem pozostawała prostota i intuicyjność, dlatego aplikacja posiada dwa ekrany, z paskiem nawigacji na górze ekranu. Zakładka po lewej stronie nawiguje do ekranu mapy, podzielonego na dwie części:
-        \begin{itemize}
-            \item \textbf{Interaktywną mapę}, widoczną na rysunku \ref{fig:map1} (a) na której znajduje się lokalizacja smartfonu użytkownika, a także pinezki oznaczające miejsca do jazdy na deskorolce. Po kliknięciu w którąś z nich na ekranie pojawia się szczegółowy opis \enquote{spotu}, przedstawiony na rysunku \ref{fig:map_screens} (a). Opis składa się ze zdjęcia, adresu, stopnia trudności oraz rodzajów przeszkód. Użytkownik ma również możliwość edycji lub usunięcia miejsca do jazdy. W prawym górnym rogu ekranu znajduje się przycisk oznaczony plusem, który umożliwia dodanie nowego miejsca do jazdy przez użytkownika. Czynność ta może zostać wykonana również poprzez kliknięcie w dowolny punkt na mapie. Po kliknięciu przycisku dodania \enquote{spotu} na ekranie pojawia się okienko edycji, widoczne na rysunku \ref{fig:map1} (b). Użytkownik ma możliwość wprowadzenia danych na temat \enquote{spotu}: nazwy, stopnia trudności, rodzajów przeszkód, adresu, opisu oraz zdjęcia (rysunek \ref{fig:map1} (c)).  W prawym dolnym rogu znajduje się ikona kompasu, kliknięcie której powoduje wycentrowanie mapy względem lokalizacji smartfona.
-            \item \textbf{Listę \enquote{spotów}} widoczną na rysunku \ref{fig:map_screens} (b). Wyświetla ona listę miejsc do jazdy w kolejności od najbliższej użytkownikowi do najdalszej. Zaimplementowano również intuicyjny mechanizm filtrowania wyników, widoczny na rysunku \ref{fig:map_screens} (c). Użytkownik ma możliwość selekcji dowolnej liczby rodzajów przeszkód, a lista dostosowuje się do wybranych filtrów, co pozwala na precyzyjniejsze i szybsze decyzje wyboru miejsca do treningu.
-        \end{itemize}
-
-        \begin{figure}[!ht]
+\begin{figure}[!ht]
             \centering
            
             \begin{subfigure}{0.3\textwidth}
@@ -315,6 +310,12 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
              \caption{Ekrany zakładki mapy w aplikacji, Źródło: [Opracowanie własne].}
                 \label{fig:map1}
         \end{figure}
+
+        Interfejs aplikacji podzielono na dwa główne ekrany dostępne z paska nawigacji. Zakładka po lewej stronie nawiguje do ekranu mapy, podzielonego na dwie części:
+        \begin{itemize}
+            \item \textbf{Interaktywną mapę}, widoczną na rysunku \ref{fig:map1} (a) na której znajduje się lokalizacja smartfonu użytkownika, a także pinezki oznaczające miejsca do jazdy na deskorolce. Po kliknięciu w którąś z nich na ekranie pojawia się szczegółowy opis \enquote{spotu}, przedstawiony na rysunku \ref{fig:map_screens} (a). Opis składa się ze zdjęcia, adresu, stopnia trudności oraz rodzajów przeszkód. Użytkownik ma również możliwość edycji lub usunięcia miejsca do jazdy. W prawym górnym rogu ekranu znajduje się przycisk oznaczony plusem, który umożliwia dodanie nowego miejsca do jazdy przez użytkownika. Czynność ta może zostać wykonana również poprzez kliknięcie w dowolny punkt na mapie. Po kliknięciu przycisku dodania \enquote{spotu} na ekranie pojawia się okienko edycji, widoczne na rysunku \ref{fig:map1} (b). Użytkownik ma możliwość wprowadzenia danych na temat \enquote{spotu}: nazwy, stopnia trudności, rodzajów przeszkód, adresu, opisu oraz zdjęcia (rysunek \ref{fig:map1} (c)).  W prawym dolnym rogu znajduje się ikona kompasu, kliknięcie której powoduje wycentrowanie mapy względem lokalizacji smartfona.
+            \item \textbf{Listę \enquote{spotów}} widoczną na rysunku \ref{fig:map_screens} (b). Wyświetla ona listę miejsc do jazdy w kolejności od najbliższej użytkownikowi do najdalszej. Lista może być filtrowana według rodzaju przeszkody, co widać na rysunku \ref{fig:map_screens} (c). Użytkownik ma możliwość selekcji dowolnej liczby rodzajów przeszkód, a lista dostosowuje się do wybranych filtrów, dzięki czemu użytkownik może ograniczyć listę wyników do wybranych rodzajów przeszkód.
+        \end{itemize}
     
         \begin{figure}[!ht]
             \begin{subfigure}{0.3\textwidth}
@@ -371,4 +372,4 @@ async def save(self, upload: UploadFile) -> tuple[str, str]:
             \label{fig:trick-detector}
         \end{figure}
 
-        Aplikacja charakteryzuje się płynnym działaniem, intuicyjną nawigacją opartą o górny pasek zakładek oraz jasnym, czytelnym motywem graficznym opartym na palecie barw z dominującym kolorem fioletowym, który zapewnia dobrą widoczność interfejsu.
+        Aplikacja wykorzystuje górny pasek nawigacyjny do przełączania między modułem mapy i analizą trików. Interfejs utrzymano w jasnej kolorystyce z dominującym kolorem fioletowym.

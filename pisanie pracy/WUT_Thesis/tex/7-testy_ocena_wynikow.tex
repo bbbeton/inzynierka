@@ -1,11 +1,56 @@
 \newpage
 \section{Testy oraz analiza wyników}
-    \subsection{Środowisko i scenariusze testowe}
-    \subsection{Ewaluacja skuteczności modelu SI}
-    \subsection{Testy funkcjonalne aplikacji}
-    \subsection{Podsumowanie}
-        \subsubsection{Napotkane trudności}
-        \subsubsection{Wdrożone poprawki}
+    W poniższym rozdziale przedstawiono przebieg testów aplikacji mobilnej, warstwy serwerowej oraz modułu klasyfikacji trików. Celem testów było sprawdzenie, jak zaprojektowany system zachowuje się w praktyce, zestawienie rzeczywistej skuteczności sieci neuronowej z wynikami z fazy treningowej oraz zidentyfikowanie obszarów wymagających poprawek.
 
-%scenariusze testów gdzie napisać się zastanowić
-%rozdzielić testy od wyników, dać podrozdziały ze scenariuszem i wynikami
+    \subsection{Środowisko testowe}
+
+        Testy aplikacji mobilnej przeprowadzono na dwóch fizycznych urządzeniach z systemem \textit{Android}: smartfonie \textit{Mode1 Retro II} oraz \textit{Samsung Galaxy S21}, a także na wirtualnym emulatorze w środowisku \textit{Android Studio}. Model uczenia maszynowego był uruchamiany przy użyciu biblioteki \textit{TensorFlow Lite Runtime}.
+
+        Warstwę serwerową przetestowano za pomocą automatycznych testów w języku \textit{Python}, wykorzystując do tego bibliotekę \texttt{pytest}. Zastosowano do tego izolowane środowisko z bazą danych \textit{SQLite} w pamięci, co pozwalało symulować docelową bazę \textit{PostgreSQL} bez modyfikacji rzeczywistych danych.
+
+    \subsection{Ewaluacja skuteczności modelu sztucznej inteligencji}
+
+        W fazie trenowania i walidacji model osiągnął skuteczność na poziomie 96\%, co zostało szerzej omówione w rozdziale 5. Głównym celem poniższych testów było sprawdzenie, jak ten wynik przełoży się na działanie aplikacji na docelowym urządzeniu mobilnym.
+
+        \subsubsection{Scenariusze testowe i zbiór ewaluacyny}
+
+            Do ewaluacji przygotowano własny zbiór 50 nagrań wideo. Filmy zostały zarejestrowane testowymi smartfonami w rozdzielczości 1080p przy 30 klatkach na sekundę. Ponadto wykorzystane zostały archiwalne nagrania, zgromadzone przez autora pracy. W celu rzetelnej reprezentacji rzeczywistego wykorzystywania aplikacji, nagrania testowe charakteryzowały się zróżnicowanymi warunkami oświetleniowymi, odległością kamerującego od sportowca oraz kątem nagrywania. Za sukces uznawano sytuację, w której algorytm poprawnie rozpoznał wykonany trik z pewnością wynoszącą co najmniej 75\%. Wyniki poniżej tego progu aplikacja traktuje jako nierozpoznane, więc w trakcie testów przyjęto takie samo założenie.
+            
+        \subsubsection{Wyniki klasyfikacji i ich analiza}
+
+            Na 50 przeprowadzonych prób, model poprawnie sklasyfikował 38 z nich, co odpowiada skuteczności na poziomie 76\%. Oznacza to spadek skuteczności o 20 punktów procentowych względem wyników uzyskanych w fazie treningowej. Wyniki dla poszczególnych trików oraz zestawienie popełnionych błędów przedstawiono w tabeli \ref{tab:field_tests}.
+
+            \begin{table}[!ht] \centering
+                \caption{Wyniki testów polowych klasyfikatora na zbiorze 50 nagrań ze smartfonów.}
+                \label{tab:field_tests} 
+                \begin{tabularx}{\textwidth}{ | l | c | c | X | c | } \hline
+                    \textbf{Klasa ewolucji} & \textbf{Liczba prób} & \textbf{Poprawne} & \textbf{Błędne klasyfikacje (Szczegóły)} & \textbf{Skuteczność} \\ \hline
+                    Ollie & 10 & 9 & 1x sklasyfikowano jako Kickflip & 90\% \\ \hline
+                    Kickflip & 8 & 5 & 2x jako Ollie, 1x jako Heelflip & 62,5\% \\ \hline
+                    Heelflip & 7 & 5 & 2x jako Ollie & 71\% \\ \hline
+                    Shuvit & 6 & 4 & 1x jako Frontshuvit, 1x Nierozpoznany & 66\% \\ \hline
+                    Frontshuvit & 5 & 4 & 1x jako Shuvit & 80\% \\ \hline
+                    Frontside 180 & 5 & 5 & Brak błędów & 100\% \\ \hline
+                    Backside 180 & 5 & 4 & 1x Nierozpoznany & 80\% \\ \hline
+                    Pressure Flip & 4 & 2 & 1x jako Shuvit, 1x Nierozpoznany & 50\% \\ \hline
+                    \textbf{SUMA} & \textbf{50} & \textbf{38} & \textbf{12 błędów (w tym 3 nierozpoznane)} & \textbf{76\%} \\ \hline
+                \end{tabularx}
+            \end{table}
+
+            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip}(71\%) oraz \textit{Pressure Flip}(50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót.
+
+            Warto również odnotować, że trzy próby zostały przez aplikację odrzucone z powodu pewności niższej niż 75\%. Z punktu widzenia użytkowego jest to zjawisko pożądane, ponieważ pomaga uniknąć wprowadzania użytkownika aplikacji w błąd.
+
+            Rzeczywistą skuteczność na poziomie 76\% można uznać za zadowalającą dla pierwszej wersji aplikacji. Ewentualna poprawa tych wyników wymagałaby zgromadzenia znacznie większej ilości zróżnicowanych danych treningowych, co mogłoby być osiągnięte za pomocą \textit{crowdsourcingu}, czyli gromadzenia nagrań od użytkowników aplikacji i uczenie modelu za ich pomocą.
+            
+    \subsection{Testy funkcjonalne aplikacji mobilnej}
+
+            Po sprawdzeniu modelu sztucznej inteligencji, przetestowano działanie samej aplikacji mobilnej oraz integracji z backendem.
+
+            \subsubsection{Scenariusze i przypadki testowe}
+
+                Do weryfikacji interfejsu użytkownika i logiki biznesowej przygotowano cztery manualne przypadki testowe, które miały sprawdzić najważniejsze funkcje systemu:
+                \begin{itemize}
+                    \item \textbf{Scenariusz 1}: Dodanie nowego \enquote{spotu} z opisem, zdjęciem, współrzędnymi, nazwą i poziomem trudności, a nastepnie sprawdzenie czy pojawi się on poprawnie na mapie na drugim urządzeniu/
+                    \item \textbf{Scenariusz 2}:
+                \end{itemize}
