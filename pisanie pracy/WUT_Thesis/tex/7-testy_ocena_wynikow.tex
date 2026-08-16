@@ -37,7 +37,7 @@
                 \end{tabularx}
             \end{table}
 
-            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip}(71\%) oraz \textit{Pressure Flip}(50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót.
+            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip} (71\%) oraz \textit{Pressure Flip} (50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót.
 
             Warto również odnotować, że trzy próby zostały przez aplikację odrzucone z powodu pewności niższej niż 75\%. Z punktu widzenia użytkowego jest to zjawisko pożądane, ponieważ pomaga uniknąć wprowadzania użytkownika aplikacji w błąd.
 
@@ -52,5 +52,113 @@
                 Do weryfikacji interfejsu użytkownika i logiki biznesowej przygotowano cztery manualne przypadki testowe, które miały sprawdzić najważniejsze funkcje systemu:
                 \begin{itemize}
                     \item \textbf{Scenariusz 1}: Dodanie nowego \enquote{spotu} z opisem, zdjęciem, współrzędnymi, nazwą i poziomem trudności, a nastepnie sprawdzenie czy pojawi się on poprawnie na mapie na drugim urządzeniu/
-                    \item \textbf{Scenariusz 2}:
+                    \item \textbf{Scenariusz 2}: Próba dodania spotu blisko już istniejącego, w celu weryfikacji blokad po stronie serwera.
+                    \item \textbf{Scenariusz 3}: Użycie filtrów na mapie, aby wyświetlić tylko wybrane rodzaje przeszkód.
+                    \item \textbf{Scenariusz 4}: Symulacja braku połączenia internetowego podczas korzystania z mapy, aby sprawdzić zachowanie aplikacji w sytuacji awaryjnej.
                 \end{itemize}
+
+
+                Logikę backendu zweryfikowano za pomocą zautomatyzowanych testów jednostkowych. Na listingu \ref{lst:backend_tests} przedstawiono fragment kodu testowego odpowiedzialnego za sprawdzenie integralności plików oraz geolokalizacji.
+
+                \begin{lstlisting}[
+    language=Python,
+    caption={Fragment zautomatyzowanych testów backendu weryfikujących logikę tworzenia \enquote{spotów}.},
+    label={lst:backend_tests}
+]
+def test_delete_spot_removes_uploaded_file(client):
+    created = _create_spot(client)
+    upload = client.post(
+        f"/spots/{created['id']}/photos",
+        files={"files": ("spot.jpg", io.BytesIO(b"fake-image"), "image/jpeg")},
+    )
+    assert upload.status_code == 200
+    photo_url = upload.json()["photo_urls"][0]
+    file_path = Path(client.app.state.upload_dir) / 
+    Path(urlparse(photo_url).path).name
+    assert file_path.exists()
+
+    deleted = client.delete(f"/spots/{created['id']}")
+    assert deleted.status_code == 204
+    assert not file_path.exists()
+
+def test_create_spot_rejects_too_close_location(client):
+    _create_spot(client)
+    response = client.post(
+        "/spots",
+        json={
+            "name": "Nearby Spot",
+            "type": "Street",
+            "address": "Warsaw",
+            "latitude": 52.22972,
+            "longitude": 21.01222,
+        },
+    )
+    assert response.status_code == 409
+\end{lstlisting}
+
+                Szczegółowy opis testów backendu został przedstawiony w tabeli \ref{tab:pytest_cases}.
+
+                \begin{table}[!ht] \centering
+    \caption{Zestawienie zautomatyzowanych testów jednostkowych warstwy serwerowej (framework pytest).}
+    \label{tab:pytest_cases}
+    \begin{tabularx}{\textwidth}{ | l | X | c | } \hline
+        \textbf{Nazwa testu / Moduł} & \textbf{Cel i opis przypadku testowego} & \textbf{Wynik} \\ \hline
+        API Healthcheck & Weryfikacja poprawnego działania punktu końcowego \texttt{/health} oraz zwracanego statusu środowiska. & Pozytywny \\ \hline
+        Operacje CRUD \enquote{spotów} & Tworzenie, pobieranie listy, pobieranie szczegółów, aktualizacja oraz usuwanie pojedynczego obiektu. & Pozytywny \\ \hline
+        Walidacja współrzędnych & Odrzucanie zapytań (błąd 422) zawierających matematycznie niepoprawne współrzędne geograficzne. & Pozytywny \\ \hline
+        Walidacja multimediów & Zezwalanie na upload zdjęć oraz skuteczne blokowanie plików z niedozwolonym rozszerzeniem (np. \texttt{.txt}). & Pozytywny \\ \hline
+        Ograniczenia zapytań & Test zabezpieczenia anty-spamowego (\textit{rate limit}). Blokada operacji (błąd 429) po 20 powtórzeniach. & Pozytywny \\ \hline
+        Filtrowanie wulgaryzmów & Zablokowanie operacji (błąd 400), gdy opis lub nazwa nowo tworzonego spotu zawiera zablokowane słowa. & Pozytywny \\ \hline
+        Walidacja duplikatów & Odrzucenie próby utworzenia obiektu o nazwie, która jest już przypisana do innej lokalizacji. & Pozytywny \\ \hline
+        Weryfikacja dystansu & Zablokowanie przesyłu danych, jeśli w bardzo bliskiej odległości od podanych współrzędnych istnieje już punkt. & Pozytywny \\ \hline
+        Integralność plików & Sprawdzenie, czy usunięcie obiektu z bazy lub usunięcie samego zdjęcia usuwa również powiązany z nim plik z dysku. & Pozytywny \\ \hline
+    \end{tabularx}
+\end{table}
+
+            Interfejs użytkownika aplikacji został przetestowany za pomocą biblioteki \texttt{flutter\_test}. Fragment kodu testowego odpowiadającego za sprawdzenie poprawnego wyrenderowania się komunikatu o błędzie przedstawiono na listingu \ref{lst:flutter_tests}.
+
+\begin{lstlisting}[
+    language=Dart,
+    caption={Fragment zautomatyzowanego testu widżetów weryfikującego renderowanie błędu na ekranie mapy.},
+    label={lst:flutter_tests}
+]
+testWidgets('MapScreen shows backend error state', (tester) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: MapScreen(
+        enableLocation: false,
+        spotApi: FakeSkateSpotApi(shouldFail: true),
+      ),
+    ),
+  );
+
+  await tester.pumpAndSettle();
+  expect(find.text('Could not load skate spots.'), findsOneWidget);
+});
+\end{lstlisting}
+
+Szczegółowy opis wykonanych testów został przedstawiony w tabeli \ref{tab:flutter_cases}. Skupiono się na trzech obszarach: parsowaniu danych wejściowych, komunikacji sieciowej oraz prawidłowym renderowaniu interfejsu.
+
+            \begin{table}[!ht] \centering
+    \caption{Zestawienie zautomatyzowanych testów jednostkowych i widoków aplikacji mobilnej (flutter\_test).}
+    \label{tab:flutter_cases}
+    \begin{tabularx}{\textwidth}{ | l | X | c | } \hline
+        \textbf{Moduł / Komponent} & \textbf{Cel i opis przypadku testowego} & \textbf{Wynik} \\ \hline
+        Deserializacja JSON & Weryfikacja metody \texttt{SkateSpot.fromJson}. Sprawdzenie parsowania danych odebranych z serwera na obiekty. & Pozytywny \\ \hline
+        Serializacja JSON & Weryfikacja metody \texttt{toCreateJson}. Upewnienie się, że przed wysłaniem pomijane są pola systemowe (np. ID). & Pozytywny \\ \hline
+        Komunikacja z API & Test usługi \texttt{SkateSpotApi}. Prawidłowe pobranie odpowiedzi z kodem 200 i konwersja do wewnętrznych typów. & Pozytywny \\ \hline
+        Obsługa błędów API & Weryfikacja poprawnego przechwytywania błędu serwera przy zapisie. Wyrzucenie bezpiecznego wyjątku \texttt{HttpException}. & Pozytywny \\ \hline
+        Konfiguracja adresu & Test dynamicznego przypisywania adresu URL serwera i poprawnego ignorowania końcowych ukośników (slashy). & Pozytywny \\ \hline
+        Widget: Mapa (Sukces) & Renderowanie widoku \texttt{MapScreen}. Weryfikacja, czy pobrany sztucznie \enquote{spot} poprawnie i stabilnie pojawia się na mapie. & Pozytywny \\ \hline
+        Widget: Mapa (Błąd) & Renderowanie \texttt{MapScreen} przy wymuszonym błędzie sieciowym. Weryfikacja poprawnego komunikatu błędu na ekranie. & Pozytywny \\ \hline
+    \end{tabularx}
+\end{table}
+            \subsubsection{Wyniki testów}
+
+                Aplikacja przeszła pomyślnie wszystkie zaplanowane scenariusze manualne. W przypadku utraty połączenia, program nie zamykał się niespodziewanie, lecz przechwytywał wyjątek sieciowy i wyświetlał na ekranie komunikat informujący o problemie z pobraniem danych. Prawidłowo działało również mapowanie odpowiedzi w formacie \textit{JSON} na struktury danych w języku \textit{Dart}.
+
+                Testy backendu potwierdziły, że serwer prawidłowo weryfikuje nadchodzące żądania - np. skutecznie limituje liczbę zapytań od jednego użytkownika oraz odrzuca próby utworzenia spotów leżących zbyt blisko siebie. Endpointy odpowiedzialne za obsługę zdjęć również pomyślnie przeszły testy, odrzucając pliki z nieprawidłowymi rozszerzeniami (np. dokumenty tekstowe) oraz prawidłowo usuwa powiązane fotografie z dysku podczas usuwania spotu z bazy danych.
+
+        \subsection{Podsumowanie testów}
+
+            Faza testowania całego systemu, choć w ogólnym rozrachunku zakończona sukcesem, ujawniła kilka obszarów wymagających dodatkowej optymalizacji. Poniżej zestawiono główne wyzwania napotkane podczas ewaluacji oprogramowania oraz opisano kroki podjęte w celu ich wyeliminowania i poprawy stabilności gotowej aplikacji.

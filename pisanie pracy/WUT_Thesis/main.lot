@@ -2,3 +2,5 @@
 \contentsline {table}{\numberline {2.1}{\ignorespaces Porównanie wizyjnej i czujnikowej analizy ruchu w sporcie, Źródło: [opracowanie własne].}}{17}{table.caption.5}%
 \contentsline {table}{\numberline {6.1}{\ignorespaces Przykładowa tabela pokazująca wybrane punkty końcowe REST API.}}{44}{table.caption.14}%
 \contentsline {table}{\numberline {7.1}{\ignorespaces Wyniki testów polowych klasyfikatora na zbiorze 50 nagrań ze smartfonów.}}{51}{table.caption.18}%
+\contentsline {table}{\numberline {7.2}{\ignorespaces Zestawienie zautomatyzowanych testów jednostkowych warstwy serwerowej (framework pytest).}}{53}{table.caption.19}%
+\contentsline {table}{\numberline {7.3}{\ignorespaces Zestawienie zautomatyzowanych testów jednostkowych i widoków aplikacji mobilnej (flutter\_test).}}{54}{table.caption.20}%
