@@ -7,8 +7,10 @@
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Makieta ekranu mapy aplikacji, Źródło: [Opracowanie własne].}}{27}{figure.caption.9}%
 \contentsline {figure}{\numberline {4.2}{\ignorespaces Makieta ekranu detekcji triku aplikacji, Źródło: [Opracowanie własne].}}{28}{figure.caption.10}%
 \contentsline {figure}{\numberline {4.3}{\ignorespaces Makieta ekranu historii trików aplikacji, Źródło: [Opracowanie własne].}}{29}{figure.caption.11}%
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego.}}{36}{figure.caption.12}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Macierz pomyłek klasyfikatora na zbiorze testowym.}}{37}{figure.caption.13}%
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Ekrany zakładki mapy w aplikacji, Źródło: [Opracowanie własne].}}{47}{figure.caption.15}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Główne ekrany modułu mapy aplikacji, Źródło: [Opracowanie własne].}}{48}{figure.caption.16}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Ekrany zakładki analizy trików deskorolkowych, Źródło: [Opracowanie własne].}}{49}{figure.caption.17}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego, Źródło: [opracowanie własne].}}{36}{figure.caption.12}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Macierz pomyłek klasyfikatora na zbiorze testowym, Źródło: [opracowanie własne].}}{37}{figure.caption.13}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Ekrany zakładki mapy w aplikacji, Źródło: [Opracowanie własne].}}{46}{figure.caption.15}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Główne ekrany modułu mapy aplikacji, Źródło: [Opracowanie własne].}}{47}{figure.caption.16}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Ekrany zakładki analizy trików deskorolkowych, Źródło: [Opracowanie własne].}}{48}{figure.caption.17}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Komunikat o błędzie w wykrywaniu triku, Źródło: [opracowanie własne].}}{51}{figure.caption.19}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Zrzuty ekranu prezentujące obsługę wyjątków i komunikaty błędów w interfejsie aplikacji, Źródło: [opracowanie własne].}}{55}{figure.caption.24}%

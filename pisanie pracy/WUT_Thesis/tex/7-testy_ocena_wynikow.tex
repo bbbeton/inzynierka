@@ -15,13 +15,15 @@
         \subsubsection{Scenariusze testowe i zbiór ewaluacyny}
 
             Do ewaluacji przygotowano własny zbiór 50 nagrań wideo. Filmy zostały zarejestrowane testowymi smartfonami w rozdzielczości 1080p przy 30 klatkach na sekundę. Ponadto wykorzystane zostały archiwalne nagrania, zgromadzone przez autora pracy. W celu rzetelnej reprezentacji rzeczywistego wykorzystywania aplikacji, nagrania testowe charakteryzowały się zróżnicowanymi warunkami oświetleniowymi, odległością kamerującego od sportowca oraz kątem nagrywania. Za sukces uznawano sytuację, w której algorytm poprawnie rozpoznał wykonany trik z pewnością wynoszącą co najmniej 75\%. Wyniki poniżej tego progu aplikacja traktuje jako nierozpoznane, więc w trakcie testów przyjęto takie samo założenie.
+
+            W ramach ewaluacji skuteczności modelu sztucznej inteligencji przewidziano również zmierzenie czasu potrzebnego na przeprowadzenie pełnej analizy nagrania i klasyfikację triku. W tym celu analiza tego samego nagrania była uruchamiana na dwóch fizycznych urządzeniach oraz na emulatorze, a następnie porównywano czasy tej analizy. Proces ten wykonano dla dziesięciu różnych nagrań, a następnie po wprowadzonych poprawkach powtórzono.
             
         \subsubsection{Wyniki klasyfikacji i ich analiza}
 
             Na 50 przeprowadzonych prób, model poprawnie sklasyfikował 38 z nich, co odpowiada skuteczności na poziomie 76\%. Oznacza to spadek skuteczności o 20 punktów procentowych względem wyników uzyskanych w fazie treningowej. Wyniki dla poszczególnych trików oraz zestawienie popełnionych błędów przedstawiono w tabeli \ref{tab:field_tests}.
 
             \begin{table}[!ht] \centering
-                \caption{Wyniki testów polowych klasyfikatora na zbiorze 50 nagrań ze smartfonów.}
+                \caption{Wyniki testów klasyfikatora na zbiorze 50 nagrań ze smartfonów, Źródło: [opracowanie własne].}
                 \label{tab:field_tests} 
                 \begin{tabularx}{\textwidth}{ | l | c | c | X | c | } \hline
                     \textbf{Klasa ewolucji} & \textbf{Liczba prób} & \textbf{Poprawne} & \textbf{Błędne klasyfikacje (Szczegóły)} & \textbf{Skuteczność} \\ \hline
@@ -37,11 +39,72 @@
                 \end{tabularx}
             \end{table}
 
-            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip} (71\%) oraz \textit{Pressure Flip} (50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót.
+            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip} (71\%) oraz \textit{Pressure Flip} (50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót.Trzy próby zostały sklasyfikowane jako nierozpoznane, ze względu na pewność niższą od 75\%. Komunikat wyświetlany użytkownikowi w przypadku odrzucenia triku widoczny jest na rysunku \ref{fig:below75}.
 
-            Warto również odnotować, że trzy próby zostały przez aplikację odrzucone z powodu pewności niższej niż 75\%. Z punktu widzenia użytkowego jest to zjawisko pożądane, ponieważ pomaga uniknąć wprowadzania użytkownika aplikacji w błąd.
+            \begin{figure}[!h]
+                \centering \includegraphics[width=0.4\linewidth]{img/below75.png}
+                \caption{Komunikat o błędzie w wykrywaniu triku, Źródło: [opracowanie własne].}
+                \label{fig:below75}
+            \end{figure} 
 
             Rzeczywistą skuteczność na poziomie 76\% można uznać za zadowalającą dla pierwszej wersji aplikacji. Ewentualna poprawa tych wyników wymagałaby zgromadzenia znacznie większej ilości zróżnicowanych danych treningowych, co mogłoby być osiągnięte za pomocą \textit{crowdsourcingu}, czyli gromadzenia nagrań od użytkowników aplikacji i uczenie modelu za ich pomocą.
+
+            \subsubsection{Testy wydajnościowe i optymalizacja czasu wnioskowania}
+
+            Pomiary czasu wnioskowania dla poszczególnych urządzeń zostały przedstawione w tabeli \ref{tab:time_before}.
+
+            \begin{table}[!ht] \centering
+    \caption{Czas analizy nagrań wideo na różnych urządzeniach przed optymalizacją, Źródło: [opracowanie własne].}
+    \label{tab:time_before} 
+    \begin{tabularx}{\textwidth}{ | l | X | X | X | } \hline
+        \textbf{Nr nagrania} & Czas analizy na urządzeniu \textbf{Mode1 Retro II [s]} & Czas analizy na urządzeniu \textbf{Samsung Galaxy S21 [s]} & Czas analizy na urządzeniu \textbf{Emulator [s]} \\ \hline
+        1 & 125 & 12 & 14 \\ \hline
+        2 & 180 & 18 & 19 \\ \hline
+        3 & 240 & 25 & 23 \\ \hline
+        4 & 150 & 15 & 16 \\ \hline
+        5 & 290 & 29 & 27 \\ \hline
+        6 & 130 & 11 & 13 \\ \hline
+        7 & 210 & 22 & 25 \\ \hline
+        8 & 260 & 28 & 30 \\ \hline
+        9 & 190 & 19 & 18 \\ \hline
+        10 & 295 & 27 & 29 \\ \hline
+    \end{tabularx}
+\end{table}
+
+        Przeprowadzone pomiary wykazały dysproporcję w czasie przetwarzania w zależności od wykorzystywanego urządzenia. Na smartfonie o niższej mocy obliczeniowej (\textit{Mode1 Retro II}) proces ten trwał od 125 do 295 sekund, podczas gdu na urządzeniu \textit{Samsung Galaxy S21} oraz na emulatorze czas analizy wynosił od 11 do 30 sekund. Dodatkowo interfejs graficzny aplikacji w trakcie wnioskowania zacinał się i nie reagował na dotyk użytkownika, a do normalnego funkcjonowania wracał dopiero po zakończeniu analizy.
+
+        W celu skrócenia czasu wnioskowania wdrożono cztery modyfikacje w sposobie działania aplikacji:
+
+        \begin{itemize}
+            \item \textbf{Wielowątkowość}: w konfiguracji interpretera \textit{TensorFlow Lite} przydzielono 4 wątki procesora do obsługi operacji splotowych,
+            \item \textbf{Izolaty języka Dart}: pętlę wyodrębniającą cechy szkieletu oraz proces klasyfikacji przeniesiono do osobnego wątku w tle,
+            \item \textbf{Skalowanie klatek obrazu}: wprowadzono mechanizm zmiany rozdzielczości każdej klatki do wymiarów $256\times 256$ pikseli przed przekazaniem jej do wejścia modelu \textit{MoveNet},
+            \item \textbf{Normalizacja}: zastosowano algorytm pomijania klatek, wymuszając analizę materiału w stałym standardzie 30 klatek na sekundę dla wszystkich plików wejściowych.
+        \end{itemize}
+
+        Po zaimplementowaniu powyższych zmian ponownie zmierzono czas analizy na tym samym zbiorze dziesięciu nagrań. Otrzymane wyniki zaprezentowano w tabeli \ref{tab:time_after}.
+
+        \begin{table}[!ht] \centering
+    \caption{Czas analizy nagrań wideo na różnych urządzeniach po optymalizacji, Źródło: [opracowanie własne].}
+    \label{tab:time_after} 
+    \begin{tabularx}{\textwidth}{ | c | X | X | X | } \hline
+        \textbf{Nr nagrania} & Czas analizy na urządzeniu \textbf{Mode1 Retro II [s]} & Czas analizy na urządzeniu \textbf{Samsung Galaxy S21 [s]} & Czas analizy na urządzeniu \textbf{Emulator [s]} \\ \hline
+        1 & 15 & 8 & 9 \\ \hline
+        2 & 22 & 12 & 14 \\ \hline
+        3 & 28 & 16 & 18 \\ \hline
+        4 & 18 & 9 & 10 \\ \hline
+        5 & 29 & 19 & 20 \\ \hline
+        6 & 16 & 7 & 8 \\ \hline
+        7 & 25 & 14 & 15 \\ \hline
+        8 & 30 & 18 & 19 \\ \hline
+        9 & 20 & 11 & 12 \\ \hline
+        10 & 27 & 17 & 18 \\ \hline
+    \end{tabularx}
+\end{table}
+
+Pomiary wykonane po wdrożeniu poprawek wykazały spadek czasu analizy na wszystkich testowanych środowiskach uruchomieniowych. Na urządzeniu \textit{Mode1 Retro II} najdłuższy zarejestrowany czas analizy zmniejszył się z 295 do 30 sekund. Na pozostałych urządzeniach czas wnioskowania nie przekroczył 20 sekund. Aplikacja w trakcie analizy triku działała płynnie i bez zauważalnej różnicy w porównaniu do działania bez wykonywania analizy w tle.
+
+Redukcja czasu przetwarzania jest wynikiem nałożenia się na siebie wdrożonych modyfikacji. Zmiana rozdzielczości obrazu oraz ich ujednolicenie zmniejszyły objętość macierzy przekazywanych do modelu sztucznej inteligencji. Z kolei przypisanie czterech wątków w konfiguracji środowiska \textit{TensorFlow Lite} przyspieszyło wykonywanie operacji matematycznych przez procesor urządzenia, a przeniesienie obliczeń do wyizolowanego wątku zapobiegło blokowaniu zasobów powiązanych z renderowaniem interfejsu graficznego.
             
     \subsection{Testy funkcjonalne aplikacji mobilnej}
 
@@ -62,21 +125,19 @@
 
                 \begin{lstlisting}[
     language=Python,
-    caption={Fragment zautomatyzowanych testów backendu weryfikujących logikę tworzenia \enquote{spotów}.},
+    caption={Fragment testów backendu weryfikujących logikę tworzenia \enquote{spotów}.},
     label={lst:backend_tests}
 ]
 def test_delete_spot_removes_uploaded_file(client):
     created = _create_spot(client)
     upload = client.post(
         f"/spots/{created['id']}/photos",
-        files={"files": ("spot.jpg", io.BytesIO(b"fake-image"), "image/jpeg")},
-    )
+        files={"files": ("spot.jpg", io.BytesIO(b"fake-image"), "image/jpeg")},)
     assert upload.status_code == 200
     photo_url = upload.json()["photo_urls"][0]
     file_path = Path(client.app.state.upload_dir) / 
     Path(urlparse(photo_url).path).name
     assert file_path.exists()
-
     deleted = client.delete(f"/spots/{created['id']}")
     assert deleted.status_code == 204
     assert not file_path.exists()
@@ -91,15 +152,14 @@ def test_create_spot_rejects_too_close_location(client):
             "address": "Warsaw",
             "latitude": 52.22972,
             "longitude": 21.01222,
-        },
-    )
+        },)
     assert response.status_code == 409
 \end{lstlisting}
 
-                Szczegółowy opis testów backendu został przedstawiony w tabeli \ref{tab:pytest_cases}.
+                Szczegółowe zestawienie testów backendu zostało przedstawione w tabeli \ref{tab:pytest_cases}.
 
                 \begin{table}[!ht] \centering
-    \caption{Zestawienie zautomatyzowanych testów jednostkowych warstwy serwerowej (framework pytest).}
+    \caption{Zestawienie testów jednostkowych warstwy serwerowej, Źródło: [opracowanie własne].}
     \label{tab:pytest_cases}
     \begin{tabularx}{\textwidth}{ | l | X | c | } \hline
         \textbf{Nazwa testu / Moduł} & \textbf{Cel i opis przypadku testowego} & \textbf{Wynik} \\ \hline
@@ -119,7 +179,7 @@ def test_create_spot_rejects_too_close_location(client):
 
 \begin{lstlisting}[
     language=Dart,
-    caption={Fragment zautomatyzowanego testu widżetów weryfikującego renderowanie błędu na ekranie mapy.},
+        caption={Fragment testu widżetów weryfikującego renderowanie błędu na ekranie mapy.},
     label={lst:flutter_tests}
 ]
 testWidgets('MapScreen shows backend error state', (tester) async {
@@ -127,20 +187,15 @@ testWidgets('MapScreen shows backend error state', (tester) async {
     MaterialApp(
       home: MapScreen(
         enableLocation: false,
-        spotApi: FakeSkateSpotApi(shouldFail: true),
-      ),
-    ),
-  );
-
+        spotApi: FakeSkateSpotApi(shouldFail: true),),),);
   await tester.pumpAndSettle();
-  expect(find.text('Could not load skate spots.'), findsOneWidget);
-});
+  expect(find.text('Could not load skate spots.'), findsOneWidget);});
 \end{lstlisting}
 
-Szczegółowy opis wykonanych testów został przedstawiony w tabeli \ref{tab:flutter_cases}. Skupiono się na trzech obszarach: parsowaniu danych wejściowych, komunikacji sieciowej oraz prawidłowym renderowaniu interfejsu.
+Szczegółowe zestawienie wykonanych testów zostało przedstawione w tabeli \ref{tab:flutter_cases}. Skupiono się na trzech obszarach: parsowaniu danych wejściowych, komunikacji sieciowej oraz prawidłowym renderowaniu interfejsu.
 
             \begin{table}[!ht] \centering
-    \caption{Zestawienie zautomatyzowanych testów jednostkowych i widoków aplikacji mobilnej (flutter\_test).}
+    \caption{Zestawienie testów jednostkowych aplikacji mobilnej, Źródło: [opracowanie własne].}
     \label{tab:flutter_cases}
     \begin{tabularx}{\textwidth}{ | l | X | c | } \hline
         \textbf{Moduł / Komponent} & \textbf{Cel i opis przypadku testowego} & \textbf{Wynik} \\ \hline
@@ -153,12 +208,53 @@ Szczegółowy opis wykonanych testów został przedstawiony w tabeli \ref{tab:fl
         Widget: Mapa (Błąd) & Renderowanie \texttt{MapScreen} przy wymuszonym błędzie sieciowym. Weryfikacja poprawnego komunikatu błędu na ekranie. & Pozytywny \\ \hline
     \end{tabularx}
 \end{table}
+
+            \subsubsection{Testy niezawodności i obsługa wyjątków}
+
+                Kolejnym elementem weryfikacji poprawności działania systemu były testy niezawodnościowe, mające na celu zbadanie zachowania aplikacji w sytuacjach brzegowych. Prawidłowo zaprojektowany system nie mowinien ulegać awaryjnemu zamknięciu, lecz przechwytywać wyjątki i informować użytkownika o napotkanym problemie. 
+
+                W tym celu przeprowadzono testy polegające na celowym wywołwaniu błędów po stronie bazy danych \textit{Supabase Storage}. Na rysunku \ref{fig:blad12} przedstawiono przykładowe komunikaty błędów w przypadku awarii działania backendu.
+
+                \begin{figure}[!ht]
+    \centering
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/blad2.png}
+        \caption{Błąd braku pojemnika}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.4\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{img/blad3.png}
+        \caption{Błąd nieobsługiwanego formatu pliku}
+    \end{subfigure}
+    \caption{Zrzuty ekranu prezentujące obsługę wyjątków i komunikaty błędów w interfejsie aplikacji, Źródło: [opracowanie własne].}
+    \label{fig:blad12}
+\end{figure}
+
+Analizując powyższe komunikaty błędów, można zweryfikować poprawne działanie mechanizmów zabezpieczających. Warstwa prezentacji skutecznie przechwytuje wyjątek sieciowy i wyświetla o tym czytelny komunikat, natomiast komunikat błędu \textit{Photo upload failed and spot was rolled back} (z ang. Przesyłanie zdjęcia zakończone niepowodzeniem, nie zapisano \enquote{spotu}) oznacza, że w przypadku niepowodzenia zapisu zdjęcia w chmurze, serwer \textit{API} wycofuje wcześniej dodany wpis z bazy danych, co zapobiega powstawaniu w systemie niepoprawnych, \enquote{osieroconych} pozycji.
+
             \subsubsection{Wyniki testów}
 
                 Aplikacja przeszła pomyślnie wszystkie zaplanowane scenariusze manualne. W przypadku utraty połączenia, program nie zamykał się niespodziewanie, lecz przechwytywał wyjątek sieciowy i wyświetlał na ekranie komunikat informujący o problemie z pobraniem danych. Prawidłowo działało również mapowanie odpowiedzi w formacie \textit{JSON} na struktury danych w języku \textit{Dart}.
 
                 Testy backendu potwierdziły, że serwer prawidłowo weryfikuje nadchodzące żądania - np. skutecznie limituje liczbę zapytań od jednego użytkownika oraz odrzuca próby utworzenia spotów leżących zbyt blisko siebie. Endpointy odpowiedzialne za obsługę zdjęć również pomyślnie przeszły testy, odrzucając pliki z nieprawidłowymi rozszerzeniami (np. dokumenty tekstowe) oraz prawidłowo usuwa powiązane fotografie z dysku podczas usuwania spotu z bazy danych.
 
+                Przeprowadzone testy niezawodnościowe pokazały komunikat błędu \texttt{502} Bad Gateway, który uniemożliwiał publikowanie zdjęć na platfornie. Komunikaty błędów bazy danych pozwoliły na identyfikację i korektę dwóch konkretnych błędów:
+                \begin{enumerate}
+                    \item \textbf{Błąd \texttt{404} Bucket not found}, który był spowodowany wprowadzeniem nieprawidłowej wartości zmiennej środowiskowej definiującej nazwę docelowego katalogu plików w konfiguracji bazy danych. Wyeliminowano go poprzez korektę zmiennej \texttt{SUPABASE\_BUCKET} na platformie internetowej serwera.
+                    \item \textbf{Błąd \texttt{415} Invalid mime type} dotyczący nieobsługiwanego formatu \texttt{MIME}. Występował on podczas przesyłania zdjęć z fizycznych urządzeń z systemem \textit{Android}. W tym przypadku błąd został skorygowany poprzez edycję klasy adaptera, tak aby serwer przed wysłaniem danych nadpisywał nagłówek na wartość \texttt{Content-Type:image/jpeg}.
+                \end{enumerate}
+
         \subsection{Podsumowanie testów}
 
-            Faza testowania całego systemu, choć w ogólnym rozrachunku zakończona sukcesem, ujawniła kilka obszarów wymagających dodatkowej optymalizacji. Poniżej zestawiono główne wyzwania napotkane podczas ewaluacji oprogramowania oraz opisano kroki podjęte w celu ich wyeliminowania i poprawy stabilności gotowej aplikacji.
+            Przeprowadzone testy ujawniły kilka obszarów wymagających poprawy. Poniżej zestawiono główne wyzwania napotkane na tym etapie pracy inżynierskiej oraz opisano kroki podjęce w celu naprawy zidentyfikowanych błędów w działaniu.
+            
+            \subsubsection{Napotkane trudności}
+
+                W trakcie testów zidentyfikowano problemy techniczne w trzech głównych obszarach systemu:
+                \begin{itemize}
+                    \item \textbf{Spadek dokładności klasyfikatora}: w warunkach rzeczywistych detekcja trików działała zauważalnie gorzej niż wskazywałyby na to pomiary wykonane na etapie trenowania modelu. Jednoznaczny powód spadku nie został zidentyfikowany, jednak najprawdopodobniej wynika to z kombinacji złych warunków oświetleniowych podczas nagrań, powodujących obniżenie jakości analizowanych nagrań, oraz zbyt małego zestawu danych treningowych. Wynikiem tych czynników było mniej skuteczne wykrywanie sylwetki przez model \textit{MoveNet}, co bezpośrednio przekładało się na precyzję wykrywania trików.
+                    \item \textbf{Blokowanie głównego wątku interfejsu graficznego i długi czas analizy triku}: Mimo podjętych starań co do jak najmniejszego zużycia zasobów, w przypadku telefonu \textit{Mode1 Retro II}, podczas analizy triku aplikacja przestawała chodzić płynnie oraz reagować na dotyk użytkownika. Takie zachowanie utrudniałoby i zniechecałoby użytkownika do korzystania z aplikacji, a czas oczekiwania wynoszący pierwotnie pomiędzy 2 a 5 minut był zdecydowanie zbyt długi. W przypadku smarftona flagowego \textit{Samsung Galaxy S21} oraz emulatora, podobne problemy nie zostały zauważone, jednakże w przypadku urządzeń o ograniczonej mocy obliczeniowej, aplikacja zachowywała się mało responsywnie i zacinała się.
+                    \item \textbf{Błędy związane z przesyłaniem zdjęć \enquote{spotów}}: Przesyłanie zdjęć obrazujących miejsca do jazdy było niemożliwe, a próba przesłania obrazu kończyła się błędem, co nie spełniało postawionych projektowi założeń inżynierskich. Głównymi przyczynami zidentyfikowanych błędów były błędy konfiguracyjne warstwy serwerowej i niezgodności formatowania danych przesyłanych z urządzeń mobilnych. 
+                \end{itemize}

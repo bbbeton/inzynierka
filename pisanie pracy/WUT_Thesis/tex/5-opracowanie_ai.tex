@@ -167,26 +167,26 @@ Na podstawie zebranych danych analitycznych sporządzono krzywe uczenia: dokład
         \includegraphics[width=\textwidth]{img/loss_plot.png}
         \caption{Wykres funkcji straty (Loss)}
     \end{subfigure}
-    \caption{Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego.}
+    \caption{Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego, Źródło: [opracowanie własne].}
     \label{fig:learning_curves}
 \end{figure}
 
 Krzywa dokładności wykazuje szybki i stabilny wzrost, osiągając wysoki pułap poprawnych klasyfikacji, przekraczający 90\%. Z kolei krzywa funkcji straty prezentuje gwałtowny spadek, szybko stabilizując się na bardzo niskim poziomie. Kluczowym wskaźnikiem świadczącym o wysokiej jakości modelu jest zachowanie krzywej walidacyjnej, która na obu wykresach niemal idealnie podąża za krzywą treningową. Brak znaczącego odchylenia (rozchodzenia się obu linii) w późniejszych epokach dowodzi, że sieć znakomicie generalizuje wiedzę i nie ulega zjawisku przeuczenia (ang. \textit{overfitting}). Oznacza to, że algorytm skutecznie wyodrębnił uniwersalne wzorce w sekwencjach ruchu, a nie zaledwie \enquote{nauczył się na pamięć} próbek ze zbioru treningowego. Zaimplementowany mechanizm wczesnego zatrzymywania skutecznie kontrolował ten proces, gwarantując zapisanie najbardziej optymalnych wag.
 
-W celu ostatecznej ewaluacji skuteczności modelu na danych niewidzianych podczas treningu, wygenerowano również macierz pomyłek (ang. \textit{Confusion Matrix}), widoczną na rysunku \ref{fig:confusion_matrix}. Macierz ta jest specjalistycznym narzędziem analitycznym w formie tabeli, służącym do wizualizacji skuteczności algorytmu poprzez zestawienie rzeczywistych klas ze zbioru testowego z predykcjami dokonanymi przez model. Wartości leżące na głównej przekątnej (od lewego górnego do prawego dolnego rogu) reprezentują próbki sklasyfikowane całkowicie poprawnie. Wszelkie wartości znajdujące się poza tą przekątną wskazują na detekcje błędne, co pozwala precyzyjnie zdiagnozować, mylenie których klas ewolucji sprawia sieci największą trudność. Obrazuje ona precyzję, z jaką sieć rozpoznaje poszczególne ewolucje deskowizrolkowe.
+W celu ostatecznej ewaluacji skuteczności modelu na danych niewidzianych podczas treningu, wygenerowano również macierz pomyłek (ang. \textit{Confusion Matrix}), widoczną na rysunku \ref{fig:confusion_matrix}. Jest to tabela służąca do zobrazowania skuteczności algorytmu poprzez zestawienie klas ze zbioru testowego z predykcjami dokonanymi przez model. Wartości leżące na głównej przekątnej (od lewego górnego do prawego dolnego rogu) reprezentują próbki, które zostały sklasyfikowane poprawnie. Wszelkie wartości znajdujące się poza tą przekątną wskazują na detekcje błędne, co pomaga zdiagnozować, mylenie których klas ewolucji sprawia sieci największą trudność.
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=0.8\textwidth]{img/macierz-pomylek.png}
-    \caption{Macierz pomyłek klasyfikatora na zbiorze testowym.}
+    \caption{Macierz pomyłek klasyfikatora na zbiorze testowym, Źródło: [opracowanie własne].}
     \label{fig:confusion_matrix}
 \end{figure}
 
 Analiza wykonanej macierzy jednoznacznie potwierdza wysoką skuteczność zaprojektowanego silnika klasyfikacyjnego. Główna przekątna macierzy, reprezentująca zbiór poprawnych predykcji jest silnie zarysowana, podczas gdy wartości leżące poza nią (oznaczające błędne klasyfikacje) są śladowe lub zerowe.
 
-Na szczególną uwagę zasługuje fakt, iż model wykazuje perfekcyjną skuteczność w rozpoznawaniu ewolucji z grupy \textit{Frontshuvit} (0 błędów na 233 próby) oraz doskonałe wyniki dla trików typu \textit{Shuvit} czy \textit{Backside 180}. Niewielkie pomyłki decyzyjne koncentrują się wokół ewolucji o bardzo zbliżonej kinematyce ruchu. Przykładem jest sporadyczne mylenie triku \textit{Kickflip} z \textit{Ollie} (7 przypadków błędnej klasyfikacji) lub z \textit{Shuvit} (5 przypadków). Zjawisko to jest w pełni uzasadnione z punktu widzenia biomechaniki - faza najazdu oraz wyskoku w obu przypadkach jest niemal identyczna, a różnica wynika z subtelnego ruchu stopy w przestrzeni, który mógł zostać zakłócony przez obniżoną jakość obrazu, czy gorsze warunki oświetleniowe w materiale wideo.
+Proces projekowania i ewaluacji modelu sztucznej inteligencji potwierdził zasadność przyjętych założeń architektonicznych. Zastosowanie jednowymiarowych sieci splotowych \textit{1D-CNN} oraz odpowiednie przygotowanie danych, obejmujące ekstrakcję punktów kluczowych sylwetki za pomocą modelu \textit{MoveNet} i wykorzystanie mechanizmu przesuwnego okna, umożliwiło skuteczną klasyfikację wykonywanych ruchów. Analiza przebiegu procesu uczenia oraz macierzy pomyłem wskazuje, że model osiąga stabline wyniki na danych testowych i prawidłowo rozróżnia triki o podobnym przebiegu ruchu.
 
-Wygenerowana macierz pomyłek dowodzi, że zastosowanie sieci splotowej \textit{1D-CNN} połączonej z przestrzenną normalizacją punktów kluczowych sylwetki pozwala na stabilne i trafne wnioskowanie, w pełni spełniając restrykcyjne wymagania aplikacji mobilnej operującej na obrazie w czasie rzeczywistym. 
+Po zakończeniu procesu uczenia model został skonwertowany do formatu 
+\textit{TensorFlow Lite}. Pozwoliło to ograniczyć jego wymagania obliczeniowe i umożliwiło wykorzystanie go w aplikacji mobilnej. Przeprowadzone testy powtierdziły, że przygotowany model może być wykorzystywany do klasyfikacji trików w aplikacji mobilnej na smartfonie.
 
-Proces projektowania i ewaluacji modułu sztucznej inteligencji dowodzi słuszności przyjętych założeń architektonicznych. Zastosowanie jednowymiarowych sieci splotowych (\textit{1D-CNN}), w połączeniu z odpowiednim przygotowaniem danych przestrzennych (ekstrakcja punktów kluczowych sylwetki przez model \textit{MoveNet} i mechanizm przesuwnego okna), pozwoliło na stworzenie wysoce skutecznego klasyfikatora ruchu. Analiza wykresów uczenia oraz macierzy pomyłek potwierdza, że model dobrze generalizuje pozyskaną wiedzę, nie ulega zjawisku przeuczenia i z dużą precyzją odróżnia od siebie ewolucje deskorolkowe o bardzo zbliżonej kinematyce. Ostateczna kompilacja i konwersja wyuczonej sieci do zoptymalizowanego formatu \textit{TensorFlow Lite} gwarantuje, że otrzymany silnik analityczny jest wystarczająco lekki i wydajny, aby bezproblemowo funkcjonować na urządzeniach mobilnych, realizując precyzyjną ocenę trików w czasie rzeczywistym.
 %odnieść się do tego czy jest wystarczająca ilość danych treningowych
