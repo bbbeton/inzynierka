@@ -1,7 +1,8 @@
 \newpage
 \section{Podsumowanie}
-\subsection{Wnioski z przeprowadzonych prac}
-\subsection{Ograniczenia stworzonego rozwiązania}
-\subsection{Możliwości dalszego rozwoju}
 
-% nie dawać podrozdziałów, usunąć je domyślnie
+    Głównym celem niniejszej pracy inżynierskiej było zaprojektowanie i wdrożenie aplikacji mobilnej wspierającej sportowców uprawiających jazdę na deskorolce. Proces ten obejmował stworzenie interaktywnej mapy \enquote{spotów} deskorolkowych oraz modułu klasyfikacji trików opartego na analizie wizyjnej. Wdrożenie tego systemu dowiodło, że współczesne urządzenia mobilne, nawet te o ograniczonych zasobach obliczeniowych, dysponują wystarczającą mocą obliczeniową do uruchamiania modeli uczenia maszynowego lokalnie, bez konieczności ciągłego dostępu do internetu. Na podstawie wniosków wyciągnietych z testowania, wdrożono modyfikacje, których skutkiem było znaczące zredukowanie czasu analizy trików oraz płynniejsze doświadczenie użytkownika. Udało się zidentyfikować błędy, które niewykryte znacząco utrudniałyby korzystanie ze wszystkich funkcjonalności stworzonej aplikacji. Pozostałe testy potwierdziły poprawność działania innych części systemu.
+
+    Pomimo pozytywnej weryfikacji głównych założeń systemu, przeprowadzone testy praktyczne ukazały techniczne i sprzętowe ograniczenia stworzonego rozwiązania. Odnotowano zauważalny spadek skuteczności z 96\% uzyskanych podczas trenowania klasyfikatora do praktycznej dokładności wynoszącej 80\%. Spadek ten mógł być spowodowany zarówno parametrami aparatów wbudowanych w smartfony, złą techniką i warunkami w trakcie tworzenia nagrań oraz zbyt małym zbiorem danych treningowych. Nagrania w złym oświetleniu często charakteryzują się rozmyciem w ruchu, co negatywnie wpływa na działanie modelu \textit{MoveNet}. Detekcja pozy, a szczególnie prawidłowa detekcja i precyzyjne śledzenie ruchu stóp jest kluczowe w wykrywaniu trików opartych na szybkiej rotacji deskorolki, takich jak \textit{Kickflip} oraz \textit{Heelflip}. Ograniczeniem projektowym był również wspomniany już relatywnie niewielki zbiór danych treningowych, liczący około 400 nagrań. Baza wideo z platformy \textit{Kaggle} zawężała zdolność sieci neuronowej do radzenia sobie z okluzją, zmiennymi kątami kamery oraz słabymi warunkami oświetleniowymi, mimo tego, iż była to największa taka baza znaleziona przez autora pracy.
+    
+    

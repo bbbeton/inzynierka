@@ -152,7 +152,8 @@ def test_create_spot_rejects_too_close_location(client):
             "address": "Warsaw",
             "latitude": 52.22972,
             "longitude": 21.01222,
-        },)
+        },
+    )
     assert response.status_code == 409
 \end{lstlisting}
 
@@ -189,7 +190,9 @@ testWidgets('MapScreen shows backend error state', (tester) async {
         enableLocation: false,
         spotApi: FakeSkateSpotApi(shouldFail: true),),),);
   await tester.pumpAndSettle();
-  expect(find.text('Could not load skate spots.'), findsOneWidget);});
+  expect(find.text('Could not load skate spots.'), findsOneWidget);
+    }
+);
 \end{lstlisting}
 
 Szczegółowe zestawienie wykonanych testów zostało przedstawione w tabeli \ref{tab:flutter_cases}. Skupiono się na trzech obszarach: parsowaniu danych wejściowych, komunikacji sieciowej oraz prawidłowym renderowaniu interfejsu.
@@ -258,3 +261,15 @@ Analizując powyższe komunikaty błędów, można zweryfikować poprawne dział
                     \item \textbf{Blokowanie głównego wątku interfejsu graficznego i długi czas analizy triku}: Mimo podjętych starań co do jak najmniejszego zużycia zasobów, w przypadku telefonu \textit{Mode1 Retro II}, podczas analizy triku aplikacja przestawała chodzić płynnie oraz reagować na dotyk użytkownika. Takie zachowanie utrudniałoby i zniechecałoby użytkownika do korzystania z aplikacji, a czas oczekiwania wynoszący pierwotnie pomiędzy 2 a 5 minut był zdecydowanie zbyt długi. W przypadku smarftona flagowego \textit{Samsung Galaxy S21} oraz emulatora, podobne problemy nie zostały zauważone, jednakże w przypadku urządzeń o ograniczonej mocy obliczeniowej, aplikacja zachowywała się mało responsywnie i zacinała się.
                     \item \textbf{Błędy związane z przesyłaniem zdjęć \enquote{spotów}}: Przesyłanie zdjęć obrazujących miejsca do jazdy było niemożliwe, a próba przesłania obrazu kończyła się błędem, co nie spełniało postawionych projektowi założeń inżynierskich. Głównymi przyczynami zidentyfikowanych błędów były błędy konfiguracyjne warstwy serwerowej i niezgodności formatowania danych przesyłanych z urządzeń mobilnych. 
                 \end{itemize}
+
+    \subsubsection{Wdrożone poprawki}
+
+                W odpowiedzi na zidentyfikowane problemy wdrożono modyfikacje w warstwie interfejsu użytkownika, logice analizy danych oraz na serwerze \textit{API}. Główne zmiany obejmowały:
+                \begin{itemize}
+                    \item \textbf{Filtrowanie wyników o niskiej pewności}: W celu ograniczenia wpływu niższej dokłądności modelu na końcowe doświaczenie użytkownika, wprowadzono próg akceptacji predykcji. Aplikacja weryfikuje wartość wyjściową funkcji \texttt{Softmax} dla najwyżej ocenionej klasy. Jeżeli nie przekracza ona zdefiniowanego empirycznie pułapu 75\%, proces zostaje przerwany, a wynik odrzucony jako nierozpoznany. Zapobiega to prezentowaniu wyników o wysokim prawdopodobieństwie błędu.
+                    \item \textbf{Implementacja funkcji pomocniczych}: W celu poprawy dokładności klasyfikacji modelu opracowano dodatkowe metody analityczne: funkcję \texttt{\_torsoAngle} służącą do wykrywania rotacji tułowia oraz mapę współczynników korygujących, modyfikującą wagi prawdopodobieństwa dla poszczególnych klas. Dokładność działania modelu po wprowadzeniu tych funkcji pomocniczych wynosiła 80\%, czego przy 50 nagraniach nie można uznać za znaczącą poprawę.
+                    \item \textbf{Optymalizacja wydajności}: Problem z brakiem responsywności aplikacji rozwiązano przenosząc pętlę analizującą wideo i wywołującą model do wyizolowanego wątku w tle. W warstwie wizualnej dodano również graficzne wskaźniki ładowania, blokujące możliwość wielokrotkego wywoływania zdarzeń dotykowych w trakcie trwania obliczń. Czas inferencji zredukowano z kilku minut do kilkudziesięciu sekund dzięki wdrożeniu mechanizmów zmiany rozdzielczości klatek, normalizacji analizowanych plików oraz przedzieleniu czterech wątków procesora do obsługi środowiska \textit{TensorFlow Lite}.
+                    \item \textbf{Korekta konfiguracji przesyłania plików}: Błędy związane z przesyłaniem obrazów wyeliminowano poprzez zmianę wartości zmiennej środowiskowej \texttt{SUPABASE\_BUCKET} oraz modyfikację kodu backendu tak, aby przed przekazaniem pliku do chmury dodawany był do niego wymagany nagłówek \texttt{Content-Type:image/jpeg}.
+                \end{itemize}
+
+        Faza testowania odegrała kluczową rolę w weryfikacji przyjętych założeń architektonicznych i generalnej poprawy działania projektu. Zrealizowane scenariusze testowe pozwoliły na identyfikację i eliminację błędów komunikacyjnych między serwerem, a aplikacją, natomiast optymalizacje wydajnościowe poprawiły responsywność interfejsu i zmniejszyły czas detekcji triku. Mimo iż ostateczna skuteczność modułu klasyfikacji trików na urządzeniach mobilnych okazała się niższa niż w warunkach treningowych, uzyskany wynik pozwala na funkcjonalne wykorzystanie aplikacji w praktyce. 

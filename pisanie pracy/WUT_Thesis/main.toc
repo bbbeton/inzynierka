@@ -1,0 +1,55 @@
+\babel@toc {polish}{}\relax 
+\setcounter {tocdepth}{-1}
+\contentsline {section}{Wykaz symboli i skrótów}{9}{section*.2}%
+\setcounter {tocdepth}{3}
+\contentsline {section}{\numberline {1\relax .\enspace }Wstęp}{11}{section.1}%
+\contentsline {section}{\numberline {2\relax .\enspace }Przegląd istniejących rozwiązań}{13}{section.2}%
+\contentsline {subsection}{\numberline {2.1\relax .\enspace }Aplikacje dedykowane dla społeczności deskorolkowej}{13}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2\relax .\enspace }Analiza ruchu w sporcie: Wideo a czujniki sprzętowe}{16}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3\relax .\enspace }Modele wizyjnej analizy ruchu}{17}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4\relax .\enspace }Podsumowanie}{19}{subsection.2.4}%
+\contentsline {section}{\numberline {3\relax .\enspace }Założenia i architektura systemu}{21}{section.3}%
+\contentsline {subsection}{\numberline {3.1\relax .\enspace }Wymagania funkcjonalne i niefunkcjonalne}{21}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2\relax .\enspace }Wybór technologii}{21}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1\relax .\enspace }Podejście IoT (czujnikowe)}{22}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2\relax .\enspace }Podejście wizyjne (\textit {Edge AI})}{23}{subsubsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.3\relax .\enspace }Architektura systemu}{24}{subsection.3.3}%
+\contentsline {section}{\numberline {4\relax .\enspace }Projekt interfejsu użytkownika}{26}{section.4}%
+\contentsline {subsection}{\numberline {4.1\relax .\enspace }Założenia projektowe i makiety aplikacji}{26}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2\relax .\enspace }Nawigacja i główne ekrany aplikacji}{26}{subsection.4.2}%
+\contentsline {subsubsection}{\numberline {4.2.1\relax .\enspace }Ekran mapy (\textit {Spot Map})}{27}{subsubsection.4.2.1}%
+\contentsline {subsubsection}{\numberline {4.2.2\relax .\enspace }Ekran wykrywania trików (\textit {Detect Trick})}{28}{subsubsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.3\relax .\enspace }Interakcja użytkownika z modułem rozpoznawania trików}{30}{subsection.4.3}%
+\contentsline {section}{\numberline {5\relax .\enspace }Opracowanie modułu sztucznej inteligencji}{31}{section.5}%
+\contentsline {subsection}{\numberline {5.1\relax .\enspace }Zbiór danych treningowych}{31}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2\relax .\enspace }Ekstrakcja cech i estymacja pozy}{32}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3\relax .\enspace }Preprocessing i normalizacja danych}{32}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4\relax .\enspace }Architektura modelu klasyfikacyjnego}{33}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5\relax .\enspace }Trenowanie modelu i konwersja TensorFlow Lite}{35}{subsection.5.5}%
+\contentsline {section}{\numberline {6\relax .\enspace }Budowa aplikacji mobilnej i warstwy serwerowej}{38}{section.6}%
+\contentsline {subsection}{\numberline {6.1\relax .\enspace }Struktura projektu w środowisku Flutter}{38}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2\relax .\enspace }Integracja modułu mapy}{38}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3\relax .\enspace }Obsługa kamery i zarządzanie plikami wideo}{39}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4\relax .\enspace }Integracja modułu TensorFlow Lite z aplikacją}{41}{subsection.6.4}%
+\contentsline {subsubsection}{\numberline {6.4.1\relax .\enspace }Estymacja pozy}{41}{subsubsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.2\relax .\enspace }Klasyfikacja trików}{41}{subsubsection.6.4.2}%
+\contentsline {subsection}{\numberline {6.5\relax .\enspace }Architektura i implementacja warstwy serwerowej}{43}{subsection.6.5}%
+\contentsline {subsection}{\numberline {6.6\relax .\enspace }Baza danych oraz przechowywanie zasobów multimedialnych}{44}{subsection.6.6}%
+\contentsline {subsection}{\numberline {6.7\relax .\enspace }Interfejs użytkownika aplikacji}{46}{subsection.6.7}%
+\contentsline {section}{\numberline {7\relax .\enspace }Testy oraz analiza wyników}{49}{section.7}%
+\contentsline {subsection}{\numberline {7.1\relax .\enspace }Środowisko testowe}{49}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2\relax .\enspace }Ewaluacja skuteczności modelu sztucznej inteligencji}{49}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1\relax .\enspace }Scenariusze testowe i zbiór ewaluacyny}{49}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2\relax .\enspace }Wyniki klasyfikacji i ich analiza}{50}{subsubsection.7.2.2}%
+\contentsline {subsubsection}{\numberline {7.2.3\relax .\enspace }Testy wydajnościowe i optymalizacja czasu wnioskowania}{51}{subsubsection.7.2.3}%
+\contentsline {subsection}{\numberline {7.3\relax .\enspace }Testy funkcjonalne aplikacji mobilnej}{53}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {7.3.1\relax .\enspace }Scenariusze i przypadki testowe}{53}{subsubsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.2\relax .\enspace }Testy niezawodności i obsługa wyjątków}{55}{subsubsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.3\relax .\enspace }Wyniki testów}{56}{subsubsection.7.3.3}%
+\contentsline {subsection}{\numberline {7.4\relax .\enspace }Podsumowanie testów}{57}{subsection.7.4}%
+\contentsline {subsubsection}{\numberline {7.4.1\relax .\enspace }Napotkane trudności}{57}{subsubsection.7.4.1}%
+\contentsline {subsubsection}{\numberline {7.4.2\relax .\enspace }Wdrożone poprawki}{57}{subsubsection.7.4.2}%
+\contentsline {section}{\numberline {8\relax .\enspace }Podsumowanie}{59}{section.8}%
+\contentsline {section}{Spis rysunków}{61}{section.8}%
+\contentsline {section}{Spis tabel}{62}{section.8}%
+\contentsline {section}{Spis załączników}{63}{section*.25}%
