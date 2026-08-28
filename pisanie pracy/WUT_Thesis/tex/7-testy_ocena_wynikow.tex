@@ -39,7 +39,7 @@
                 \end{tabularx}
             \end{table}
 
-            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip} (71\%) oraz \textit{Pressure Flip} (50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót.Trzy próby zostały sklasyfikowane jako nierozpoznane, ze względu na pewność niższą od 75\%. Komunikat wyświetlany użytkownikowi w przypadku odrzucenia triku widoczny jest na rysunku \ref{fig:below75}.
+            Z zebranych danych wynika, że najlepiej rozpoznawanym trikiem jest \textit{Frontside 180}, przy którym nie zarejstrowano żadnej błędnej klasyfikacji. Słabsze wyniki uzyskano dla trików polegających na obrocie deski, czyli: \textit{Kickflip} (62,5\%), \textit{Heelflip} (71\%) oraz \textit{Pressure Flip} (50\%). Model najczęściej mylił je z \textit{Ollie}, co może być spowodowane podobnym ruchem tułowia w trakcie wykonywania tych trików. Dodatkowo, ograniczenia aparatów w smartfonach mogą powodować problemy z rejestrowaniem szybkiego ruchu stopy, który jest kluczowy w odróżnianiu tych sztuczek od siebie nawzajem. W przypadku błędnej klasyfikacji trików z obrotem deski, algorytm \textit{MoveNet} gubił pozycję stóp, co powodowało rejestrację jedynie podskoku sylwetki, pomijając charakterystyczne kopnięcie, które wprawia deskorolkę w obrót. Trzy próby zostały sklasyfikowane jako nierozpoznane, ze względu na pewność niższą od 75\%. Komunikat wyświetlany użytkownikowi w przypadku odrzucenia triku widoczny jest na rysunku \ref{fig:below75}.
 
             \begin{figure}[!h]
                 \centering \includegraphics[width=0.4\linewidth]{img/below75.png}
@@ -105,6 +105,8 @@
 Pomiary wykonane po wdrożeniu poprawek wykazały spadek czasu analizy na wszystkich testowanych środowiskach uruchomieniowych. Na urządzeniu \textit{Mode1 Retro II} najdłuższy zarejestrowany czas analizy zmniejszył się z 295 do 30 sekund. Na pozostałych urządzeniach czas wnioskowania nie przekroczył 20 sekund. Aplikacja w trakcie analizy triku działała płynnie i bez zauważalnej różnicy w porównaniu do działania bez wykonywania analizy w tle.
 
 Redukcja czasu przetwarzania jest wynikiem nałożenia się na siebie wdrożonych modyfikacji. Zmiana rozdzielczości obrazu oraz ich ujednolicenie zmniejszyły objętość macierzy przekazywanych do modelu sztucznej inteligencji. Z kolei przypisanie czterech wątków w konfiguracji środowiska \textit{TensorFlow Lite} przyspieszyło wykonywanie operacji matematycznych przez procesor urządzenia, a przeniesienie obliczeń do wyizolowanego wątku zapobiegło blokowaniu zasobów powiązanych z renderowaniem interfejsu graficznego.
+
+Wprowadzone modyfikacje optymalizacyjne, w szczególności agresywne skalowanie rozdzielczości klatek wejściowych do stałego rozmiaru $256\times256$ pikseli, mogły wpłynąć negatywnie na dokładność detekcji. Obniżenie szczegółowości obrazu bywa krytyczne w przypadku szybkich, dynamicznych ruchów deskorolki, ponieważ mniejsza rozdzielczość utrudnia modelu \textit{MoveNet} precyzyjne śledzenie drobnych elementów, takich jak ułożenie stóp czy krawędzi deski w warunkach gorszego oświetlenia. Kompromis ten okazał się jednak konieczny – z punktu widzenia użyteczności aplikacji mobilnej drastyczne skrócenie czasu oczekiwania na wynik i zapewnienie pełnej płynności interfejsu miało wyższy priorytet niż precyzja, czyniąc ostateczny system bardziej użytecznym.
             
     \subsection{Testy funkcjonalne aplikacji mobilnej}
 
@@ -114,18 +116,17 @@ Redukcja czasu przetwarzania jest wynikiem nałożenia się na siebie wdrożonyc
 
                 Do weryfikacji interfejsu użytkownika i logiki biznesowej przygotowano cztery manualne przypadki testowe, które miały sprawdzić najważniejsze funkcje systemu:
                 \begin{itemize}
-                    \item \textbf{Scenariusz 1}: Dodanie nowego \enquote{spotu} z opisem, zdjęciem, współrzędnymi, nazwą i poziomem trudności, a nastepnie sprawdzenie czy pojawi się on poprawnie na mapie na drugim urządzeniu/
+                    \item \textbf{Scenariusz 1}: Dodanie nowego \enquote{spotu} z opisem, zdjęciem, współrzędnymi, nazwą i poziomem trudności, a nastepnie sprawdzenie czy pojawi się on poprawnie na mapie na drugim urządzeniu.
                     \item \textbf{Scenariusz 2}: Próba dodania spotu blisko już istniejącego, w celu weryfikacji blokad po stronie serwera.
                     \item \textbf{Scenariusz 3}: Użycie filtrów na mapie, aby wyświetlić tylko wybrane rodzaje przeszkód.
                     \item \textbf{Scenariusz 4}: Symulacja braku połączenia internetowego podczas korzystania z mapy, aby sprawdzić zachowanie aplikacji w sytuacji awaryjnej.
                 \end{itemize}
 
+                Logikę backendu zweryfikowano za pomocą zautomatyzowanych testów jednostkowych. Wszystkie przeprowadzone testy zakończyły się powodzeniem, potwierdzając poprawne działanie warstwy serwerowej. Przykładową funkcję testową, za pomocą której przeprowadzano testy, przedstawiono na listingu \ref{lst:backend_tests}.
 
-                Logikę backendu zweryfikowano za pomocą zautomatyzowanych testów jednostkowych. Na listingu \ref{lst:backend_tests} przedstawiono fragment kodu testowego odpowiedzialnego za sprawdzenie integralności plików oraz geolokalizacji.
-
-                \begin{lstlisting}[
+                \begin{code}[
     language=Python,
-    caption={Fragment testów backendu weryfikujących logikę tworzenia \enquote{spotów}.},
+    caption={Funkcja testująca poprawne przesyłanie i usuwanie \enquote{spotów}.},
     label={lst:backend_tests}
 ]
 def test_delete_spot_removes_uploaded_file(client):
@@ -140,24 +141,9 @@ def test_delete_spot_removes_uploaded_file(client):
     assert file_path.exists()
     deleted = client.delete(f"/spots/{created['id']}")
     assert deleted.status_code == 204
-    assert not file_path.exists()
+    assert not file_path.exists()\end{code}
 
-def test_create_spot_rejects_too_close_location(client):
-    _create_spot(client)
-    response = client.post(
-        "/spots",
-        json={
-            "name": "Nearby Spot",
-            "type": "Street",
-            "address": "Warsaw",
-            "latitude": 52.22972,
-            "longitude": 21.01222,
-        },
-    )
-    assert response.status_code == 409
-\end{lstlisting}
-
-                Szczegółowe zestawienie testów backendu zostało przedstawione w tabeli \ref{tab:pytest_cases}.
+Opracowany zestaw testów jednostkowych stanowi fundament stabilności całej warstwy serwerowej, pozwalając na szybkie wykrywanie błędów podczas wprowadzania modyfikacji w kodzie źródłowym. Automatyzacja procesu weryfikacji umożliwia symulowanie scenariuszy biznesowych, takich jak jednoczesne odpytywanie bazy przez wielu użytkowników czy próby wstrzyknięcia niepoprawnych danych geograficznych, co podnosi bezpieczeństwo oraz niezawodność warstwy serwerowej. Szczegółowe zestawienie wszystkich przeprowadzonych przypadków testowych wraz z ich końcowym rezultatem zostało zaprezentowane w tabeli \ref{tab:pytest_cases}.
 
                 \begin{table}[!ht] \centering
     \caption{Zestawienie testów jednostkowych warstwy serwerowej, Źródło: [opracowanie własne].}
@@ -168,7 +154,7 @@ def test_create_spot_rejects_too_close_location(client):
         Operacje CRUD \enquote{spotów} & Tworzenie, pobieranie listy, pobieranie szczegółów, aktualizacja oraz usuwanie pojedynczego obiektu. & Pozytywny \\ \hline
         Walidacja współrzędnych & Odrzucanie zapytań (błąd 422) zawierających matematycznie niepoprawne współrzędne geograficzne. & Pozytywny \\ \hline
         Walidacja multimediów & Zezwalanie na upload zdjęć oraz skuteczne blokowanie plików z niedozwolonym rozszerzeniem (np. \texttt{.txt}). & Pozytywny \\ \hline
-        Ograniczenia zapytań & Test zabezpieczenia anty-spamowego (\textit{rate limit}). Blokada operacji (błąd 429) po 20 powtórzeniach. & Pozytywny \\ \hline
+        Ograniczenia zapytań & Test zabezpieczenia anty–spamowego (\textit{rate limit}). Blokada operacji (błąd 429) po 20 powtórzeniach. & Pozytywny \\ \hline
         Filtrowanie wulgaryzmów & Zablokowanie operacji (błąd 400), gdy opis lub nazwa nowo tworzonego spotu zawiera zablokowane słowa. & Pozytywny \\ \hline
         Walidacja duplikatów & Odrzucenie próby utworzenia obiektu o nazwie, która jest już przypisana do innej lokalizacji. & Pozytywny \\ \hline
         Weryfikacja dystansu & Zablokowanie przesyłu danych, jeśli w bardzo bliskiej odległości od podanych współrzędnych istnieje już punkt. & Pozytywny \\ \hline
@@ -176,13 +162,13 @@ def test_create_spot_rejects_too_close_location(client):
     \end{tabularx}
 \end{table}
 
-            Interfejs użytkownika aplikacji został przetestowany za pomocą biblioteki \texttt{flutter\_test}. Fragment kodu testowego odpowiadającego za sprawdzenie poprawnego wyrenderowania się komunikatu o błędzie przedstawiono na listingu \ref{lst:flutter_tests}.
+Interfejs użytkownika aplikacji został przetestowany za pomocą biblioteki \texttt{flutter\_test}, a fragment kodu testowego odpowiadającego za sprawdzenie poprawnego wyrenderowania się komunikatu o błędzie przedstawiono na listingu \ref{lst:flutter_tests}.
 
-\begin{lstlisting}[
-    language=Dart,
-        caption={Fragment testu widżetów weryfikującego renderowanie błędu na ekranie mapy.},
-    label={lst:flutter_tests}
-]
+        \begin{code}[
+            language=Dart,
+            caption={Fragment testu widżetów weryfikującego renderowanie błędu na ekranie mapy.},
+            label={lst:flutter_tests}
+        ]
 testWidgets('MapScreen shows backend error state', (tester) async {
   await tester.pumpWidget(
     MaterialApp(
@@ -191,26 +177,25 @@ testWidgets('MapScreen shows backend error state', (tester) async {
         spotApi: FakeSkateSpotApi(shouldFail: true),),),);
   await tester.pumpAndSettle();
   expect(find.text('Could not load skate spots.'), findsOneWidget);
-    }
-);
-\end{lstlisting}
+});        \end{code} 
+Pozwoliło to na automatyczną weryfikację poprawności renderowania poszczególnych widżetów oraz reakcji systemu na stany awaryjne.Przeprowadzone scenariusze testowe skupiały się na sprawdzeniu stabilności ekranów w warunkach braku połączenia internetowego oraz przy wystąpieniu błędów po stronie serwera. Automatyzacja testów interfejsu gwarantuje, że kluczowe elementy wizualne oraz komunikaty błędów będą wyświetlane poprawnie niezależnie od wprowadzanych w przyszłości zmian w kodzie źródłowym aplikacji.
 
 Szczegółowe zestawienie wykonanych testów zostało przedstawione w tabeli \ref{tab:flutter_cases}. Skupiono się na trzech obszarach: parsowaniu danych wejściowych, komunikacji sieciowej oraz prawidłowym renderowaniu interfejsu.
 
-            \begin{table}[!ht] \centering
-    \caption{Zestawienie testów jednostkowych aplikacji mobilnej, Źródło: [opracowanie własne].}
-    \label{tab:flutter_cases}
-    \begin{tabularx}{\textwidth}{ | l | X | c | } \hline
-        \textbf{Moduł / Komponent} & \textbf{Cel i opis przypadku testowego} & \textbf{Wynik} \\ \hline
-        Deserializacja JSON & Weryfikacja metody \texttt{SkateSpot.fromJson}. Sprawdzenie parsowania danych odebranych z serwera na obiekty. & Pozytywny \\ \hline
-        Serializacja JSON & Weryfikacja metody \texttt{toCreateJson}. Upewnienie się, że przed wysłaniem pomijane są pola systemowe (np. ID). & Pozytywny \\ \hline
-        Komunikacja z API & Test usługi \texttt{SkateSpotApi}. Prawidłowe pobranie odpowiedzi z kodem 200 i konwersja do wewnętrznych typów. & Pozytywny \\ \hline
-        Obsługa błędów API & Weryfikacja poprawnego przechwytywania błędu serwera przy zapisie. Wyrzucenie bezpiecznego wyjątku \texttt{HttpException}. & Pozytywny \\ \hline
-        Konfiguracja adresu & Test dynamicznego przypisywania adresu URL serwera i poprawnego ignorowania końcowych ukośników (slashy). & Pozytywny \\ \hline
-        Widget: Mapa (Sukces) & Renderowanie widoku \texttt{MapScreen}. Weryfikacja, czy pobrany sztucznie \enquote{spot} poprawnie i stabilnie pojawia się na mapie. & Pozytywny \\ \hline
-        Widget: Mapa (Błąd) & Renderowanie \texttt{MapScreen} przy wymuszonym błędzie sieciowym. Weryfikacja poprawnego komunikatu błędu na ekranie. & Pozytywny \\ \hline
-    \end{tabularx}
-\end{table}
+        \begin{table}[!ht] \centering
+            \caption{Zestawienie testów jednostkowych aplikacji mobilnej, Źródło: [opracowanie własne].}
+            \label{tab:flutter_cases}
+            \begin{tabularx}{\textwidth}{ | l | X | c | } \hline
+                \textbf{Moduł / Komponent} & \textbf{Cel i opis przypadku testowego} & \textbf{Wynik} \\ \hline
+                Deserializacja JSON & Weryfikacja metody \texttt{SkateSpot.fromJson}. Sprawdzenie parsowania danych odebranych z serwera na obiekty. & Pozytywny \\ \hline
+                Serializacja JSON & Weryfikacja metody \texttt{toCreateJson}. Upewnienie się, że przed wysłaniem pomijane są pola systemowe (np. ID). & Pozytywny \\ \hline
+                Komunikacja z API & Test usługi \texttt{SkateSpotApi}. Prawidłowe pobranie odpowiedzi z kodem 200 i konwersja do wewnętrznych typów. & Pozytywny \\ \hline
+                Obsługa błędów API & Weryfikacja poprawnego przechwytywania błędu serwera przy zapisie. Wyrzucenie bezpiecznego wyjątku \texttt{HttpException}. & Pozytywny \\ \hline
+                Konfiguracja adresu & Test dynamicznego przypisywania adresu URL serwera i poprawnego ignorowania końcowych ukośników (slashy). & Pozytywny \\ \hline
+                Widget: Mapa (Sukces) & Renderowanie widoku \texttt{MapScreen}. Weryfikacja, czy pobrany sztucznie \enquote{spot} poprawnie i stabilnie pojawia się na mapie. & Pozytywny \\ \hline
+                Widget: Mapa (Błąd) & Renderowanie \texttt{MapScreen} przy wymuszonym błędzie sieciowym. Weryfikacja poprawnego komunikatu błędu na ekranie. & Pozytywny \\ \hline
+            \end{tabularx}
+        \end{table}
 
             \subsubsection{Testy niezawodności i obsługa wyjątków}
 
@@ -223,13 +208,13 @@ Szczegółowe zestawienie wykonanych testów zostało przedstawione w tabeli \re
     \begin{subfigure}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/blad2.png}
-        \caption{Błąd braku pojemnika}
+        \caption{Błąd katalogu bazy danych.}
     \end{subfigure}
     \hfill
     \begin{subfigure}{0.4\textwidth}
         \centering
         \includegraphics[width=\textwidth]{img/blad3.png}
-        \caption{Błąd nieobsługiwanego formatu pliku}
+        \caption{Błąd nieobsługiwanego formatu pliku.}
     \end{subfigure}
     \caption{Zrzuty ekranu prezentujące obsługę wyjątków i komunikaty błędów w interfejsie aplikacji, Źródło: [opracowanie własne].}
     \label{fig:blad12}
@@ -241,12 +226,12 @@ Analizując powyższe komunikaty błędów, można zweryfikować poprawne dział
 
                 Aplikacja przeszła pomyślnie wszystkie zaplanowane scenariusze manualne. W przypadku utraty połączenia, program nie zamykał się niespodziewanie, lecz przechwytywał wyjątek sieciowy i wyświetlał na ekranie komunikat informujący o problemie z pobraniem danych. Prawidłowo działało również mapowanie odpowiedzi w formacie \textit{JSON} na struktury danych w języku \textit{Dart}.
 
-                Testy backendu potwierdziły, że serwer prawidłowo weryfikuje nadchodzące żądania - np. skutecznie limituje liczbę zapytań od jednego użytkownika oraz odrzuca próby utworzenia spotów leżących zbyt blisko siebie. Endpointy odpowiedzialne za obsługę zdjęć również pomyślnie przeszły testy, odrzucając pliki z nieprawidłowymi rozszerzeniami (np. dokumenty tekstowe) oraz prawidłowo usuwa powiązane fotografie z dysku podczas usuwania spotu z bazy danych.
+                Testy backendu potwierdziły, że serwer prawidłowo weryfikuje nadchodzące żądania – np. skutecznie limituje liczbę zapytań od jednego użytkownika oraz odrzuca próby utworzenia spotów leżących zbyt blisko siebie. Endpointy odpowiedzialne za obsługę zdjęć również pomyślnie przeszły testy, odrzucając pliki z nieprawidłowymi rozszerzeniami (np. dokumenty tekstowe) oraz prawidłowo usuwa powiązane fotografie z dysku podczas usuwania spotu z bazy danych.
 
                 Przeprowadzone testy niezawodnościowe pokazały komunikat błędu \texttt{502} Bad Gateway, który uniemożliwiał publikowanie zdjęć na platfornie. Komunikaty błędów bazy danych pozwoliły na identyfikację i korektę dwóch konkretnych błędów:
                 \begin{enumerate}
                     \item \textbf{Błąd \texttt{404} Bucket not found}, który był spowodowany wprowadzeniem nieprawidłowej wartości zmiennej środowiskowej definiującej nazwę docelowego katalogu plików w konfiguracji bazy danych. Wyeliminowano go poprzez korektę zmiennej \texttt{SUPABASE\_BUCKET} na platformie internetowej serwera.
-                    \item \textbf{Błąd \texttt{415} Invalid mime type} dotyczący nieobsługiwanego formatu \texttt{MIME}. Występował on podczas przesyłania zdjęć z fizycznych urządzeń z systemem \textit{Android}. W tym przypadku błąd został skorygowany poprzez edycję klasy adaptera, tak aby serwer przed wysłaniem danych nadpisywał nagłówek na wartość \texttt{Content-Type:image/jpeg}.
+                    \item \textbf{Błąd \texttt{415} Invalid mime type} dotyczący nieobsługiwanego formatu \texttt{MIME}. Występował on podczas przesyłania zdjęć z fizycznych urządzeń z systemem \textit{Android}. W tym przypadku błąd został skorygowany poprzez edycję klasy adaptera, tak aby serwer przed wysłaniem danych nadpisywał nagłówek na wartość \texttt{Content–Type:image/jpeg}.
                 \end{enumerate}
 
         \subsection{Podsumowanie testów}
@@ -269,7 +254,7 @@ Analizując powyższe komunikaty błędów, można zweryfikować poprawne dział
                     \item \textbf{Filtrowanie wyników o niskiej pewności}: W celu ograniczenia wpływu niższej dokłądności modelu na końcowe doświaczenie użytkownika, wprowadzono próg akceptacji predykcji. Aplikacja weryfikuje wartość wyjściową funkcji \texttt{Softmax} dla najwyżej ocenionej klasy. Jeżeli nie przekracza ona zdefiniowanego empirycznie pułapu 75\%, proces zostaje przerwany, a wynik odrzucony jako nierozpoznany. Zapobiega to prezentowaniu wyników o wysokim prawdopodobieństwie błędu.
                     \item \textbf{Implementacja funkcji pomocniczych}: W celu poprawy dokładności klasyfikacji modelu opracowano dodatkowe metody analityczne: funkcję \texttt{\_torsoAngle} służącą do wykrywania rotacji tułowia oraz mapę współczynników korygujących, modyfikującą wagi prawdopodobieństwa dla poszczególnych klas. Dokładność działania modelu po wprowadzeniu tych funkcji pomocniczych wynosiła 80\%, czego przy 50 nagraniach nie można uznać za znaczącą poprawę.
                     \item \textbf{Optymalizacja wydajności}: Problem z brakiem responsywności aplikacji rozwiązano przenosząc pętlę analizującą wideo i wywołującą model do wyizolowanego wątku w tle. W warstwie wizualnej dodano również graficzne wskaźniki ładowania, blokujące możliwość wielokrotkego wywoływania zdarzeń dotykowych w trakcie trwania obliczń. Czas inferencji zredukowano z kilku minut do kilkudziesięciu sekund dzięki wdrożeniu mechanizmów zmiany rozdzielczości klatek, normalizacji analizowanych plików oraz przedzieleniu czterech wątków procesora do obsługi środowiska \textit{TensorFlow Lite}.
-                    \item \textbf{Korekta konfiguracji przesyłania plików}: Błędy związane z przesyłaniem obrazów wyeliminowano poprzez zmianę wartości zmiennej środowiskowej \texttt{SUPABASE\_BUCKET} oraz modyfikację kodu backendu tak, aby przed przekazaniem pliku do chmury dodawany był do niego wymagany nagłówek \texttt{Content-Type:image/jpeg}.
+                    \item \textbf{Korekta konfiguracji przesyłania plików}: Błędy związane z przesyłaniem obrazów wyeliminowano poprzez zmianę wartości zmiennej środowiskowej \texttt{SUPABASE\_BUCKET} oraz modyfikację kodu backendu tak, aby przed przekazaniem pliku do chmury dodawany był do niego wymagany nagłówek \texttt{Content–Type:image/jpeg}.
                 \end{itemize}
 
         Faza testowania odegrała kluczową rolę w weryfikacji przyjętych założeń architektonicznych i generalnej poprawy działania projektu. Zrealizowane scenariusze testowe pozwoliły na identyfikację i eliminację błędów komunikacyjnych między serwerem, a aplikacją, natomiast optymalizacje wydajnościowe poprawiły responsywność interfejsu i zmniejszyły czas detekcji triku. Mimo iż ostateczna skuteczność modułu klasyfikacji trików na urządzeniach mobilnych okazała się niższa niż w warunkach treningowych, uzyskany wynik pozwala na funkcjonalne wykorzystanie aplikacji w praktyce. 

@@ -1,16 +1,20 @@
 \babel@toc {polish}{}\relax 
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Czujnik \textit {Skategrounds} montowany do podstawy \textit {trucka} deskorolki, Źródło: \blx@tocontentsinit {0}\cite {skategrounds_tech}.}}{14}{figure.caption.3}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Urządzenie \textit {Spinnax FREAK} oraz dedykowana aplikacja mobilna, Źródło: \blx@tocontentsinit {0}\cite {spinnax_com}.}}{15}{figure.caption.4}%
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Schemat czujnikowej architektury systemu, Źródło: [Opracowanie własne].}}{22}{figure.caption.6}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Schemat hybrydowej architektury systemu, Źródło: [Opracowanie własne].}}{23}{figure.caption.7}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Schemat wizyjnej architektury systemu, Źródło: [Opracowanie własne].}}{24}{figure.caption.8}%
-\contentsline {figure}{\numberline {4.1}{\ignorespaces Makieta ekranu mapy aplikacji, Źródło: [Opracowanie własne].}}{27}{figure.caption.9}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Makieta ekranu detekcji triku aplikacji, Źródło: [Opracowanie własne].}}{28}{figure.caption.10}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Makieta ekranu historii trików aplikacji, Źródło: [Opracowanie własne].}}{29}{figure.caption.11}%
-\contentsline {figure}{\numberline {5.1}{\ignorespaces Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego, Źródło: [opracowanie własne].}}{36}{figure.caption.12}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Macierz pomyłek klasyfikatora na zbiorze testowym, Źródło: [opracowanie własne].}}{37}{figure.caption.13}%
-\contentsline {figure}{\numberline {6.1}{\ignorespaces Ekrany zakładki mapy w aplikacji, Źródło: [Opracowanie własne].}}{46}{figure.caption.15}%
-\contentsline {figure}{\numberline {6.2}{\ignorespaces Główne ekrany modułu mapy aplikacji, Źródło: [Opracowanie własne].}}{47}{figure.caption.16}%
-\contentsline {figure}{\numberline {6.3}{\ignorespaces Ekrany zakładki analizy trików deskorolkowych, Źródło: [Opracowanie własne].}}{48}{figure.caption.17}%
-\contentsline {figure}{\numberline {7.1}{\ignorespaces Komunikat o błędzie w wykrywaniu triku, Źródło: [opracowanie własne].}}{51}{figure.caption.19}%
-\contentsline {figure}{\numberline {7.2}{\ignorespaces Zrzuty ekranu prezentujące obsługę wyjątków i komunikaty błędów w interfejsie aplikacji, Źródło: [opracowanie własne].}}{56}{figure.caption.24}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Ekran główny aplikacji \textit {findskatespots.com}, Źródło: \blx@tocontentsinit {0}\cite {findskatespots}.}}{11}{figure.caption.2}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Czujnik \textit {Skategrounds} montowany do podstawy \textit {trucka} deskorolki, Źródło: \blx@tocontentsinit {0}\cite {skategrounds_tech}.}}{12}{figure.caption.3}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Urządzenie \textit {Spinnax FREAK} oraz dedykowana aplikacja mobilna, Źródło: \blx@tocontentsinit {0}\cite {spinnax_com}.}}{13}{figure.caption.4}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Schemat czujnikowej architektury systemu, Źródło: [Opracowanie własne].}}{20}{figure.caption.6}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Schemat hybrydowej architektury systemu, Źródło: [Opracowanie własne].}}{21}{figure.caption.7}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Schemat wizyjnej architektury systemu, Źródło: [Opracowanie własne].}}{22}{figure.caption.8}%
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Makieta ekranu mapy aplikacji, Źródło: [Opracowanie własne].}}{25}{figure.caption.9}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Makieta ekranu detekcji triku aplikacji, Źródło: [Opracowanie własne].}}{26}{figure.caption.10}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Makieta ekranu historii trików aplikacji, Źródło: [Opracowanie własne].}}{27}{figure.caption.11}%
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Uproszczony opisowy schemat blokowy klasyfikatora, Źródło: [opracowanie własne].}}{32}{figure.caption.13}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Macierz pomyłek klasyfikatora na zbiorze testowym, Źródło: [opracowanie własne].}}{35}{figure.caption.17}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Krzywe uczenia modelu splotowego dla zbioru treningowego i walidacyjnego, Źródło: [opracowanie własne].}}{36}{figure.caption.18}%
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Schemat przepływu i separacji danych w systemie, Źródło: [opracowanie własne].}}{43}{figure.caption.25}%
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Ekrany zakładki mapy w aplikacji, Źródło: [Opracowanie własne].}}{45}{figure.caption.28}%
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Główne ekrany modułu mapy aplikacji, Źródło: [Opracowanie własne].}}{46}{figure.caption.29}%
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Schemat przepływu danych w procesie rozpoznawania triku, Źródło: [opracowanie własne].}}{47}{figure.caption.30}%
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Ekrany zakładki analizy trików deskorolkowych, Źródło: [Opracowanie własne].}}{47}{figure.caption.31}%
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Komunikat o błędzie w wykrywaniu triku, Źródło: [opracowanie własne].}}{51}{figure.caption.33}%
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Zrzuty ekranu prezentujące obsługę wyjątków i komunikaty błędów w interfejsie aplikacji, Źródło: [opracowanie własne].}}{56}{figure.caption.40}%

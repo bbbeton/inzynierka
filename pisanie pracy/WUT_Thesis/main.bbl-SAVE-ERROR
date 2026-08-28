@@ -19,6 +19,23 @@
 
 \refsection{0}
   \datalist[entry]{none/global//global/global/global}
+    \entry{findskatespots}{online}{}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{title}{FindSkateSpots.com}
+      \field{urlday}{4}
+      \field{urlmonth}{6}
+      \field{urlyear}{2025}
+      \field{year}{2025}
+      \field{urldateera}{ce}
+      \verb{urlraw}
+      \verb https://findskatespots.com
+      \endverb
+      \verb{url}
+      \verb https://findskatespots.com
+      \endverb
+    \endentry
     \entry{wikipedia_skatespots}{online}{}{}
       \name{author}{1}{}{%
         {{hash=b6aea1a416c89509a7df1cbb69249cb6}{%
@@ -33,8 +50,8 @@
       \strng{authornamehash}{b6aea1a416c89509a7df1cbb69249cb6}
       \strng{authorfullhash}{b6aea1a416c89509a7df1cbb69249cb6}
       \strng{authorfullhashraw}{b6aea1a416c89509a7df1cbb69249cb6}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{title}{Skatespots --- {W}ikipedia{,} The Free Encyclopedia}
@@ -50,26 +67,9 @@
       \verb https://en.wikipedia.org/wiki/Skatespots
       \endverb
     \endentry
-    \entry{findskatespots}{online}{}{}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
-      \field{labeltitlesource}{title}
-      \field{title}{FindSkateSpots.com}
-      \field{urlday}{4}
-      \field{urlmonth}{6}
-      \field{urlyear}{2025}
-      \field{year}{2025}
-      \field{urldateera}{ce}
-      \verb{urlraw}
-      \verb https://findskatespots.com
-      \endverb
-      \verb{url}
-      \verb https://findskatespots.com
-      \endverb
-    \endentry
     \entry{skatespot_home}{online}{}{}
-      \field{sortinit}{3}
-      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \field{labeltitlesource}{title}
       \field{title}{SkateSpot – Find Skate Spots Near You}
       \field{urlday}{4}
@@ -85,8 +85,8 @@
       \endverb
     \endentry
     \entry{skategrounds_tech}{online}{}{}
-      \field{sortinit}{4}
-      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
       \field{labeltitlesource}{title}
       \field{title}{Skategrounds -- Smart Skateboarding Sensor}
       \field{urlday}{4}
@@ -102,8 +102,8 @@
       \endverb
     \endentry
     \entry{spinnax_com}{online}{}{}
-      \field{sortinit}{7}
-      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
       \field{labeltitlesource}{title}
       \field{title}{Spinnax -- Real-time Skateboarding Analytics}
       \field{urlday}{4}
@@ -239,8 +239,8 @@
       \strng{authornamehash}{5dcb8226de514f8ff093e7fd8b2b35e8}
       \strng{authorfullhash}{11a4fd5992d9ce5f825830cd61a944f3}
       \strng{authorfullhashraw}{11a4fd5992d9ce5f825830cd61a944f3}
-      \field{sortinit}{1}
-      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{journaltitle}{IEEE Internet of Things Journal}
@@ -365,7 +365,6 @@
       \endverb
     \endentry
   \enddatalist
-  \missing{fig:map1}
 \endrefsection
 \endinput
 

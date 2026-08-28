@@ -19,27 +19,27 @@
 \addbibresource{bibliografia.bib} % Plik .bib z bibliografią
 
 % --- Zmniejszenie odstępów wokół rysunków i tabel ---
-\setlength{\intextsep}{10pt plus 2pt minus 2pt}   % Odstęp dla rysunków z opcją [h] lub [H]
-\setlength{\textfloatsep}{10pt plus 2pt minus 2pt} % Odstęp rysunku od tekstu na górze/dole strony
-\setlength{\abovecaptionskip}{8pt}                % Odstęp między rysunkiem a podpisem (pod rysunkiem)
-\setlength{\belowcaptionskip}{0pt}                % Odstęp pod podpisem
-
+% --- Ujednolicenie odstępów wokół rysunków, tabel i listingów ---
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}   % Odstęp dla obiektów w tekście [h]
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt} % Odstęp na górze/dole strony
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}    % Odstęp pomiędzy dwoma kodami obok siebie
+\setlength{\abovecaptionskip}{8pt}                % Odstęp między obiektem a podpisem
+\setlength{\belowcaptionskip}{0pt}           % Odstęp pod podpisem            % Odstęp pod podpisem
+\raggedbottom
 \begin{document}
 
 %--------------------------------------
 % Strona tytułowa
 %--------------------------------------
 \EngineerThesis% Dla pracy inżynierskiej mamy \EngineerThesis
-\instytut{Zakład Systemów Telekomunikacyjnych}
+\instytut{Telekomunikacji i Cyberbezpieczeństwa}
 \kierunek{Inżynieria Internetu Rzeczy}
 %\specjalnosc{Systemy wbudowane i Internet Rzeczy}
 \title{
-    Rozpoznawanie trików deskorolkowych w 
-    aplikacji mobilnej z funkcją mapowania skateparków
+    Rozpoznawanie trików deskorolkowych w aplikacji mobilnej z funkcją mapowania skateparków
 }
 \engtitle{ % Tytuł po angielsku do angielskiego streszczenia
-    Skateboard trick recognition in a mobile application 
-    with skatepark mapping functionality
+    Recognition of skateboard tricks in mobile app with skatepark mapping function
 }
 \author{Jan Błoniarz}
 \album{321007}
@@ -51,22 +51,13 @@
 % Streszczenie po polsku
 %--------------------------------------
 \cleardoublepage % Zaczynamy od nieparzystej strony
-\streszczenie \lipsum[1-3]
-\slowakluczowe XXX, XXX, XXX
+\streszczenie W niniejszej pracy przedstawiono aplikację mobilną integrującą mapę obiektów sportowych z modułem analizy trików deskorolkowych. System zaprojektowano z uwzględnieniem przetwarzania danych bezpośrednio na urządzeniu końcowym. Do ekstrakcji cech szkieletowych wykorzystano model \textit{Google MoveNet Thunder}, który lokalizuje 17 punktów kluczowych sylwetki. Klasyfikacja sekwencji ruchów opiera się na jednowymiarowej splotowej sieci neuronowej (\textit{1D-CNN}) przekonwertowanej do formatu \textit{TensorFlow Lite}. Warstwę mobilną zaimplementowano w technologii \textit{Flutter}, natomiast warstwę danych i map oparto na usługach \textit{PostgreSQL} oraz \textit{Supabase}. W pracy opisano architekturę systemu, proces przygotowania danych, a także wyniki testów wydajnościowych i funkcjonalnych przeprowadzonych na rzeczywistych urządzeniach.
+\slowakluczowe deskorolka, uczenie maszynowe, aplikacja mobilna, wizja komputerowa, praca inżynierska
 
-%--------------------------------------
-% Streszczenie po angielsku
-%--------------------------------------
 \newpage
-\abstract \kant[1-3]
-\keywords XXX, XXX, XXX
+\abstract This thesis presents a mobile application integrating a skatepark map with a skateboarding trick analysis module. The system is designed to perform data processing directly on the edge device. For skeletal feature extraction, the \textit{Google MoveNet Thunder} model is utilized to locate 17 key points of the user's pose. The classification of movement sequences relies on a one-dimensional convolutional neural network (\textit{1D-CNN}) converted into the \textit{TensorFlow Lite} format. The mobile frontend is implemented in \textit{Flutter}, while the database and mapping layer use \textit{PostgreSQL} and \textit{Supabase} services. The thesis describes the system architecture, data preparation process, and the results of performance and functional tests conducted on physical devices.
+\keywords skateboard, machine learning, mobile application, computer vision, engineering thesis
 
-%--------------------------------------
-% Oświadczenie o autorstwie
-%--------------------------------------
-\cleardoublepage  % Zaczynamy od nieparzystej strony
-\pagestyle{plain}
-\makeauthorship
 
 %--------------------------------------
 % Spis treści
@@ -79,7 +70,6 @@
 \addtocontents{toc}{\protect\setcounter{tocdepth}{3}}
 \acronym{EiTI}{Wydział Elektroniki i Technik Informacyjnych}
 \acronym{PW}{Politechnika Warszawska}
-\acronym{WEIRD}{ang. \emph{Western, Educated, Industrialized, Rich and Democratic}}
 \acronym{UI/UX}{ang. \emph{User Interface/User Experience}}
 \acronym{SI}{Sztuczna Inteligencja}
 \acronym{AI}{ang. \emph{Artificial Intelligence}}
@@ -139,16 +129,16 @@
 \newpage         % vertical space
 \listoftablestoc      % Spis tabel.
 \newpage          % vertical space
-\listofappendicestoc  % Spis załączników
+%\listofappendicestoc  % Spis załączników
 
 % Załączniki
-\newpage
-\appendix{Nazwa załącznika 1}
-\lipsum[1-8]
+% \newpage
+% \appendix{Nazwa załącznika 1}
+% \lipsum[1-8]
 
-\newpage
-\appendix{Nazwa załącznika 2}
-\lipsum[1-4]
+% \newpage
+% \appendix{Nazwa załącznika 2}
+% \lipsum[1-4]
 
 % Używając powyższych spisów jako szablonu,
 % możesz tu dodać swój własny wykaz bądź listę,

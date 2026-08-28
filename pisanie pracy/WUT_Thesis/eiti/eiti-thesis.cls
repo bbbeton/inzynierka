@@ -84,8 +84,8 @@
     commentstyle=\color{atomcomment}\itshape,
     numberstyle=\tiny\color{atomcomment},
     basicstyle=\ttfamily\footnotesize,
-    breaklines=true,                  % <--- Automatyczne zawijanie długich linii kodu
-    breakatwhitespace=false,          % Zawijaj na spacjach
+    breaklines=true,                  
+    breakatwhitespace=false,          
     columns=flexible,
     captionpos=b,
     keepspaces=true,
@@ -95,9 +95,20 @@
     showstringspaces=false,
     tabsize=2,
     xleftmargin=6mm,
-    frame=single,                     % Estetyczna ramka wokół kodu
+    frame=single,                     
     rulecolor=\color{lightgray}
 }
+
+% Czyste środowisko, bez żadnych uciążliwych minipage
+% Source - https://tex.stackexchange.com/a/10146
+% Posted by Tiago Veloso, modified by community. See post 'Timeline' for change history
+% Retrieved 2026-08-24, License - CC BY-SA 2.5
+
+% Snippet Listings
+\lstnewenvironment{code}[1][]
+    {\lstset{float=htp,#1}} 
+    {}
+
 \RequirePackage{longtable}  % Multi-page tables
 \RequirePackage{multirow}   % Advanced table cells
 \RequirePackage{setspace}   % Set space between lines
@@ -111,6 +122,8 @@
 \RequirePackage{tabularx}
 \RequirePackage{ragged2e}
 \usepackage{subcaption}
+\usepackage{tikz}
+\RequirePackage{etoolbox}
 %--------------------------------------
 % PdfTeX specific configuration
 %--------------------------------------
